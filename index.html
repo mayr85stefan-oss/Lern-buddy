@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v121</title>
+<title>Master Lern-App Final v122</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -57,8 +57,8 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 <div class="wrap">
   <div class="card">
     <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App v121</h1>
-    <div class="muted">Fehlerfrei. Übersetzungs-Bug gelöst. Konfiguration optimiert.</div>
+    <h1>Master Lern-App v122</h1>
+    <div class="muted">Cache-Leak gefixt. Nächste-Frage-Buttons nach oben geholt.</div>
     <div class="row" style="margin-top:10px">
       <div class="badge" id="pointsBadge">0 Punkte</div>
       <div class="badge" id="streakBadge">Serie: 0</div>
@@ -124,7 +124,6 @@ const CONFIG = {
   SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co",
   
   // 2. Welches KI-Modell soll genutzt werden? 
-  // Falls Fehler 404 kommt, ändere es hier auf "gemini-1.5-flash"
   GEMINI_MODEL: "gemini-2.5-flash" 
 };
 
@@ -229,11 +228,11 @@ function setRating(id, level, mode){
 function getRating(id){ return progress.ratings && progress.ratings[id] ? progress.ratings[id] : null; }
 function renderRatingControls(item, mode){
   const r = getRating(item.id); const active = (x)=> r && r.level===x ? " active" : "";
-  return `<div class="ratingRow" style="background: #f1f5f9; border-radius: 12px; padding: 12px; margin-top: 14px;">
-    <div class="muted" style="width:100%; font-weight: bold; margin-bottom: 8px;">Frage abgeschlossen. Wie war's? (Klick lädt nächste Frage):</div>
-    <button type="button" class="ratingBtn${active('easy')}" data-rate="easy" data-mode="${mode}" style="color: #16a34a; border: 1px solid #cbd5e1;">Einfach</button>
-    <button type="button" class="ratingBtn${active('medium')}" data-rate="medium" data-mode="${mode}" style="color: #d97706; border: 1px solid #cbd5e1;">Mittel</button>
-    <button type="button" class="ratingBtn${active('hard')}" data-rate="hard" data-mode="${mode}" style="color: #dc2626; border: 1px solid #cbd5e1;">Schwierig</button>
+  return `<div class="ratingRow" style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 14px; margin-top: 14px; margin-bottom: 14px; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);">
+    <div style="width:100%; font-weight: 800; margin-bottom: 10px; color: #1e40af; font-size: 16px;">Nächste Frage laden? Bitte kurz bewerten:</div>
+    <button type="button" class="ratingBtn${active('easy')}" data-rate="easy" data-mode="${mode}" style="color: #16a34a; border: 1px solid #cbd5e1; flex: 1;">Einfach</button>
+    <button type="button" class="ratingBtn${active('medium')}" data-rate="medium" data-mode="${mode}" style="color: #d97706; border: 1px solid #cbd5e1; flex: 1;">Mittel</button>
+    <button type="button" class="ratingBtn${active('hard')}" data-rate="hard" data-mode="${mode}" style="color: #dc2626; border: 1px solid #cbd5e1; flex: 1;">Schwierig</button>
   </div>`;
 }
 function attachRatingHandlers(scope, item){
@@ -305,7 +304,17 @@ function renderQuiz(){const item=currentItem(),box=$("quizBody"); if(!item){box.
     return `<button class="option${active}${cls}" data-opt="${i}" ${dis}>${esc(o.text)}</button>`
   }).join(""); 
   
-  box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(item.question)}</h2><div class="muted" style="margin-top:6px">Tippe die Aussagen an, die fachlich passen.</div></div><div style="margin-top:14px">${optHtml}${revealed?`<div class="${progress.status[item.id]==='known'?'good':progress.status[item.id]==='unsure'?'mid':'bad'}"><div style="font-weight:700">${progress.status[item.id]==='known'?'Richtig':'Feedback'}</div><div style="margin-top:8px">${esc(item.explanation)}</div><div class="merksatz" style="margin-top:8px">Merksatz: ${esc(item.merksatz)}</div></div>`:""}<div class="toolRow" style="margin-top:12px">${!revealed?'<button class="primary" id="quizCheckBtn">Antwort prüfen</button>':''}<button id="quizCoachBtn">Coach öffnen</button></div>${revealed?renderRatingControls(item,"quiz"):""}<div id="quizCoachBox" class="coachbox hidden"></div></div>`; 
+  box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(item.question)}</h2><div class="muted" style="margin-top:6px">Tippe die Aussagen an, die fachlich passen.</div></div>
+  <div style="margin-top:14px">
+    ${optHtml}
+    <div class="toolRow" style="margin-top:12px">
+      ${!revealed?'<button class="primary" id="quizCheckBtn">Antwort prüfen</button>':''}
+      <button id="quizCoachBtn">Coach öffnen</button>
+    </div>
+    ${revealed?renderRatingControls(item,"quiz"):""}
+    ${revealed?`<div class="${progress.status[item.id]==='known'?'good':progress.status[item.id]==='unsure'?'mid':'bad'}"><div style="font-weight:700">${progress.status[item.id]==='known'?'Richtig':'Feedback'}</div><div style="margin-top:8px">${esc(item.explanation)}</div><div class="merksatz" style="margin-top:8px">Merksatz: ${esc(item.merksatz)}</div></div>`:""}
+    <div id="quizCoachBox" class="coachbox hidden"></div>
+  </div>`; 
   
   box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{
     if(revealed) return;
@@ -318,7 +327,19 @@ function renderQuiz(){const item=currentItem(),box=$("quizBody"); if(!item){box.
   if(revealed) attachRatingHandlers(box,item);
 }
 
-function renderCards(){const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='<div class="muted">Keine Karteikarten verfügbar.</div>'; return} box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(flashRevealed?item.explanation:item.question)}</h2>${flashRevealed?`<div class="merksatz" style="margin-top:12px">Merksatz: ${esc(item.merksatz)}</div>`:''}</div><div class="toolRow" style="margin-top:14px"><button class="primary" id="flipBtn">${flashRevealed?'Vorderseite':'Karte drehen'}</button><button id="cardCoachBtn">Coach öffnen</button></div>${flashRevealed?renderRatingControls(item,"cards"):""}<div id="cardCoachBox" class="coachbox hidden"></div>`; $("flipBtn").onclick=()=>{flashRevealed=!flashRevealed; renderCards()}; $("cardCoachBtn").onclick=()=>{$("cardCoachBox").classList.remove("hidden"); renderCoachBox("cardCoachBox",item)}; if(flashRevealed) attachRatingHandlers(box,item);}
+function renderCards(){const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='<div class="muted">Keine Karteikarten verfügbar.</div>'; return} 
+  box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(flashRevealed?item.explanation:item.question)}</h2>${flashRevealed?`<div class="merksatz" style="margin-top:12px">Merksatz: ${esc(item.merksatz)}</div>`:''}</div>
+  <div class="toolRow" style="margin-top:14px">
+    <button class="primary" id="flipBtn">${flashRevealed?'Vorderseite':'Karte drehen'}</button>
+    <button id="cardCoachBtn">Coach öffnen</button>
+  </div>
+  ${flashRevealed?renderRatingControls(item,"cards"):""}
+  <div id="cardCoachBox" class="coachbox hidden"></div>`; 
+  
+  $("flipBtn").onclick=()=>{flashRevealed=!flashRevealed; renderCards()}; 
+  $("cardCoachBtn").onclick=()=>{$("cardCoachBox").classList.remove("hidden"); renderCoachBox("cardCoachBox",item)}; 
+  if(flashRevealed) attachRatingHandlers(box,item);
+}
 
 function localEvaluate(item,text){const txt=(text||"").toLowerCase(), must=(item.mustHave||[]).map(x=>String(x).toLowerCase()), found=must.filter(k=>txt.includes(k)); if(txt.trim().length<6) return {cls:"bad",label:"Zu kurz",body:"Bitte nenne mindestens einen fachlichen Kernpunkt.",status:"unknown",found}; if(found.length>=Math.max(2,Math.ceil(must.length/2))) return {cls:"good",label:"Gut",body:"Mehrere Kernpunkte sind enthalten.",status:"known",found}; if(found.length>=1) return {cls:"mid",label:"Teilweise",body:"Einige Kernpunkte fehlen.",status:"unsure",found}; return {cls:"bad",label:"Nicht ausreichend",body:"Keine zentralen Kernpunkte erkannt.",status:"unknown",found}}
 
@@ -342,6 +363,8 @@ function renderOpen(){
     </div>
     <div class="helper" style="margin-top:8px" id="openStatusLine">Hinweis: Spracheingabe füllt das Feld. Danach einfach auf "Text bewerten" klicken.</div>
   </div>
+  
+  ${revealed ? renderRatingControls(item,"open") : ""}
 
   ${revealed ? `
   <div class="soft" style="margin-top:14px; border: 2px solid var(--border);">
@@ -352,7 +375,6 @@ function renderOpen(){
       <div class="answerScroll" style="margin-top:10px; font-weight:500;">${esc(item.explanation)}</div>
       <div style="margin-top:10px"><strong>Kernpunkte:</strong> ${(item.mustHave||[]).map(x=>`<span class="pill">${esc(x)}</span>`).join("")}</div>
     </div>
-    ${renderRatingControls(item,"open")}
   </div>
   ` : ""}
 
@@ -473,8 +495,35 @@ function renderDashboard(){
 }
 
 function renderTopics(){const data=currentData(),box=$("topicBoxes"); if(!data){box.innerHTML='<div class="muted">Noch kein JSON importiert.</div>'; return} box.innerHTML=`<div class="soft"><div style="font-weight:700">${esc(data.ueberthema)}</div><div class="muted" style="margin-top:8px">Importierter Prüfungstrainer für ${esc(profile)}.</div><div style="margin-top:10px">${data.unterthemen.map(u=>`<div class="soft" style="margin-bottom:10px"><div style="font-weight:700">${esc(u.name)}</div><div class="muted">${(u.fragen||[]).length} Fragen</div></div>`).join("")}</div></div>`}
-function debouncedLocalSave(){try{const draftKey="ml_final_draft_"+profile+"_"+area+"_"+topic; localStorage.setItem(draftKey, JSON.stringify({openText, selected, revealed, flashRevealed, scale, offsetX, offsetY, brushSize, tool}));}catch(e){}}
-function restoreDraft(){try{const draftKey="ml_final_draft_"+profile+"_"+area+"_"+topic; const raw=localStorage.getItem(draftKey); if(!raw) return; const d=JSON.parse(raw); openText=d.openText||""; selected=d.selected||[]; revealed=!!d.revealed; flashRevealed=!!d.flashRevealed; scale=typeof d.scale==="number"?d.scale:scale; offsetX=typeof d.offsetX==="number"?d.offsetX:offsetX; offsetY=typeof d.offsetY==="number"?d.offsetY:offsetY; brushSize=typeof d.brushSize==="number"?d.brushSize:brushSize; tool=d.tool||tool;}catch(e){}}
+
+function debouncedLocalSave(){
+    try{
+        const item = currentItem(); if(!item) return;
+        const draftKey="ml_draft_v4_"+profile+"_"+item.id; 
+        localStorage.setItem(draftKey, JSON.stringify({openText, selected, scale, offsetX, offsetY, brushSize, tool}));
+    }catch(e){}
+}
+function restoreDraft(){
+    try{
+        const item = currentItem(); if(!item) return;
+        const draftKey="ml_draft_v4_"+profile+"_"+item.id; 
+        const raw=localStorage.getItem(draftKey); 
+        if(!raw) return; 
+        const d=JSON.parse(raw); 
+        
+        // Verhindert den Leak: Alter Text wird NUR bei unbeantworteten Fragen geladen
+        if (!progress.status[item.id]) {
+            openText=d.openText||""; 
+            selected=d.selected||[]; 
+        }
+        
+        scale=typeof d.scale==="number"?d.scale:scale; 
+        offsetX=typeof d.offsetX==="number"?d.offsetX:offsetX; 
+        offsetY=typeof d.offsetY==="number"?d.offsetY:offsetY; 
+        brushSize=typeof d.brushSize==="number"?d.brushSize:brushSize; 
+        tool=d.tool||tool;
+    }catch(e){}
+}
 function renderAll(){restoreDraft(); renderHeader();renderProfiles();renderSelectors();renderQuiz();renderCards();renderOpen();renderDashboard();renderTopics()}
 
 document.querySelectorAll(".tab").forEach(btn=>{btn.onclick=()=>{document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); const map={quiz:"quizTab",cards:"cardsTab",open:"openTab",dashboard:"dashboardTab",topics:"topicsTab"}; Object.values(map).forEach(id=>$(id).classList.add("hidden")); $(map[btn.dataset.tab]).classList.remove("hidden"); if(btn.dataset.tab==="open") setTimeout(updateCanvasTransform,50)}})
@@ -482,7 +531,7 @@ $("voiceToggle").onchange=e=>voiceEnabled=e.target.checked;
 $("resetProgressBtn").onclick=()=>{if(!confirm("Wirklich den Fortschritt dieses Profils zurücksetzen?")) return; progress=JSON.parse(JSON.stringify(DEFAULT_PROGRESS)); saveProgress(); renderAll()}
 
 /* =========================
-   CANVAS: GOODNOTES-STYLE (Pen=Draw, Finger=Pan/Zoom)
+   CANVAS: GOODNOTES-STYLE
 ========================= */
 function mountCanvas(){const vp=$("canvasViewport"); if(vp&&!vp.contains(canvas)) vp.appendChild(canvas)}
 function updateCanvasTransform(){canvas.style.transform=`translate(${offsetX}px, ${offsetY}px) scale(${scale})`}
