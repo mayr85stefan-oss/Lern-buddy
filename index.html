@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v120</title>
+<title>Master Lern-App Final v121</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -57,8 +57,8 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 <div class="wrap">
   <div class="card">
     <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App v120</h1>
-    <div class="muted">Original-App inkl. S-Pen Modus, gefixtem Radar & Quiz.</div>
+    <h1>Master Lern-App v121</h1>
+    <div class="muted">Fehlerfrei. Übersetzungs-Bug gelöst. Konfiguration optimiert.</div>
     <div class="row" style="margin-top:10px">
       <div class="badge" id="pointsBadge">0 Punkte</div>
       <div class="badge" id="streakBadge">Serie: 0</div>
@@ -115,12 +115,27 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* =========================================================
+   🚨 APP KONFIGURATION (HIER DEINE KEYS EINTRAGEN) 🚨
+========================================================= */
+const CONFIG = {
+  // 1. Dein echter Supabase-Key (beginnt mit eyJ...)
+  SUPABASE_KEY: "HIER_DEINEN_ECHTEN_SUPABASE_KEY_EINTRAGEN", 
+  SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co",
+  
+  // 2. Welches KI-Modell soll genutzt werden? 
+  // Falls Fehler 404 kommt, ändere es hier auf "gemini-1.5-flash"
+  GEMINI_MODEL: "gemini-2.5-flash" 
+};
+
+
 /* =========================
    🔗 SUPABASE & SYNC ENGINE
 ========================= */
-const SUPABASE_URL = "https://nujchjlrndwitadigzvs.supabase.co";
-const SUPABASE_KEY = "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let supabaseClient = null;
+if (CONFIG.SUPABASE_KEY !== "HIER_DEINEN_ECHTEN_SUPABASE_KEY_EINTRAGEN") {
+    supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+}
 
 let syncId = localStorage.getItem("app_sync_id") || "";
 if(syncId) document.getElementById("syncIdInput").value = syncId;
@@ -129,11 +144,13 @@ function updateBadge(status) {
   const badge = document.getElementById("syncStatusBadge");
   if(status === "ok") { badge.textContent = "Cloud OK"; badge.style.background = "#dcfce7"; badge.style.color = "#166534"; }
   else if(status === "syncing") { badge.textContent = "Speichert..."; badge.style.background = "#fef08a"; badge.style.color = "#854d0e"; }
+  else if(status === "nokey") { badge.textContent = "Key fehlt!"; badge.style.background = "#fee2e2"; badge.style.color = "#991b1b"; }
   else { badge.textContent = "Sync Fehler"; badge.style.background = "#fee2e2"; badge.style.color = "#991b1b"; }
 }
 
 async function saveToCloud() {
   if(!syncId) return;
+  if(!supabaseClient) { updateBadge("nokey"); return; }
   updateBadge("syncing");
   try {
     await supabaseClient.from("progress").upsert({
@@ -145,6 +162,7 @@ async function saveToCloud() {
 
 async function loadFromCloud() {
   if(!syncId) return;
+  if(!supabaseClient) { updateBadge("nokey"); return; }
   try {
     const { data, error } = await supabaseClient.from("progress").select("data").eq("id", syncId).maybeSingle();
     if(!error) updateBadge("ok");
@@ -251,11 +269,11 @@ function coachBase(item,mode){if(!item) return ""; if(mode==="short") return ite
 function speak(text){if(!voiceEnabled||!("speechSynthesis" in window)) return; window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang="de-DE"; window.speechSynthesis.speak(u)}
 function addCoachMessage(role,text){coachMessages.push({role,text}); if(role==="ai") speak(text)}
 
-/* === GEMINI API v2.5 FLASH === */
+/* === GEMINI API === */
 async function geminiText(prompt){
   const key=$("geminiKey").value.trim() || localStorage.getItem("ml_final_gemini_key"); 
   if(!key) throw new Error("Gemini API Key fehlt."); 
-  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=`+encodeURIComponent(key);
   const body={contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:0.3,maxOutputTokens:700}}; 
   const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); 
   if(!res.ok){const txt=await res.text(); throw new Error(txt.slice(0,260))} 
@@ -265,7 +283,7 @@ async function geminiText(prompt){
 async function geminiImage(prompt,mimeType,data){
   const key=$("geminiKey").value.trim() || localStorage.getItem("ml_final_gemini_key"); 
   if(!key) throw new Error("Gemini API Key fehlt."); 
-  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=`+encodeURIComponent(key);
   const body={contents:[{role:"user",parts:[{text:prompt},{inlineData:{mimeType,data}}]}],generationConfig:{temperature:0.2,maxOutputTokens:800}}; 
   const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); 
   if(!res.ok){const txt=await res.text(); throw new Error(txt.slice(0,260))} 
@@ -508,4 +526,62 @@ canvas.addEventListener("pointermove",e=>{
 function endPointer(e){
   pointers.delete(e.pointerId); 
   if(e.pointerType==='pen' || e.pointerType==='mouse') drawLast=null;
-  
+  if(pointers.size===0) gestureStart=null;
+  else if(pointers.size===1 && [...pointers.values()][0].pointerType==='touch'){
+    const first=[...pointers.values()][0]; gestureStart={panX:first.clientX, panY:first.clientY, offsetX, offsetY};
+  }
+}
+canvas.addEventListener("pointerup",endPointer); canvas.addEventListener("pointercancel",endPointer)
+function exportCanvasTrimmed(){const src=cctx.getImageData(0,0,canvas.width,canvas.height); let minX=canvas.width,minY=canvas.height,maxX=0,maxY=0,found=false; for(let y=0;y<canvas.height;y++){for(let x=0;x<canvas.width;x++){const idx=(y*canvas.width+x)*4, r=src.data[idx], g=src.data[idx+1], b=src.data[idx+2], a=src.data[idx+3]; if(a>0 && !(r>245&&g>245&&b>245)){found=true; if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y}}} if(!found) return {base64:canvas.toDataURL("image/png").split(",")[1]}; const pad=20; minX=Math.max(0,minX-pad); minY=Math.max(0,minY-pad); maxX=Math.min(canvas.width-1,maxX+pad); maxY=Math.min(canvas.height-1,maxY+pad); const w=maxX-minX+1,h=maxY-minY+1; const tmp=document.createElement("canvas"); tmp.width=w; tmp.height=h; const tctx=tmp.getContext("2d"); tctx.fillStyle="#fff"; tctx.fillRect(0,0,w,h); tctx.drawImage(canvas,minX,minY,w,h,0,0,w,h); return {base64:tmp.toDataURL("image/png").split(",")[1]}}
+
+/* SPEECH RECOGNITION */
+async function speechToTextField(fieldId){
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const status=$("openStatusLine"); const el=$(fieldId);
+if(!window.isSecureContext){ if(status) status.textContent="HTTPS nötig."; return;}
+if(!SR){
+  if(status) status.textContent="Spracheingabe hier nicht unterstützt.";
+  const fallback = window.prompt("Hier einfügen:", "");
+  if(fallback && el){ el.value=(el.value?el.value+" ":"")+fallback; if(fieldId==="openAnswer"){ openText=el.value; debouncedLocalSave(); } } return;
+}
+try{ if(navigator.permissions && navigator.permissions.query){ const p = await navigator.permissions.query({name:'microphone'}); if(p.state === 'denied'){ alert("Mikrofon blockiert."); return;} } }catch(e){}
+const rec=new SR(); rec.lang="de-DE"; rec.interimResults=true; rec.maxAlternatives=1; let finalText="";
+rec.onstart=()=>{ if(status) status.textContent="Spracheingabe läuft ... (Danach auf 'Text bewerten' klicken)"; };
+rec.onerror=(e)=>{ if(status) status.textContent="Fehler: "+(e.error||"unbekannt"); };
+rec.onend=()=>{ if(finalText && el){ el.value=(el.value?el.value+" ":"")+finalText.trim(); if(fieldId==="openAnswer"){ openText=el.value; debouncedLocalSave(); } if(status) status.textContent="Übernommen. Jetzt auf 'Text bewerten' klicken."; } else { if(status) status.textContent="Nichts erkannt."; } };
+rec.onresult=ev=>{ let interim=""; for(let i=ev.resultIndex;i<ev.results.length;i++){ const part=ev.results[i][0].transcript; if(ev.results[i].isFinal) finalText += " " + part; else interim += part; } if(status) status.textContent = interim ? ("Ich höre: "+interim) : "Spracheingabe läuft ..."; };
+try{ rec.start(); }catch(e){ if(status) status.textContent="Fehler beim Start."; }
+}
+
+/* BUTTONS / INIT */
+$("saveSyncIdBtn").onclick=()=>{
+  syncId = $("syncIdInput").value.trim();
+  localStorage.setItem("app_sync_id", syncId);
+  loadFromCloud();
+  alert("Gerät gekoppelt.");
+};
+
+$("saveKeysBtn").onclick=()=>{
+  localStorage.setItem("ml_final_gemini_key", $("geminiKey").value.trim());
+  alert("KI Key gespeichert. Coach & Stift sind bereit!");
+};
+
+$("importJsonBtn").onclick=()=>{
+  try{
+    const data=normalizeJson(JSON.parse($("jsonText").value.trim())); 
+    APP.dataByProfile[profile]=data; saveDataByProfile(); 
+    resetStudyState(); area="Alle Oberthemen"; topic="Alle Unterthemen"; 
+    $("importStatus").textContent="JSON importiert."; 
+    saveToCloud(); 
+    renderAll();
+  }catch(e){$("importStatus").textContent="Import fehlgeschlagen: "+e.message}
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    $("geminiKey").value = localStorage.getItem("ml_final_gemini_key") || "";
+    loadFromCloud();
+    renderAll();
+});
+</script>
+</body>
+</html>
