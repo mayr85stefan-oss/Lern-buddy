@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v117</title>
+<title>Master Lern-App Final v120</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -20,6 +20,7 @@ html,body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(-
 .pill{font-size:12px;margin:0 8px 8px 0}
 button,input,select,textarea{font:inherit;border-radius:14px;padding:12px 14px}
 button{border:1px solid var(--border);background:#fff;cursor:pointer} button.primary{background:var(--dark);color:#fff;border-color:var(--dark)}
+button:disabled{opacity:0.6;cursor:not-allowed}
 input,select,textarea{width:100%;border:1px solid var(--border);background:#fff} textarea{resize:vertical}
 .tabbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;border:1px solid var(--border);padding:6px;border-radius:16px;background:#fff}
 .tab.active{background:var(--dark);color:#fff}.hidden{display:none!important}
@@ -30,20 +31,20 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
   .focusQuestion h2{font-size:24px;line-height:1.2;margin:0}
   .focusQuestion .fq-meta{display:none}
 }
-.option{display:block;width:100%;text-align:left;border:1px solid var(--border);margin:0 0 10px;background:#fff}
-.option.active{background:#e2e8f0}.option.correct{background:var(--good)}.option.wrong{background:var(--bad)}
+.option{display:block;width:100%;text-align:left;border:1px solid var(--border);margin:0 0 10px;background:#fff;transition:0.2s}
+.option.active{background:#e2e8f0}.option.correct{background:var(--good);border-color:#10b981}.option.wrong{background:var(--bad);border-color:#ef4444}
 .good,.mid,.bad{border-radius:16px;padding:12px;margin-top:12px}.good{background:var(--good)}.mid{background:var(--mid)}.bad{background:var(--bad)}
 .merksatz{color:var(--red);font-weight:700}
 .soft{border:1px solid var(--border);border-radius:18px;background:#fbfdff;padding:14px}.kpi{font-size:28px;font-weight:700}.statusBox{background:#eef2ff;border-left:4px solid var(--dark);padding:12px;border-radius:12px}
 .profileBtn{width:100%;text-align:left}.profileBtn.active{background:#f1f5f9}.bigEditor{min-height:180px;font-size:18px}.answerScroll{max-height:240px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .toolRow{display:flex;gap:8px;flex-wrap:wrap}
 .coachbox{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:14px}.chat-log{max-height:240px;overflow:auto;border:1px solid var(--border);border-radius:12px;padding:8px;background:#fff}.chat-user,.chat-ai{padding:10px 12px;border-radius:14px;margin-bottom:8px;white-space:pre-wrap}.chat-user{background:#ede9fe;margin-left:auto;max-width:88%}.chat-ai{background:#eef2f7;max-width:92%}
-.canvasWrap{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff}.canvasToolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border);background:#f8fafc}.canvasViewport{position:relative;width:100%;height:450px;overflow:hidden;touch-action:none;background:#fff}#drawCanvas{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0;touch-action:none}
+.canvasWrap{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff}.canvasToolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border);background:#f8fafc;align-items:center}.canvasViewport{position:relative;width:100%;height:450px;overflow:hidden;touch-action:none;background:#fff}#drawCanvas{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0;touch-action:none}
 .helper{font-size:12px;color:var(--muted)}
 .ratingRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.ratingBtn{border-radius:999px;padding:8px 12px}
-.ratingBtn.active{background:var(--dark);color:#fff;border-color:var(--dark)}
-.filterChip{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:8px 12px;margin:0 8px 8px 0;background:#fff;cursor:pointer}
+.ratingBtn{border-radius:999px;padding:8px 12px;font-weight:bold;cursor:pointer;background:#fff}
+.ratingBtn.active{background:var(--dark);color:#fff!important;border-color:var(--dark)!important}
+.filterChip{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:8px 12px;margin:0 8px 8px 0;background:#fff;cursor:pointer;font-weight:bold}
 .filterChip.active{background:var(--dark);color:#fff;border-color:var(--dark)}
 .smallScroll{max-height:220px;overflow:auto}
 .collapseHead{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
@@ -56,8 +57,8 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 <div class="wrap">
   <div class="card">
     <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App v117</h1>
-    <div class="muted">Gemini 2.5 Flash repariert. Goodnotes-Stiftmodus (Finger = Verschieben).</div>
+    <h1>Master Lern-App v120</h1>
+    <div class="muted">Original-App inkl. S-Pen Modus, gefixtem Radar & Quiz.</div>
     <div class="row" style="margin-top:10px">
       <div class="badge" id="pointsBadge">0 Punkte</div>
       <div class="badge" id="streakBadge">Serie: 0</div>
@@ -80,6 +81,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       <h3>KI Coach & API</h3>
       <div style="margin-top:10px"><input id="geminiKey" type="password" placeholder="Gemini API Key hier rein..."></div>
       <div class="row" style="margin-top:10px"><button id="saveKeysBtn" style="width:100%">KI Key speichern</button></div>
+      <div class="helper" style="margin-top:8px;color:#ef4444">Fehler 429? API-Limit erreicht. Google Cloud Billing aktivieren.</div>
       <hr class="sep">
 
       <label class="muted" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="voiceToggle" style="width:auto"> Sprachcoach vorlesen</label>
@@ -161,9 +163,12 @@ async function loadFromCloud() {
 const APP={profiles:[{id:"stefan",name:"Stefan",program:"Technischer Betriebswirt",badge:"TBW"},{id:"lolla",name:"Lolla",program:"Wirtschaftsfachwirt",badge:"WFW"}],dataByProfile:JSON.parse(localStorage.getItem("v109_dataByProfile")||"{}"),supabase:null,user:null};
 const DEFAULT_PROGRESS={points:0,streak:0,status:{},ratings:{}};
 let profile="stefan",progress=loadProgress(profile),area="Alle Oberthemen",topic="Alle Unterthemen",selected=[],revealed=false,flashRevealed=false,openText="",openResult=null,coachMessages=[],voiceEnabled=false,forcedItemId=null;
+
+/* CANVAS GLOBALS */
 const canvas=document.createElement("canvas"); canvas.width=1800; canvas.height=1200; canvas.id="drawCanvas";
 const cctx=canvas.getContext("2d"); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); cctx.lineCap="round"; cctx.lineJoin="round";
-let tool="pen",brushSize=4,scale=0.6,offsetX=0,offsetY=0,pointers=new Map(),drawLast=null,gestureStart=null;
+let tool="pen",brushSize=4,scale=0.6,offsetX=0,offsetY=0;
+let pointers=new Map(), drawLast=null, gestureStart=null;
 
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
@@ -207,7 +212,7 @@ function getRating(id){ return progress.ratings && progress.ratings[id] ? progre
 function renderRatingControls(item, mode){
   const r = getRating(item.id); const active = (x)=> r && r.level===x ? " active" : "";
   return `<div class="ratingRow" style="background: #f1f5f9; border-radius: 12px; padding: 12px; margin-top: 14px;">
-    <div class="muted" style="width:100%; font-weight: bold; margin-bottom: 8px;">Dein Feedback (Speichert & lädt nächste Frage):</div>
+    <div class="muted" style="width:100%; font-weight: bold; margin-bottom: 8px;">Frage abgeschlossen. Wie war's? (Klick lädt nächste Frage):</div>
     <button type="button" class="ratingBtn${active('easy')}" data-rate="easy" data-mode="${mode}" style="color: #16a34a; border: 1px solid #cbd5e1;">Einfach</button>
     <button type="button" class="ratingBtn${active('medium')}" data-rate="medium" data-mode="${mode}" style="color: #d97706; border: 1px solid #cbd5e1;">Mittel</button>
     <button type="button" class="ratingBtn${active('hard')}" data-rate="hard" data-mode="${mode}" style="color: #dc2626; border: 1px solid #cbd5e1;">Schwierig</button>
@@ -229,8 +234,14 @@ function filteredByDashboard(items){
   });
 }
 function attachDashboardFilterState(){
-  document.querySelectorAll("[data-dash-filter]").forEach(el=>{ el.classList.toggle("active", el.dataset.dashFilter===dashboardFilter); });
-  document.querySelectorAll("[data-dash-mode]").forEach(el=>{ el.classList.toggle("active", el.dataset.dashMode===dashboardModeFilter); });
+  document.querySelectorAll("[data-dash-filter]").forEach(el=>{ 
+    el.classList.toggle("active", el.dataset.dashFilter===dashboardFilter); 
+    el.onclick = () => { dashboardFilter = el.dataset.dashFilter; renderDashboard(); };
+  });
+  document.querySelectorAll("[data-dash-mode]").forEach(el=>{ 
+    el.classList.toggle("active", el.dataset.dashMode===dashboardModeFilter); 
+    el.onclick = () => { dashboardModeFilter = el.dataset.dashMode; renderDashboard(); };
+  });
 }
 
 function renderHeader(){const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length,unknown=vals.filter(v=>v==="unknown").length,unsure=vals.filter(v=>v==="unsure").length,acc=vals.length?Math.round((known/vals.length)*100):0; $("pointsBadge").textContent=progress.points+" Punkte"; $("streakBadge").textContent="Serie: "+progress.streak; $("accBadge").textContent="Trefferquote: "+acc+"%"; $("countsBadge").textContent=`Gewusst ${known} · Nicht gewusst ${unknown} · Unsicher ${unsure}`}
@@ -240,11 +251,10 @@ function coachBase(item,mode){if(!item) return ""; if(mode==="short") return ite
 function speak(text){if(!voiceEnabled||!("speechSynthesis" in window)) return; window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang="de-DE"; window.speechSynthesis.speak(u)}
 function addCoachMessage(role,text){coachMessages.push({role,text}); if(role==="ai") speak(text)}
 
-/* === GEMINI API v2.5 FLASH (Korrigiert für aktuelle Keys) === */
+/* === GEMINI API v2.5 FLASH === */
 async function geminiText(prompt){
   const key=$("geminiKey").value.trim() || localStorage.getItem("ml_final_gemini_key"); 
   if(!key) throw new Error("Gemini API Key fehlt."); 
-  // Zurück auf 2.5 Flash, wie es in deiner v109 erfolgreich war.
   const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+encodeURIComponent(key);
   const body={contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:0.3,maxOutputTokens:700}}; 
   const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); 
@@ -266,13 +276,35 @@ async function geminiImage(prompt,mimeType,data){
 function renderCoachBox(id,item){const box=$(id); box.innerHTML=`<div style="font-weight:700">Lerncoach</div><div class="toolRow" style="margin-top:10px"><button data-coach="short">Kurz</button><button data-coach="normal">Normal</button><button data-coach="long">Ausführlich</button><button data-coach="analogy">Analogie</button><button data-coach="exam">Prüfungsbezug</button><button id="${id}_why">Warum falsch?</button><button id="${id}_simple">Noch einfacher</button><button id="${id}_speak">Vorlesen</button><button id="${id}_mic">🎤 Sprache</button></div><div class="chat-log" id="${id}_log" style="margin-top:12px"></div><div class="row" style="margin-top:10px"><input id="${id}_input" placeholder="Frag die KI zum Thema..."><button class="primary" id="${id}_send">Senden</button></div>`; const redraw=()=>{$(id+"_log").innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join(""); $(id+"_log").scrollTop=$(id+"_log").scrollHeight}; if(!coachMessages.length) addCoachMessage("ai",coachBase(item,"normal")); redraw(); box.querySelectorAll("[data-coach]").forEach(btn=>btn.onclick=()=>{addCoachMessage("ai",coachBase(item,btn.dataset.coach)); redraw()}); $(id+"_speak").onclick=()=>{if(coachMessages.length) speak(coachMessages[coachMessages.length-1].text)}; $(id+"_mic").onclick=()=>speechToTextField(id+"_input"); $(id+"_why").onclick=()=>{addCoachMessage("ai","Typische Fehler: zu allgemein antworten, Kernpunkte auslassen und Begriffe nicht sauber abgrenzen."); redraw()}; $(id+"_simple").onclick=()=>{addCoachMessage("ai",coachBase(item,"short")); redraw()}; $(id+"_send").onclick=async()=>{const inp=$(id+"_input"); const txt=inp.value.trim(); if(!txt) return; addCoachMessage("user",txt); redraw(); inp.value=""; addCoachMessage("ai","Denke nach ..."); redraw(); try{const reply=await geminiText(`Du bist ein IHK-Lerncoach.\\nThema: ${item.topic}\\nFrage: ${item.question}\\nMusterantwort: ${item.explanation}\\nMerksatz: ${item.merksatz}\\nKernpunkte: ${(item.mustHave||[]).join(", ")}\\n\\nBenutzerfrage:\\n${txt}\\n\\nAntworte in einfachem Deutsch, kurz und prüfungsnah.`); coachMessages.pop(); addCoachMessage("ai",reply)}catch(e){coachMessages.pop(); addCoachMessage("ai","Coach-Fehler: "+e.message)} redraw()}}
 
 /* QUIZ & CARDS */
-function renderQuiz(){const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='<div class="muted">Noch keine Inhalte da. Importiere zuerst dein JSON im Tab „Themen / Import“.</div>'; return} const optHtml=item.optionMeta.map((o,i)=>{const active=selected.includes(i)?" active":""; let cls=""; if(revealed){if(o.correct) cls=" correct"; else if(selected.includes(i)) cls=" wrong"} return `<button class="option${active}${cls}" data-opt="${i}">${esc(o.text)}</button>`}).join(""); box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(item.question)}</h2><div class="muted" style="margin-top:6px">Tippe die Aussagen an, die fachlich passen.</div></div><div style="margin-top:14px">${optHtml}${revealed?`<div class="${progress.status[item.id]==='known'?'good':progress.status[item.id]==='unsure'?'mid':'bad'}"><div style="font-weight:700">${progress.status[item.id]==='known'?'Richtig':'Feedback'}</div><div style="margin-top:8px">${esc(item.explanation)}</div><div class="merksatz" style="margin-top:8px">Merksatz: ${esc(item.merksatz)}</div></div>`:""}<div class="toolRow" style="margin-top:12px">${!revealed?'<button class="primary" id="quizCheckBtn">Antwort prüfen</button>':''}<button id="quizCoachBtn">Coach öffnen</button></div>${revealed?renderRatingControls(item,"quiz"):""}<div id="quizCoachBox" class="coachbox hidden"></div></div>`; box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz()}); $("quizCoachBtn").onclick=()=>{$("quizCoachBox").classList.remove("hidden"); renderCoachBox("quizCoachBox",item)}; const check=$("quizCheckBtn"); if(check) check.onclick=()=>{const ok=arraysEqual(selected,item.answer); if(ok) setStatus(item.id,"known",10); else if(selected.length) setStatus(item.id,"unsure",3); else setStatus(item.id,"unknown",0); revealed=true; renderQuiz()}; if(revealed) attachRatingHandlers(box,item);}
+function renderQuiz(){const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='<div class="muted">Noch keine Inhalte da. Importiere zuerst dein JSON im Tab „Themen / Import“.</div>'; return} 
+  const optHtml=item.optionMeta.map((o,i)=>{
+    const active=selected.includes(i)?" active":""; 
+    let cls="", dis=""; 
+    if(revealed){
+      dis = "disabled"; 
+      if(o.correct) cls=" correct"; else if(selected.includes(i)) cls=" wrong";
+    } 
+    return `<button class="option${active}${cls}" data-opt="${i}" ${dis}>${esc(o.text)}</button>`
+  }).join(""); 
+  
+  box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(item.question)}</h2><div class="muted" style="margin-top:6px">Tippe die Aussagen an, die fachlich passen.</div></div><div style="margin-top:14px">${optHtml}${revealed?`<div class="${progress.status[item.id]==='known'?'good':progress.status[item.id]==='unsure'?'mid':'bad'}"><div style="font-weight:700">${progress.status[item.id]==='known'?'Richtig':'Feedback'}</div><div style="margin-top:8px">${esc(item.explanation)}</div><div class="merksatz" style="margin-top:8px">Merksatz: ${esc(item.merksatz)}</div></div>`:""}<div class="toolRow" style="margin-top:12px">${!revealed?'<button class="primary" id="quizCheckBtn">Antwort prüfen</button>':''}<button id="quizCoachBtn">Coach öffnen</button></div>${revealed?renderRatingControls(item,"quiz"):""}<div id="quizCoachBox" class="coachbox hidden"></div></div>`; 
+  
+  box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{
+    if(revealed) return;
+    const i=Number(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz()
+  }); 
+  
+  $("quizCoachBtn").onclick=()=>{$("quizCoachBox").classList.remove("hidden"); renderCoachBox("quizCoachBox",item)}; 
+  const check=$("quizCheckBtn"); 
+  if(check) check.onclick=()=>{const ok=arraysEqual(selected,item.answer); if(ok) setStatus(item.id,"known",10); else if(selected.length) setStatus(item.id,"unsure",3); else setStatus(item.id,"unknown",0); revealed=true; renderQuiz()}; 
+  if(revealed) attachRatingHandlers(box,item);
+}
 
 function renderCards(){const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='<div class="muted">Keine Karteikarten verfügbar.</div>'; return} box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(flashRevealed?item.explanation:item.question)}</h2>${flashRevealed?`<div class="merksatz" style="margin-top:12px">Merksatz: ${esc(item.merksatz)}</div>`:''}</div><div class="toolRow" style="margin-top:14px"><button class="primary" id="flipBtn">${flashRevealed?'Vorderseite':'Karte drehen'}</button><button id="cardCoachBtn">Coach öffnen</button></div>${flashRevealed?renderRatingControls(item,"cards"):""}<div id="cardCoachBox" class="coachbox hidden"></div>`; $("flipBtn").onclick=()=>{flashRevealed=!flashRevealed; renderCards()}; $("cardCoachBtn").onclick=()=>{$("cardCoachBox").classList.remove("hidden"); renderCoachBox("cardCoachBox",item)}; if(flashRevealed) attachRatingHandlers(box,item);}
 
 function localEvaluate(item,text){const txt=(text||"").toLowerCase(), must=(item.mustHave||[]).map(x=>String(x).toLowerCase()), found=must.filter(k=>txt.includes(k)); if(txt.trim().length<6) return {cls:"bad",label:"Zu kurz",body:"Bitte nenne mindestens einen fachlichen Kernpunkt.",status:"unknown",found}; if(found.length>=Math.max(2,Math.ceil(must.length/2))) return {cls:"good",label:"Gut",body:"Mehrere Kernpunkte sind enthalten.",status:"known",found}; if(found.length>=1) return {cls:"mid",label:"Teilweise",body:"Einige Kernpunkte fehlen.",status:"unsure",found}; return {cls:"bad",label:"Nicht ausreichend",body:"Keine zentralen Kernpunkte erkannt.",status:"unknown",found}}
 
-/* OPEN-MODUS (Reihenfolge strikt eingehalten, Canvas Re-render gestoppt) */
+/* OPEN-MODUS */
 function renderOpen(){
   const item=currentItem(),box=$("openBody");
   if(!item){box.innerHTML='<div class="muted">Keine offenen Fragen verfügbar.</div>'; return}
@@ -308,16 +340,15 @@ function renderOpen(){
 
   <div class="soft" style="margin-top:14px">
     <div class="collapseHead" id="toggleInkHead"><div style="font-weight:700">Stifteingabe (Ausklappen)</div><button type="button" id="toggleInkBtn">${window.__inkCollapsed ? "Öffnen" : "Schließen"}</button></div>
-    <div class="helper" style="margin-top:8px">Goodnotes-Modus: Stift = Schreiben. 1 Finger = Verschieben. 2 Finger = Zoomen.</div>
+    <div class="helper" style="margin-top:8px">S-Pen = Malen. 1 Finger = Verschieben. 2 Finger = Zoomen.</div>
     <div id="inkBody" class="collapseBody ${window.__inkCollapsed ? "hiddenBody" : ""}" style="margin-top:12px">
       <div class="canvasWrap">
         <div class="canvasToolbar">
           <button type="button" id="penToolBtn">Stift</button>
           <button type="button" id="eraserToolBtn">Radierer</button>
-          <span class="helper">Größe</span>
-          <input type="range" id="sizeRange" min="2" max="28" value="${brushSize}" style="width:120px">
+          <input type="range" id="sizeRange" min="2" max="28" value="${brushSize}" style="width:80px">
           <button type="button" id="clearCanvasBtn">Leeren</button>
-          <button type="button" class="primary" id="evalCanvasBtn">Stifteingabe mit KI bewerten</button>
+          <button type="button" class="primary" id="evalCanvasBtn">Stifteingabe bewerten</button>
         </div>
         <div class="canvasViewport" id="canvasViewport"></div>
       </div>
@@ -477,62 +508,4 @@ canvas.addEventListener("pointermove",e=>{
 function endPointer(e){
   pointers.delete(e.pointerId); 
   if(e.pointerType==='pen' || e.pointerType==='mouse') drawLast=null;
-  if(pointers.size===0) gestureStart=null;
-  else if(pointers.size===1 && [...pointers.values()][0].pointerType==='touch'){
-    const first=[...pointers.values()][0]; gestureStart={panX:first.clientX, panY:first.clientY, offsetX, offsetY};
-  }
-}
-canvas.addEventListener("pointerup",endPointer); canvas.addEventListener("pointercancel",endPointer)
-function exportCanvasTrimmed(){const src=cctx.getImageData(0,0,canvas.width,canvas.height); let minX=canvas.width,minY=canvas.height,maxX=0,maxY=0,found=false; for(let y=0;y<canvas.height;y++){for(let x=0;x<canvas.width;x++){const idx=(y*canvas.width+x)*4, r=src.data[idx], g=src.data[idx+1], b=src.data[idx+2], a=src.data[idx+3]; if(a>0 && !(r>245&&g>245&&b>245)){found=true; if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y}}} if(!found) return {base64:canvas.toDataURL("image/png").split(",")[1]}; const pad=20; minX=Math.max(0,minX-pad); minY=Math.max(0,minY-pad); maxX=Math.min(canvas.width-1,maxX+pad); maxY=Math.min(canvas.height-1,maxY+pad); const w=maxX-minX+1,h=maxY-minY+1; const tmp=document.createElement("canvas"); tmp.width=w; tmp.height=h; const tctx=tmp.getContext("2d"); tctx.fillStyle="#fff"; tctx.fillRect(0,0,w,h); tctx.drawImage(canvas,minX,minY,w,h,0,0,w,h); return {base64:tmp.toDataURL("image/png").split(",")[1]}}
-
-/* SPEECH RECOGNITION */
-async function speechToTextField(fieldId){
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-const status=$("openStatusLine"); const el=$(fieldId);
-if(!window.isSecureContext){ if(status) status.textContent="HTTPS nötig."; return;}
-if(!SR){
-  if(status) status.textContent="Spracheingabe hier nicht unterstützt.";
-  const fallback = window.prompt("Hier einfügen:", "");
-  if(fallback && el){ el.value=(el.value?el.value+" ":"")+fallback; if(fieldId==="openAnswer"){ openText=el.value; debouncedLocalSave(); } } return;
-}
-try{ if(navigator.permissions && navigator.permissions.query){ const p = await navigator.permissions.query({name:'microphone'}); if(p.state === 'denied'){ alert("Mikrofon blockiert."); return;} } }catch(e){}
-const rec=new SR(); rec.lang="de-DE"; rec.interimResults=true; rec.maxAlternatives=1; let finalText="";
-rec.onstart=()=>{ if(status) status.textContent="Spracheingabe läuft ... (Danach auf 'Text bewerten' klicken)"; };
-rec.onerror=(e)=>{ if(status) status.textContent="Fehler: "+(e.error||"unbekannt"); };
-rec.onend=()=>{ if(finalText && el){ el.value=(el.value?el.value+" ":"")+finalText.trim(); if(fieldId==="openAnswer"){ openText=el.value; debouncedLocalSave(); } if(status) status.textContent="Übernommen. Jetzt auf 'Text bewerten' klicken."; } else { if(status) status.textContent="Nichts erkannt."; } };
-rec.onresult=ev=>{ let interim=""; for(let i=ev.resultIndex;i<ev.results.length;i++){ const part=ev.results[i][0].transcript; if(ev.results[i].isFinal) finalText += " " + part; else interim += part; } if(status) status.textContent = interim ? ("Ich höre: "+interim) : "Spracheingabe läuft ..."; };
-try{ rec.start(); }catch(e){ if(status) status.textContent="Fehler beim Start."; }
-}
-
-/* BUTTONS / INIT */
-$("saveSyncIdBtn").onclick=()=>{
-  syncId = $("syncIdInput").value.trim();
-  localStorage.setItem("app_sync_id", syncId);
-  loadFromCloud();
-  alert("Gerät gekoppelt.");
-};
-
-$("saveKeysBtn").onclick=()=>{
-  localStorage.setItem("ml_final_gemini_key", $("geminiKey").value.trim());
-  alert("KI Key gespeichert. Coach & Stift sind bereit!");
-};
-
-$("importJsonBtn").onclick=()=>{
-  try{
-    const data=normalizeJson(JSON.parse($("jsonText").value.trim())); 
-    APP.dataByProfile[profile]=data; saveDataByProfile(); 
-    resetStudyState(); area="Alle Oberthemen"; topic="Alle Unterthemen"; 
-    $("importStatus").textContent="JSON importiert."; 
-    saveToCloud(); 
-    renderAll();
-  }catch(e){$("importStatus").textContent="Import fehlgeschlagen: "+e.message}
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-    $("geminiKey").value = localStorage.getItem("ml_final_gemini_key") || "";
-    loadFromCloud();
-    renderAll();
-});
-</script>
-</body>
-</html>
+  
