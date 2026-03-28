@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v115</title>
+<title>Master Lern-App Final v116</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -23,23 +23,23 @@ button{border:1px solid var(--border);background:#fff;cursor:pointer} button.pri
 input,select,textarea{width:100%;border:1px solid var(--border);background:#fff} textarea{resize:vertical}
 .tabbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;border:1px solid var(--border);padding:6px;border-radius:16px;background:#fff}
 .tab.active{background:var(--dark);color:#fff}.hidden{display:none!important}
-.focusQuestion{position:sticky;top:8px;z-index:2;background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
-.mobileQuestionBar{display:block}
+.focusQuestion{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+/* STICKY FRAGE FÜR PC UND MOBILE (Mitwandern über dem Stift) */
+.pinBox{position:sticky;top:8px;z-index:10;}
 @media (max-width:950px){
-  .focusQuestion{position:static;top:auto}
-  .focusQuestion .fq-meta,.focusQuestion .fq-help{display:none}
-  .focusQuestion h2{font-size:32px;line-height:1.1;margin:0}
-  .mobileQuestionBar{display:block;position:static;top:auto;z-index:auto;background:#fff;border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:10px;box-shadow:0 4px 14px rgba(0,0,0,.05);font-weight:700}
+  .pinBox{position:sticky;top:0;z-index:10;border-radius:0 0 14px 14px;margin-top:-14px}
+  .focusQuestion h2{font-size:24px;line-height:1.2;margin:0}
+  .focusQuestion .fq-meta{display:none}
 }
 .option{display:block;width:100%;text-align:left;border:1px solid var(--border);margin:0 0 10px;background:#fff}
 .option.active{background:#e2e8f0}.option.correct{background:var(--good)}.option.wrong{background:var(--bad)}
 .good,.mid,.bad{border-radius:16px;padding:12px;margin-top:12px}.good{background:var(--good)}.mid{background:var(--mid)}.bad{background:var(--bad)}
 .merksatz{color:var(--red);font-weight:700}
 .soft{border:1px solid var(--border);border-radius:18px;background:#fbfdff;padding:14px}.kpi{font-size:28px;font-weight:700}.statusBox{background:#eef2ff;border-left:4px solid var(--dark);padding:12px;border-radius:12px}
-.profileBtn{width:100%;text-align:left}.profileBtn.active{background:#f1f5f9}.bigEditor{min-height:220px;font-size:20px}.answerScroll{max-height:240px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.profileBtn{width:100%;text-align:left}.profileBtn.active{background:#f1f5f9}.bigEditor{min-height:180px;font-size:18px}.answerScroll{max-height:240px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .toolRow{display:flex;gap:8px;flex-wrap:wrap}
 .coachbox{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:14px}.chat-log{max-height:240px;overflow:auto;border:1px solid var(--border);border-radius:12px;padding:8px;background:#fff}.chat-user,.chat-ai{padding:10px 12px;border-radius:14px;margin-bottom:8px;white-space:pre-wrap}.chat-user{background:#ede9fe;margin-left:auto;max-width:88%}.chat-ai{background:#eef2f7;max-width:92%}
-.canvasWrap{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff}.canvasToolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border);background:#f8fafc}.canvasViewport{position:relative;width:100%;height:520px;overflow:hidden;touch-action:none;background:#fff}#drawCanvas{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0;touch-action:none}
+.canvasWrap{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff}.canvasToolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border);background:#f8fafc}.canvasViewport{position:relative;width:100%;height:450px;overflow:hidden;touch-action:none;background:#fff}#drawCanvas{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0;touch-action:none}
 .helper{font-size:12px;color:var(--muted)}
 .ratingRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .ratingBtn{border-radius:999px;padding:8px 12px}
@@ -47,9 +47,8 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
 .filterChip{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:8px 12px;margin:0 8px 8px 0;background:#fff;cursor:pointer}
 .filterChip.active{background:var(--dark);color:#fff;border-color:var(--dark)}
 .smallScroll{max-height:220px;overflow:auto}
- .collapseHead{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.collapseHead{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
 .collapseBody.hiddenBody{display:none}
-.pinBox{position:sticky;top:8px;z-index:3}@media (max-width:950px){.pinBox{position:static;top:auto;z-index:auto}}
 hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 #syncStatusBadge { position: absolute; top: 16px; right: 16px; font-weight: 700; }
 </style>
@@ -58,8 +57,8 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 <div class="wrap">
   <div class="card">
     <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App Final v115</h1>
-    <div class="muted">Originaler voller Funktionsumfang + Reparierte Gemini API + Finger-Stifteingabe + Sync.</div>
+    <h1>Master Lern-App Final v116</h1>
+    <div class="muted">Sticky Questions, fixierte Rating-Buttons & stabiler Canvas.</div>
     <div class="row" style="margin-top:10px">
       <div class="badge" id="pointsBadge">0 Punkte</div>
       <div class="badge" id="streakBadge">Serie: 0</div>
@@ -75,19 +74,17 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       <hr class="sep">
       
       <h3>Cloud-Sync (ID)</h3>
-      <div class="muted">Handy & Tablet koppeln.</div>
       <input type="text" id="syncIdInput" placeholder="Deine geheime ID..." style="margin-top:8px">
       <button class="primary" id="saveSyncIdBtn" style="width:100%;margin-top:8px">ID Koppeln & Laden</button>
       <hr class="sep">
 
       <h3>KI Coach & API</h3>
-      <div class="helper" style="margin-top:8px">Gib hier deinen Gemini API Key ein, damit der Coach und die Stiftbewertung funktionieren.</div>
-      <div style="margin-top:10px"><input id="geminiKey" type="password" placeholder="AIzaSy..."></div>
+      <div style="margin-top:10px"><input id="geminiKey" type="password" placeholder="Gemini API Key hier rein..."></div>
       <div class="row" style="margin-top:10px"><button id="saveKeysBtn" style="width:100%">KI Key speichern</button></div>
       <hr class="sep">
 
       <label class="muted" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="voiceToggle" style="width:auto"> Sprachcoach vorlesen</label>
-      <div class="row" style="margin-top:12px"><button id="resetProgressBtn">Gesamten Fortschritt zurücksetzen</button></div>
+      <div class="row" style="margin-top:12px"><button id="resetProgressBtn">Fortschritt zurücksetzen</button></div>
     </div>
 
     <div>
@@ -108,9 +105,9 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 
       <div id="quizTab"><div class="card"><div id="quizBody"></div></div></div>
       <div id="cardsTab" class="hidden"><div class="card"><div id="cardBody"></div></div></div>
-      <div id="openTab" class="hidden"><div class="card"><div id="openBody"></div></div></div>
+      <div id="openTab" class="hidden"><div class="card" id="openBodyWrapper"><div id="openBody"></div></div></div>
       <div id="dashboardTab" class="hidden"><div class="card"><div class="grid grid4" id="dashTop"></div><div class="grid grid4" id="dashBottom" style="margin-top:12px"></div><div class="card" style="margin-top:12px"><h3>Themenradar</h3><div id="radar"></div></div></div></div>
-      <div id="topicsTab" class="hidden"><div class="card"><div id="topicBoxes"></div><div class="card" style="margin-top:12px"><h3>JSON Import</h3><textarea id="jsonText" rows="14"></textarea><div class="row" style="margin-top:12px"><button class="primary" id="importJsonBtn">JSON importieren</button></div><div id="importStatus" class="statusBox" style="margin-top:12px">Bereit.</div></div></div></div>
+      <div id="topicsTab" class="hidden"><div class="card"><div id="topicBoxes"></div><div class="card" style="margin-top:12px"><h3>JSON Import</h3><textarea id="jsonText" rows="14" placeholder="Achtung: Neuer Upload überschreibt alte Fragen dieses Profils!"></textarea><div class="row" style="margin-top:12px"><button class="primary" id="importJsonBtn">JSON importieren</button></div><div id="importStatus" class="statusBox" style="margin-top:12px">Bereit.</div></div></div></div>
     </div>
   </div>
 </div>
@@ -127,33 +124,36 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let syncId = localStorage.getItem("app_sync_id") || "";
 if(syncId) document.getElementById("syncIdInput").value = syncId;
 
+function updateBadge(status) {
+  const badge = document.getElementById("syncStatusBadge");
+  if(status === "ok") { badge.textContent = "Cloud OK"; badge.style.background = "#dcfce7"; badge.style.color = "#166534"; }
+  else if(status === "syncing") { badge.textContent = "Speichert..."; badge.style.background = "#fef08a"; badge.style.color = "#854d0e"; }
+  else { badge.textContent = "Sync Fehler"; badge.style.background = "#fee2e2"; badge.style.color = "#991b1b"; }
+}
+
 async function saveToCloud() {
   if(!syncId) return;
-  const badge = document.getElementById("syncStatusBadge");
-  badge.textContent = "Speichert...";
+  updateBadge("syncing");
   try {
     await supabaseClient.from("progress").upsert({
-      id: syncId,
-      data: { profile: profile, progress: progress, all_data: APP.dataByProfile },
-      updated_at: new Date().toISOString()
+      id: syncId, data: { profile: profile, progress: progress, all_data: APP.dataByProfile }, updated_at: new Date().toISOString()
     });
-    badge.textContent = "Cloud OK"; badge.style.background = "#dcfce7"; badge.style.color = "#166534";
-  } catch (e) {
-    badge.textContent = "Sync Fehler"; badge.style.background = "#fee2e2"; badge.style.color = "#991b1b";
-  }
+    updateBadge("ok");
+  } catch (e) { updateBadge("error"); }
 }
 
 async function loadFromCloud() {
   if(!syncId) return;
   try {
-    const { data } = await supabaseClient.from("progress").select("data").eq("id", syncId).maybeSingle();
+    const { data, error } = await supabaseClient.from("progress").select("data").eq("id", syncId).maybeSingle();
+    if(!error) updateBadge("ok"); // Setzt sofort auf Grün, wenn Verbindung klappt!
     if (data && data.data) {
       if(data.data.all_data) APP.dataByProfile = data.data.all_data;
       if(data.data.progress) progress = data.data.progress;
       saveDataByProfile();
       renderAll();
     }
-  } catch (e) { console.log("Cloud Load Fehler"); }
+  } catch (e) { updateBadge("error"); }
 }
 
 /* =========================
@@ -171,7 +171,6 @@ function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 function storageKey(p){return "master_lernapp_v109_"+p}
 function loadProgress(p){try{return JSON.parse(localStorage.getItem(storageKey(p))||JSON.stringify(DEFAULT_PROGRESS))}catch{return JSON.parse(JSON.stringify(DEFAULT_PROGRESS))}}
 
-// ERWEITERT: Trigger Cloud Sync
 function saveProgress(){
   localStorage.setItem(storageKey(profile),JSON.stringify(progress));
   saveToCloud();
@@ -188,41 +187,31 @@ function areas(){return ["Alle Oberthemen",...new Set(allItems().map(i=>i.area))
 function topics(){return ["Alle Unterthemen",...new Set(allItems().filter(i=>area==="Alle Oberthemen"||i.area===area).map(i=>i.topic))]}
 function filtered(){return allItems().filter(i=>(area==="Alle Oberthemen"||i.area===area)&&(topic==="Alle Unterthemen"||i.topic===topic))}
 function currentItem(){
-  const a=filtered();
-  if(!a.length) return null;
-  if(forcedItemId){
-    const forced=a.find(x=>x.id===forcedItemId);
-    if(forced) return forced;
-    forcedItemId=null;
-  }
+  const a=filtered(); if(!a.length) return null;
+  if(forcedItemId){ const forced=a.find(x=>x.id===forcedItemId); if(forced) return forced; forcedItemId=null; }
   const ratings = progress.ratings || {};
-  const unrated = a.find(x=>!ratings[x.id]);
-  if(unrated) return unrated;
-  const unanswered = a.find(x=>!progress.status[x.id]);
-  if(unanswered) return unanswered;
+  const unrated = a.find(x=>!ratings[x.id]); if(unrated) return unrated;
+  const unanswered = a.find(x=>!progress.status[x.id]); if(unanswered) return unanswered;
   return a[0];
 }
 function resetStudyState(){selected=[];revealed=false;flashRevealed=false;openText="";openResult=null;coachMessages=[];clearCanvas()}
 function setStatus(id,status,points=0){progress.points+=points;progress.streak=status==="known"?progress.streak+1:0;progress.status[id]=status;saveProgress(); debouncedLocalSave()}
 function arraysEqual(a,b){if(a.length!==b.length)return false; const sa=[...a].sort((x,y)=>x-y), sb=[...b].sort((x,y)=>x-y); return sa.every((v,i)=>v===sb[i])}
 
+/* FIX: Buttons speichern und laden ERST DANN die nächste Frage */
 function setRating(id, level, mode){
   if(!progress.ratings) progress.ratings = {};
   progress.ratings[id] = { level, mode };
   saveProgress();
-  // Nach dem Bewerten direkt nächste Frage laden
   forcedItemId = null;
   resetStudyState();
   renderAll();
 }
-function getRating(id){
-  return progress.ratings && progress.ratings[id] ? progress.ratings[id] : null;
-}
+function getRating(id){ return progress.ratings && progress.ratings[id] ? progress.ratings[id] : null; }
 function renderRatingControls(item, mode){
-  const r = getRating(item.id);
-  const active = (x)=> r && r.level===x ? " active" : "";
+  const r = getRating(item.id); const active = (x)=> r && r.level===x ? " active" : "";
   return `<div class="ratingRow" style="background: #f1f5f9; border-radius: 12px; padding: 12px; margin-top: 14px;">
-    <div class="muted" style="width:100%; font-weight: bold; margin-bottom: 8px;">Wie war die Frage?</div>
+    <div class="muted" style="width:100%; font-weight: bold; margin-bottom: 8px;">Dein Feedback (Speichert & lädt nächste Frage):</div>
     <button type="button" class="ratingBtn${active('easy')}" data-rate="easy" data-mode="${mode}" style="color: #16a34a; border: 1px solid #cbd5e1;">Einfach</button>
     <button type="button" class="ratingBtn${active('medium')}" data-rate="medium" data-mode="${mode}" style="color: #d97706; border: 1px solid #cbd5e1;">Mittel</button>
     <button type="button" class="ratingBtn${active('hard')}" data-rate="hard" data-mode="${mode}" style="color: #dc2626; border: 1px solid #cbd5e1;">Schwierig</button>
@@ -230,14 +219,11 @@ function renderRatingControls(item, mode){
 }
 function attachRatingHandlers(scope, item){
   scope.querySelectorAll("[data-rate]").forEach(btn=>{
-    btn.onclick=()=>{
-      setRating(item.id, btn.dataset.rate, btn.dataset.mode);
-    };
+    btn.onclick=()=>{ setRating(item.id, btn.dataset.rate, btn.dataset.mode); };
   });
 }
 
-let dashboardFilter = "all";
-let dashboardModeFilter = "all";
+let dashboardFilter = "all"; let dashboardModeFilter = "all";
 function filteredByDashboard(items){
   return items.filter(i=>{
     const r = getRating(i.id);
@@ -247,12 +233,8 @@ function filteredByDashboard(items){
   });
 }
 function attachDashboardFilterState(){
-  document.querySelectorAll("[data-dash-filter]").forEach(el=>{
-    el.classList.toggle("active", el.dataset.dashFilter===dashboardFilter);
-  });
-  document.querySelectorAll("[data-dash-mode]").forEach(el=>{
-    el.classList.toggle("active", el.dataset.dashMode===dashboardModeFilter);
-  });
+  document.querySelectorAll("[data-dash-filter]").forEach(el=>{ el.classList.toggle("active", el.dataset.dashFilter===dashboardFilter); });
+  document.querySelectorAll("[data-dash-mode]").forEach(el=>{ el.classList.toggle("active", el.dataset.dashMode===dashboardModeFilter); });
 }
 
 function renderHeader(){const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length,unknown=vals.filter(v=>v==="unknown").length,unsure=vals.filter(v=>v==="unsure").length,acc=vals.length?Math.round((known/vals.length)*100):0; $("pointsBadge").textContent=progress.points+" Punkte"; $("streakBadge").textContent="Serie: "+progress.streak; $("accBadge").textContent="Trefferquote: "+acc+"%"; $("countsBadge").textContent=`Gewusst ${known} · Nicht gewusst ${unknown} · Unsicher ${unsure}`}
@@ -281,38 +263,53 @@ async function geminiImage(prompt,mimeType,data){
   const json=await res.json(); 
   return json?.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("\\n").trim()||"Keine Antwort erhalten."
 }
-/* ========================================== */
 
-function renderCoachBox(id,item){const box=$(id); box.innerHTML=`<div style="font-weight:700">Lerncoach</div><div class="toolRow" style="margin-top:10px"><button data-coach="short">Kurz</button><button data-coach="normal">Normal</button><button data-coach="long">Ausführlich</button><button data-coach="analogy">Analogie</button><button data-coach="exam">Prüfungsbezug</button><button id="${id}_why">Warum falsch?</button><button id="${id}_simple">Noch einfacher</button><button id="${id}_speak">Vorlesen</button><button id="${id}_mic">🎤 Sprache → Text</button></div><div class="chat-log" id="${id}_log" style="margin-top:12px"></div><div class="row" style="margin-top:10px"><input id="${id}_input" placeholder="Frag die KI zum Thema..."><button class="primary" id="${id}_send">Senden</button></div>`; const redraw=()=>{$(id+"_log").innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join(""); $(id+"_log").scrollTop=$(id+"_log").scrollHeight}; if(!coachMessages.length) addCoachMessage("ai",coachBase(item,"normal")); redraw(); box.querySelectorAll("[data-coach]").forEach(btn=>btn.onclick=()=>{addCoachMessage("ai",coachBase(item,btn.dataset.coach)); redraw()}); $(id+"_speak").onclick=()=>{if(coachMessages.length) speak(coachMessages[coachMessages.length-1].text)}; $(id+"_mic").onclick=()=>speechToTextField(id+"_input"); $(id+"_why").onclick=()=>{addCoachMessage("ai","Typische Fehler: zu allgemein antworten, Kernpunkte auslassen und Begriffe nicht sauber abgrenzen."); redraw()}; $(id+"_simple").onclick=()=>{addCoachMessage("ai",coachBase(item,"short")); redraw()}; $(id+"_send").onclick=async()=>{const inp=$(id+"_input"); const txt=inp.value.trim(); if(!txt) return; addCoachMessage("user",txt); redraw(); inp.value=""; addCoachMessage("ai","Denke nach ..."); redraw(); try{const reply=await geminiText(`Du bist ein IHK-Lerncoach.\\nThema: ${item.topic}\\nFrage: ${item.question}\\nMusterantwort: ${item.explanation}\\nMerksatz: ${item.merksatz}\\nKernpunkte: ${(item.mustHave||[]).join(", ")}\\n\\nBenutzerfrage:\\n${txt}\\n\\nAntworte in einfachem Deutsch, kurz und prüfungsnah.`); coachMessages.pop(); addCoachMessage("ai",reply)}catch(e){coachMessages.pop(); addCoachMessage("ai","Coach-Fehler: "+e.message)} redraw()}}
+function renderCoachBox(id,item){const box=$(id); box.innerHTML=`<div style="font-weight:700">Lerncoach</div><div class="toolRow" style="margin-top:10px"><button data-coach="short">Kurz</button><button data-coach="normal">Normal</button><button data-coach="long">Ausführlich</button><button data-coach="analogy">Analogie</button><button data-coach="exam">Prüfungsbezug</button><button id="${id}_why">Warum falsch?</button><button id="${id}_simple">Noch einfacher</button><button id="${id}_speak">Vorlesen</button><button id="${id}_mic">🎤 Sprache</button></div><div class="chat-log" id="${id}_log" style="margin-top:12px"></div><div class="row" style="margin-top:10px"><input id="${id}_input" placeholder="Frag die KI zum Thema..."><button class="primary" id="${id}_send">Senden</button></div>`; const redraw=()=>{$(id+"_log").innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join(""); $(id+"_log").scrollTop=$(id+"_log").scrollHeight}; if(!coachMessages.length) addCoachMessage("ai",coachBase(item,"normal")); redraw(); box.querySelectorAll("[data-coach]").forEach(btn=>btn.onclick=()=>{addCoachMessage("ai",coachBase(item,btn.dataset.coach)); redraw()}); $(id+"_speak").onclick=()=>{if(coachMessages.length) speak(coachMessages[coachMessages.length-1].text)}; $(id+"_mic").onclick=()=>speechToTextField(id+"_input"); $(id+"_why").onclick=()=>{addCoachMessage("ai","Typische Fehler: zu allgemein antworten, Kernpunkte auslassen und Begriffe nicht sauber abgrenzen."); redraw()}; $(id+"_simple").onclick=()=>{addCoachMessage("ai",coachBase(item,"short")); redraw()}; $(id+"_send").onclick=async()=>{const inp=$(id+"_input"); const txt=inp.value.trim(); if(!txt) return; addCoachMessage("user",txt); redraw(); inp.value=""; addCoachMessage("ai","Denke nach ..."); redraw(); try{const reply=await geminiText(`Du bist ein IHK-Lerncoach.\\nThema: ${item.topic}\\nFrage: ${item.question}\\nMusterantwort: ${item.explanation}\\nMerksatz: ${item.merksatz}\\nKernpunkte: ${(item.mustHave||[]).join(", ")}\\n\\nBenutzerfrage:\\n${txt}\\n\\nAntworte in einfachem Deutsch, kurz und prüfungsnah.`); coachMessages.pop(); addCoachMessage("ai",reply)}catch(e){coachMessages.pop(); addCoachMessage("ai","Coach-Fehler: "+e.message)} redraw()}}
 
-function renderQuiz(){const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='<div class="muted">Noch keine Inhalte da. Importiere zuerst dein JSON im Tab „Themen / Import“.</div>'; return} const optHtml=item.optionMeta.map((o,i)=>{const active=selected.includes(i)?" active":""; let cls=""; if(revealed){if(o.correct) cls=" correct"; else if(selected.includes(i)) cls=" wrong"} return `<button class="option${active}${cls}" data-opt="${i}">${esc(o.text)}</button>`}).join(""); box.innerHTML=`<div class="focusQuestion"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span>${item.operator?`<span class="badge">${esc(item.operator)}</span>`:''}</div><h2 style="margin-top:10px">${esc(item.question)}</h2><div class="muted" style="margin-top:6px">Tippe die Aussagen an, die fachlich passen.</div></div><div style="margin-top:14px">${optHtml}${revealed?`<div class="${progress.status[item.id]==='known'?'good':progress.status[item.id]==='unsure'?'mid':'bad'}"><div style="font-weight:700">${progress.status[item.id]==='known'?'Richtig':'Feedback'}</div><div style="margin-top:8px">${esc(item.explanation)}</div><div class="merksatz" style="margin-top:8px">Merksatz: ${esc(item.merksatz)}</div></div>`:""}<div class="toolRow" style="margin-top:12px">${!revealed?'<button class="primary" id="quizCheckBtn">Antwort prüfen</button>':''}<button id="quizCoachBtn">Coach öffnen</button></div>${revealed?renderRatingControls(item,"quiz"):""}<div id="quizCoachBox" class="coachbox hidden"></div></div>`; box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz()}); $("quizCoachBtn").onclick=()=>{$("quizCoachBox").classList.remove("hidden"); renderCoachBox("quizCoachBox",item)}; const check=$("quizCheckBtn"); if(check) check.onclick=()=>{const ok=arraysEqual(selected,item.answer); if(ok) setStatus(item.id,"known",10); else if(selected.length) setStatus(item.id,"unsure",3); else setStatus(item.id,"unknown",0); revealed=true; renderQuiz()}; if(revealed) attachRatingHandlers(box,item);}
+/* QUIZ & CARDS */
+function renderQuiz(){const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='<div class="muted">Noch keine Inhalte da. Importiere zuerst dein JSON im Tab „Themen / Import“.</div>'; return} const optHtml=item.optionMeta.map((o,i)=>{const active=selected.includes(i)?" active":""; let cls=""; if(revealed){if(o.correct) cls=" correct"; else if(selected.includes(i)) cls=" wrong"} return `<button class="option${active}${cls}" data-opt="${i}">${esc(o.text)}</button>`}).join(""); box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(item.question)}</h2><div class="muted" style="margin-top:6px">Tippe die Aussagen an, die fachlich passen.</div></div><div style="margin-top:14px">${optHtml}${revealed?`<div class="${progress.status[item.id]==='known'?'good':progress.status[item.id]==='unsure'?'mid':'bad'}"><div style="font-weight:700">${progress.status[item.id]==='known'?'Richtig':'Feedback'}</div><div style="margin-top:8px">${esc(item.explanation)}</div><div class="merksatz" style="margin-top:8px">Merksatz: ${esc(item.merksatz)}</div></div>`:""}<div class="toolRow" style="margin-top:12px">${!revealed?'<button class="primary" id="quizCheckBtn">Antwort prüfen</button>':''}<button id="quizCoachBtn">Coach öffnen</button></div>${revealed?renderRatingControls(item,"quiz"):""}<div id="quizCoachBox" class="coachbox hidden"></div></div>`; box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{const i=Number(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz()}); $("quizCoachBtn").onclick=()=>{$("quizCoachBox").classList.remove("hidden"); renderCoachBox("quizCoachBox",item)}; const check=$("quizCheckBtn"); if(check) check.onclick=()=>{const ok=arraysEqual(selected,item.answer); if(ok) setStatus(item.id,"known",10); else if(selected.length) setStatus(item.id,"unsure",3); else setStatus(item.id,"unknown",0); revealed=true; renderQuiz()}; if(revealed) attachRatingHandlers(box,item);}
 
-function renderCards(){const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='<div class="muted">Keine Karteikarten verfügbar.</div>'; return} box.innerHTML=`<div class="focusQuestion"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(flashRevealed?item.explanation:item.question)}</h2>${flashRevealed?`<div class="merksatz" style="margin-top:12px">Merksatz: ${esc(item.merksatz)}</div>`:''}</div><div class="toolRow" style="margin-top:14px"><button class="primary" id="flipBtn">${flashRevealed?'Vorderseite':'Karte drehen'}</button><button id="cardCoachBtn">Coach öffnen</button></div>${flashRevealed?renderRatingControls(item,"cards"):""}<div id="cardCoachBox" class="coachbox hidden"></div>`; $("flipBtn").onclick=()=>{flashRevealed=!flashRevealed; renderCards()}; $("cardCoachBtn").onclick=()=>{$("cardCoachBox").classList.remove("hidden"); renderCoachBox("cardCoachBox",item)}; if(flashRevealed) attachRatingHandlers(box,item);}
+function renderCards(){const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='<div class="muted">Keine Karteikarten verfügbar.</div>'; return} box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(flashRevealed?item.explanation:item.question)}</h2>${flashRevealed?`<div class="merksatz" style="margin-top:12px">Merksatz: ${esc(item.merksatz)}</div>`:''}</div><div class="toolRow" style="margin-top:14px"><button class="primary" id="flipBtn">${flashRevealed?'Vorderseite':'Karte drehen'}</button><button id="cardCoachBtn">Coach öffnen</button></div>${flashRevealed?renderRatingControls(item,"cards"):""}<div id="cardCoachBox" class="coachbox hidden"></div>`; $("flipBtn").onclick=()=>{flashRevealed=!flashRevealed; renderCards()}; $("cardCoachBtn").onclick=()=>{$("cardCoachBox").classList.remove("hidden"); renderCoachBox("cardCoachBox",item)}; if(flashRevealed) attachRatingHandlers(box,item);}
 
-function localEvaluate(item,text){const txt=(text||"").toLowerCase(), must=(item.mustHave||[]).map(x=>String(x).toLowerCase()), found=must.filter(k=>txt.includes(k)); if(txt.trim().length<6) return {cls:"bad",label:"Zu kurz",body:"Bitte nenne mindestens einen fachlichen Kernpunkt.",status:"unknown",found}; if(found.length>=Math.max(2,Math.ceil(must.length/2))) return {cls:"good",label:"Gut",body:"Mehrere Kernpunkte sind enthalten. Das ist schon prüfungsnah.",status:"known",found}; if(found.length>=1) return {cls:"mid",label:"Teilweise",body:"Einige Kernpunkte sind enthalten, aber es fehlt noch ein Teil der Musterlösung.",status:"unsure",found}; return {cls:"bad",label:"Nicht ausreichend",body:"Es wurden noch keine zentralen Kernpunkte erkannt.",status:"unknown",found}}
+function localEvaluate(item,text){const txt=(text||"").toLowerCase(), must=(item.mustHave||[]).map(x=>String(x).toLowerCase()), found=must.filter(k=>txt.includes(k)); if(txt.trim().length<6) return {cls:"bad",label:"Zu kurz",body:"Bitte nenne mindestens einen fachlichen Kernpunkt.",status:"unknown",found}; if(found.length>=Math.max(2,Math.ceil(must.length/2))) return {cls:"good",label:"Gut",body:"Mehrere Kernpunkte sind enthalten.",status:"known",found}; if(found.length>=1) return {cls:"mid",label:"Teilweise",body:"Einige Kernpunkte fehlen.",status:"unsure",found}; return {cls:"bad",label:"Nicht ausreichend",body:"Keine zentralen Kernpunkte erkannt.",status:"unknown",found}}
 
+/* FIX: OPEN-MODUS (Reihenfolge strikt eingehalten, Canvas Re-render gestoppt) */
 function renderOpen(){
   const item=currentItem(),box=$("openBody");
   if(!item){box.innerHTML='<div class="muted">Keine offenen Fragen verfügbar.</div>'; return}
-  box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span>${item.operator?`<span class="badge">${esc(item.operator)}</span>`:''}</div><h2 style="margin-top:10px">${esc(item.question)}</h2><div class="muted fq-help" style="margin-top:6px">Antworte kurz und fachlich. Bewertung und Coach erscheinen direkt unter deiner Texteingabe.</div></div>
-  <div class="mobileQuestionBar">Frage: <span id="mobileQuestionText"></span></div>
+  
+  // 1. Frage (Sticky) & 2. Texteingabe & Buttons
+  box.innerHTML=`
+  <div class="focusQuestion pinBox">
+    <div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div>
+    <h2 style="margin-top:10px">${esc(item.question)}</h2>
+  </div>
+
   <div class="soft" style="margin-top:12px">
-    <div style="font-weight:700">Texteingabe / Spracheingabe</div>
     <textarea id="openAnswer" class="bigEditor" placeholder="Hier deine Antwort schreiben ...">${esc(openText)}</textarea>
     <div class="toolRow" style="margin-top:12px">
       <button type="button" class="primary" id="evalTextBtn">Text bewerten</button>
-      <button type="button" id="speechTextBtn">Sprache → Text</button>
-      <button type="button" id="showExpectationBtn">Erwartungshorizont zeigen</button>
+      <button type="button" id="speechTextBtn">🎤 Sprache</button>
       <button type="button" id="speakExpectationBtn">Antwort vorlesen</button>
     </div>
-    <div class="helper" style="margin-top:8px" id="openStatusLine">Texteingabe und Bewertung sind oben kompakt angeordnet. Die Stifteingabe kannst du nur bei Bedarf aufklappen.</div>
-    ${openResult?`<div class="${openResult.cls}" style="margin-top:12px"><div style="font-weight:700">${esc(openResult.label)}</div><div class="answerScroll" style="margin-top:8px;white-space:pre-wrap">${esc(openResult.body)}</div>${openResult.found?`<div style="margin-top:8px"><strong>Erkannt:</strong> ${openResult.found.length?esc(openResult.found.join(", ")):"keine Kernpunkte"}</div>`:""}</div>`:""}
-    <div id="expectationBox" class="soft ${openResult?'':'hidden'}" style="margin-top:14px"><div style="font-weight:700">Erwartungshorizont</div><div class="answerScroll" style="margin-top:10px;white-space:pre-wrap">${esc(item.explanation)}</div><div class="merksatz" style="margin-top:10px">Merksatz: ${esc(item.merksatz)}</div><div style="margin-top:10px"><strong>Kernpunkte:</strong> ${(item.mustHave||[]).map(x=>`<span class="pill">${esc(x)}</span>`).join("")}</div></div>
-    ${openResult?renderRatingControls(item,"open"):""}<div id="openCoachBox" class="coachbox" style="margin-top:14px"></div>
+    <div class="helper" style="margin-top:8px" id="openStatusLine"></div>
   </div>
+
+  ${revealed ? `
+  <div class="soft" style="margin-top:14px; border: 2px solid var(--border);">
+    <div style="font-weight:700; margin-bottom:8px">Bewertung & Erwartungshorizont</div>
+    ${openResult ? `<div class="${openResult.cls}" style="margin-bottom:12px"><div style="font-weight:700">${esc(openResult.label)}</div><div class="answerScroll">${esc(openResult.body)}</div></div>` : ""}
+    <div style="padding-top:12px; border-top:1px solid var(--border)">
+      <div class="merksatz" style="font-size:16px;">Merksatz: ${esc(item.merksatz)}</div>
+      <div class="answerScroll" style="margin-top:10px; font-weight:500;">${esc(item.explanation)}</div>
+      <div style="margin-top:10px"><strong>Kernpunkte:</strong> ${(item.mustHave||[]).map(x=>`<span class="pill">${esc(x)}</span>`).join("")}</div>
+    </div>
+    ${renderRatingControls(item,"open")}
+  </div>
+  ` : ""}
+
   <div class="soft" style="margin-top:14px">
-    <div class="collapseHead" id="toggleInkHead"><div style="font-weight:700">Stifteingabe</div><button type="button" id="toggleInkBtn">${window.__inkCollapsed ? "Stifteingabe öffnen" : "Stifteingabe schließen"}</button></div>
-    <div class="helper" style="margin-top:8px">Stift oder Finger = schreiben. So bleibt die App auf dem Handy kompakt.</div>
+    <div class="collapseHead" id="toggleInkHead"><div style="font-weight:700">Stifteingabe (Ausklappen)</div><button type="button" id="toggleInkBtn">${window.__inkCollapsed ? "Öffnen" : "Schließen"}</button></div>
     <div id="inkBody" class="collapseBody ${window.__inkCollapsed ? "hiddenBody" : ""}" style="margin-top:12px">
       <div class="canvasWrap">
         <div class="canvasToolbar">
@@ -320,63 +317,57 @@ function renderOpen(){
           <button type="button" id="eraserToolBtn">Radierer</button>
           <span class="helper">Größe</span>
           <input type="range" id="sizeRange" min="2" max="28" value="${brushSize}" style="width:120px">
-          <button type="button" id="zoomInBtn">+</button>
-          <button type="button" id="zoomOutBtn">−</button>
-          <button type="button" id="resetViewBtn">Ansicht</button>
           <button type="button" id="clearCanvasBtn">Leeren</button>
           <button type="button" class="primary" id="evalCanvasBtn">Stifteingabe mit KI bewerten</button>
         </div>
         <div class="canvasViewport" id="canvasViewport"></div>
       </div>
     </div>
-  </div>`;
+  </div>
+
+  <div id="openCoachBox" class="coachbox" style="margin-top:14px"></div>`;
 
   mountCanvas(); updateCanvasTransform();
-  if($("mobileQuestionText")) $("mobileQuestionText").textContent=item.question;
-  renderCoachBox("openCoachBox",item); if(openResult) attachRatingHandlers(box,item);
+  renderCoachBox("openCoachBox",item);
+  if(revealed) attachRatingHandlers(box,item);
 
   $("toggleInkBtn").onclick=()=>{ window.__inkCollapsed = !window.__inkCollapsed; renderOpen(); setTimeout(updateCanvasTransform,60); };
   if($("penToolBtn")) $("penToolBtn").onclick=()=>tool="pen";
   if($("eraserToolBtn")) $("eraserToolBtn").onclick=()=>tool="eraser";
   if($("sizeRange")) $("sizeRange").oninput=e=>brushSize=Number(e.target.value);
-  if($("zoomInBtn")) $("zoomInBtn").onclick=()=>{scale=Math.min(3,scale+0.1); updateCanvasTransform()};
-  if($("zoomOutBtn")) $("zoomOutBtn").onclick=()=>{scale=Math.max(0.25,scale-0.1); updateCanvasTransform()};
-  if($("resetViewBtn")) $("resetViewBtn").onclick=()=>{scale=0.6;offsetX=0;offsetY=0;updateCanvasTransform()};
   if($("clearCanvasBtn")) $("clearCanvasBtn").onclick=()=>clearCanvas();
 
   $("speechTextBtn").onclick=()=>speechToTextField("openAnswer");
-  $("showExpectationBtn").onclick=()=>{$("expectationBox").classList.toggle("hidden")};
   $("speakExpectationBtn").onclick=()=>speak(item.explanation);
 
   $("evalTextBtn").onclick=async()=>{
     const status=$("openStatusLine"); if(status) status.textContent="Text wird bewertet ...";
     openText=$("openAnswer").value;
-    const local=localEvaluate(item,openText); openResult=local;
+    const local=localEvaluate(item,openText); openResult=local; revealed=true; renderOpen();
     try{
-      const ai=await geminiText(`Du bist ein IHK-Prüfer.\nFrage: ${item.question}\n\nMusterantwort:\n${item.explanation}\n\nKernpunkte:\n${(item.mustHave||[]).join(", ")}\n\nNutzerantwort:\n${openText}\n\nBewerte kurz und prüfungsnah in Deutsch:\nBewertung: Gut / Teilweise / Falsch\nBegründung:\nFehlende Punkte:\nMinimalantwort:`);
-      openResult={cls:local.cls,label:local.label,body:ai,status:local.status,found:local.found}
+      const ai=await geminiText(`Du bist ein IHK-Prüfer.\nFrage: ${item.question}\n\nMusterantwort:\n${item.explanation}\n\nKernpunkte:\n${(item.mustHave||[]).join(", ")}\n\nNutzerantwort:\n${openText}\n\nBewerte kurz und prüfungsnah in Deutsch:\nBewertung: Gut / Teilweise / Falsch\nBegründung:\nFehlende Punkte:`);
+      openResult={cls:local.cls,label:local.label,body:ai,status:local.status,found:local.found};
     }catch(e){
-      openResult={cls:local.cls,label:local.label,body:local.body+"\n\nKI-Hinweis: "+e.message,status:local.status,found:local.found}
+      openResult={cls:local.cls,label:local.label,body:local.body+"\n\nKI-Hinweis: "+e.message,status:local.status,found:local.found};
     }
     setStatus(item.id,openResult.status,openResult.status==="known"?12:openResult.status==="unsure"?4:0);
-    if($("openStatusLine")) $("openStatusLine").textContent="Textbewertung abgeschlossen.";
     renderOpen();
   };
 
   if($("evalCanvasBtn")) $("evalCanvasBtn").onclick=async()=>{
-    if($("openStatusLine")) $("openStatusLine").textContent="Stifteingabe wird bewertet ...";
-    const trimmed=exportCanvasTrimmed();
+    const status=$("openStatusLine"); if(status) status.textContent="Stifteingabe wird bewertet ...";
+    const trimmed=exportCanvasTrimmed(); revealed=true; renderOpen();
     try{
-      const ai=await geminiImage(`Du bist ein IHK-Prüfer.\nLies die handschriftliche Antwort im Bild und bewerte sie.\n\nFrage:\n${item.question}\n\nMusterantwort:\n${item.explanation}\n\nKernpunkte:\n${(item.mustHave||[]).join(", ")}\n\nAntworte kurz in Deutsch:\nBewertung: Gut / Teilweise / Falsch\nBegründung:\nFehlende Punkte:\nMinimalantwort:`,`image/png`,trimmed.base64);
-      openResult={cls:"mid",label:"KI-Bewertung Stift",body:ai,status:"unsure",found:[]}
+      const ai=await geminiImage(`Lies die handschriftliche Antwort und bewerte sie zur Frage:\n${item.question}\n\nMusterantwort:\n${item.explanation}\n\nKernpunkte:\n${(item.mustHave||[]).join(", ")}\n\nAntworte kurz in Deutsch:\nBewertung: Gut / Teilweise / Falsch\nBegründung:`,`image/png`,trimmed.base64);
+      openResult={cls:"mid",label:"KI-Bewertung Stift",body:ai,status:"unsure",found:[]};
     }catch(e){
-      openResult={cls:"bad",label:"Stifteingabe nicht bewertet",body:e.message,status:"unknown",found:[]}
+      openResult={cls:"bad",label:"Stifteingabe nicht bewertet",body:e.message,status:"unknown",found:[]};
     }
-    if($("openStatusLine")) $("openStatusLine").textContent="Stiftbewertung abgeschlossen.";
     renderOpen();
   };
 }
 
+/* DASHBOARD */
 function renderDashboard(){
   const items=filtered();
   const vals=Object.entries(progress.status).filter(([id])=>items.find(i=>i.id===id)).map(([,v])=>v);
@@ -437,12 +428,13 @@ function renderTopics(){const data=currentData(),box=$("topicBoxes"); if(!data){
 function debouncedLocalSave(){try{const draftKey="ml_final_draft_"+profile+"_"+area+"_"+topic; localStorage.setItem(draftKey, JSON.stringify({openText, selected, revealed, flashRevealed, scale, offsetX, offsetY, brushSize, tool}));}catch(e){}}
 function restoreDraft(){try{const draftKey="ml_final_draft_"+profile+"_"+area+"_"+topic; const raw=localStorage.getItem(draftKey); if(!raw) return; const d=JSON.parse(raw); openText=d.openText||""; selected=d.selected||[]; revealed=!!d.revealed; flashRevealed=!!d.flashRevealed; scale=typeof d.scale==="number"?d.scale:scale; offsetX=typeof d.offsetX==="number"?d.offsetX:offsetX; offsetY=typeof d.offsetY==="number"?d.offsetY:offsetY; brushSize=typeof d.brushSize==="number"?d.brushSize:brushSize; tool=d.tool||tool;}catch(e){}}
 function renderAll(){restoreDraft(); renderHeader();renderProfiles();renderSelectors();renderQuiz();renderCards();renderOpen();renderDashboard();renderTopics()}
+
 document.querySelectorAll(".tab").forEach(btn=>{btn.onclick=()=>{document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); const map={quiz:"quizTab",cards:"cardsTab",open:"openTab",dashboard:"dashboardTab",topics:"topicsTab"}; Object.values(map).forEach(id=>$(id).classList.add("hidden")); $(map[btn.dataset.tab]).classList.remove("hidden"); if(btn.dataset.tab==="open") setTimeout(updateCanvasTransform,50)}})
 $("voiceToggle").onchange=e=>voiceEnabled=e.target.checked;
 $("resetProgressBtn").onclick=()=>{if(!confirm("Wirklich den Fortschritt dieses Profils zurücksetzen?")) return; progress=JSON.parse(JSON.stringify(DEFAULT_PROGRESS)); saveProgress(); renderAll()}
 
 /* =========================
-   CANVAS & TOUCH FIX (v115)
+   CANVAS & TOUCH FIX (v116)
 ========================= */
 function mountCanvas(){const vp=$("canvasViewport"); if(vp&&!vp.contains(canvas)) vp.appendChild(canvas)}
 function updateCanvasTransform(){canvas.style.transform=`translate(${offsetX}px, ${offsetY}px) scale(${scale})`}
@@ -450,15 +442,12 @@ function clearCanvas(){cctx.setTransform(1,0,0,1,0,0); cctx.fillStyle="#fff"; cc
 function clientToCanvas(e){const vp=$("canvasViewport").getBoundingClientRect(); return {x:(e.clientX-vp.left-offsetX)/scale,y:(e.clientY-vp.top-offsetY)/scale}}
 function getDistance(a,b){return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)} function getCenter(a,b){return {x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2}}
 
-// 🔥 FIX FÜR TOUCH/FINGER EINGABE: 
-// Erlaubt jetzt Stift ("pen"), Maus ("mouse") UND Finger ("touch")
 canvas.addEventListener("pointerdown", e=>{
   if(e.pointerType !== "pen" && e.pointerType !== "mouse" && e.pointerType !== "touch") return;
   canvas.setPointerCapture(e.pointerId); pointers.set(e.pointerId,e); 
   if(pointers.size===1){drawLast=clientToCanvas(e)} 
   else if(pointers.size===2){const arr=[...pointers.values()]; gestureStart={dist:getDistance(arr[0],arr[1]),center:getCenter(arr[0],arr[1]),scale,offsetX,offsetY}}
 });
-
 canvas.addEventListener("pointermove",e=>{
   if(!pointers.has(e.pointerId)) return; pointers.set(e.pointerId,e); 
   if(pointers.size===1&&drawLast && (e.pointerType==='pen' || e.pointerType==='mouse' || e.pointerType==='touch')){
@@ -482,7 +471,7 @@ const status=$("openStatusLine"); const el=$(fieldId);
 if(!window.isSecureContext){ if(status) status.textContent="HTTPS nötig."; return;}
 if(!SR){
   if(status) status.textContent="Spracheingabe hier nicht unterstützt.";
-  const fallback = window.prompt("Spracheingabe wird hier nicht unterstützt. Hier einfügen:", "");
+  const fallback = window.prompt("Hier einfügen:", "");
   if(fallback && el){ el.value=(el.value?el.value+" ":"")+fallback; if(fieldId==="openAnswer"){ openText=el.value; debouncedLocalSave(); } } return;
 }
 try{ if(navigator.permissions && navigator.permissions.query){ const p = await navigator.permissions.query({name:'microphone'}); if(p.state === 'denied'){ alert("Mikrofon blockiert."); return;} } }catch(e){}
@@ -513,7 +502,7 @@ $("importJsonBtn").onclick=()=>{
     APP.dataByProfile[profile]=data; saveDataByProfile(); 
     resetStudyState(); area="Alle Oberthemen"; topic="Alle Unterthemen"; 
     $("importStatus").textContent="JSON importiert."; 
-    saveToCloud(); // Nach Import direkt syncen
+    saveToCloud(); 
     renderAll();
   }catch(e){$("importStatus").textContent="Import fehlgeschlagen: "+e.message}
 };
