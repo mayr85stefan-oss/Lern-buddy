@@ -1579,6 +1579,7 @@ $("loadCloudBtn").onclick = async ()=>{
   syncId = $("syncIdInput").value.trim();
   localStorage.setItem("app_sync_id", syncId);
   await loadFromCloud();
+  alert("Profile in Cloud: " + Object.keys(APP.dataByProfile || {}).join(", "));
 };
 
 document.addEventListener("DOMContentLoaded", async ()=>{
