@@ -130,7 +130,10 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       <h3>Cloud-Sync (ID)</h3>
       <div class="muted">Dieselbe ID auf Handy und Tablet eintragen, damit alles synchron bleibt.</div>
       <input type="text" id="syncIdInput" placeholder="Deine Sync-ID...">
-      <button class="primary" id="saveSyncIdBtn" style="width:100%;margin-top:8px">ID koppeln & Cloud laden</button>
+      <div class="row" style="margin-top:8px">
+  <button class="primary" id="saveCloudBtn" style="flex:1">Cloud speichern</button>
+  <button id="loadCloudBtn" style="flex:1">Cloud laden</button>
+      </div>
 
       <hr class="sep">
 
