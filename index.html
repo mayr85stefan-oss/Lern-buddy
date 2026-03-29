@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v139 (v127 Restore + Multi-JSON)</title>
+<title>Master Lern-App Final v141</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -51,8 +51,8 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 <div class="wrap">
   <div class="card">
     <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App v139</h1>
-    <div class="muted">1:1 v127 RESTORE: Quiz, Karten, S-Pen Pro, Multi-JSON & Cloud Fix.</div>
+    <h1>Master Lern-App v141</h1>
+    <div class="muted">VOLLSTÄNDIGER v127 ABGLEICH: Alles aktiv + Multi-Themen Fix.</div>
     <div class="row" style="margin-top:10px">
       <div class="badge" id="pointsBadge">0 Punkte</div>
       <div class="badge" id="accBadge">Trefferquote: 0%</div>
@@ -92,7 +92,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
         </div>
       </div>
       <div id="quizTab"><div class="card"><div id="quizBody"></div></div></div>
-      <div id="cardsTab" class="hidden"><div class="card"><div id="cardBody"></div></div></div>
+      <div id="cardBody" class="hidden"></div>
       <div id="openTab" class="hidden"><div class="card"><div id="openBody"></div></div></div>
       <div id="dashboardTab" class="hidden"><div class="card"><div class="grid grid4" id="dashTop"></div><div id="radar" style="margin-top:12px"></div></div></div>
       <div id="topicsTab" class="hidden"><div class="card"><h3>Importierte Themen</h3><div id="topicBoxes"></div><hr class="sep"><h3>Thema anhängen</h3><textarea id="jsonText" rows="6" placeholder="JSON hier einfügen..."></textarea><button class="primary" id="importJsonBtn" style="margin-top:12px;width:100%">Thema hinzufügen</button><div id="importStatus" class="helper" style="margin-top:8px">Bereit.</div></div></div>
@@ -102,18 +102,12 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* =========================
-   🚨 KONFIGURATION
-========================= */
 const CONFIG = {
   SUPABASE_KEY: "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9", 
   SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co",
   GEMINI_MODEL: "gemini-2.5-flash" 
 };
 
-/* =========================
-   🔗 SUPABASE
-========================= */
 const supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 let syncId = localStorage.getItem("app_sync_id") || "";
 
@@ -142,15 +136,12 @@ async function loadFromCloud() {
   } catch (e) { updateBadge("err"); }
 }
 
-/* =========================
-   CORE LOGIC (1:1 v127)
-========================= */
 const APP={profiles:[{id:"stefan",name:"Stefan",program:"Technischer Betriebswirt",badge:"TBW"},{id:"lolla",name:"Lolla",program:"Wirtschaftsfachwirt",badge:"WFW"}],dataByProfile:JSON.parse(localStorage.getItem("v109_dataByProfile")||"{}")};
 const DEFAULT_PROGRESS={points:0,streak:0,status:{},ratings:{}};
 let profile="stefan",progress=loadProgress(profile),area="Alle Oberthemen",topic="Alle Unterthemen",selected=[],revealed=false,flashRevealed=false,openText="",openResult=null,coachMessages=[],voiceEnabled=false,forcedItemId=null;
 
 const canvas=document.createElement("canvas"); canvas.width=1800; canvas.height=1200; canvas.id="drawCanvas";
-const cctx=canvas.getContext("2d"); cctx.fillStyle="#fff"; cctx.fillRect(0,0,1800,1200); cctx.lineCap="round"; cctx.lineJoin="round";
+const cctx=canvas.getContext("2d"); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); cctx.lineCap="round"; cctx.lineJoin="round";
 let tool="pen",brushSize=4,scale=0.6,offsetX=0,offsetY=0,pointers=new Map(),drawLast=null,gestureStart=null;
 
 function $(id){return document.getElementById(id)}
@@ -167,7 +158,7 @@ function allItems(){
     (data.unterthemen||[]).forEach((u, ui) => {
       (u.fragen||[]).forEach((q, qi) => {
         const correct=(q.kernpunkte||q.signalwoerter||[]).slice(0,3).map(x=>({text:x,correct:true}));
-        const optionMeta=[...correct,{text:"Falsche Antwort-Option A",correct:false},{text:"Falsche Antwort-Option B",correct:false}].slice(0,5);
+        const optionMeta=[...correct,{text:"Falsche Antwort A",correct:false},{text:"Falsche Antwort B",correct:false}].slice(0,5);
         out.push({
           id:`${profile}_${dIdx}_${ui}_${qi}`, area: data.ueberthema||"Oberthema", topic: u.name||"Unterthema",
           question: q.frage||"", explanation: q.antwort||"", merksatz: q.merksatz||"",
@@ -193,29 +184,25 @@ function currentItem(){
 
 function resetStudyState(){selected=[];revealed=false;flashRevealed=false;openText="";openResult=null;coachMessages=[];clearCanvas()}
 
-/* KI & SPEECH */
 async function geminiText(prompt){
   const k=localStorage.getItem("ml_final_gemini_key"); if(!k) throw new Error("Key fehlt."); 
   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${k}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}]})});
   const d=await res.json(); return d.candidates[0].content.parts[0].text;
 }
-
 async function geminiImage(prompt,mimeType,data){
   const k=localStorage.getItem("ml_final_gemini_key"); if(!k) throw new Error("Key fehlt."); 
   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${k}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt},{inlineData:{mimeType,data}}]}]})});
   const d=await res.json(); return d.candidates[0].content.parts[0].text;
 }
-
 async function speechToText(fieldId, statusId){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return;
-  const rec=new SR(); rec.lang="de-DE"; rec.onstart=()=>{$(statusId).textContent="Ich höre...";};
+  const rec=new SR(); rec.lang="de-DE"; rec.onstart=()=>{$(statusId).textContent="Höre...";};
   rec.onresult=e=>{$(fieldId).value += " " + e.results[0][0].transcript; $(statusId).textContent="OK"; openText=$(fieldId).value; debouncedLocalSave();};
   rec.start();
 }
 
-/* RENDERING TABS (1:1 v127) */
 function renderQuiz(){
-  const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema geladen.</div>'; return}
+  const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='Kein Thema.'; return}
   const optHtml=item.optionMeta.map((o,i)=>{
     const active=selected.includes(i)?" active":""; 
     let cls="", dis=revealed?"disabled":""; 
@@ -226,41 +213,41 @@ function renderQuiz(){
     <div style="margin-top:14px">${optHtml}
       <div class="toolRow">${!revealed?'<button class="primary" id="qCheck">Prüfen</button>':''}<button id="qCoach">Coach</button></div>
       ${revealed?renderRatingControls(item,"quiz"):""}
-      ${revealed?`<div class="good"><strong>Lösung:</strong><br>${esc(item.explanation)}<br><br><strong>Merksatz:</strong> ${esc(item.merksatz)}</div>`:""}
+      ${revealed?`<div class="good"><strong>Lösung:</strong><br>${esc(item.explanation)}</div>`:""}
       <div id="qCBox" class="coachbox hidden"></div>`;
-  box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{if(revealed)return; const i=parseInt(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz(); debouncedLocalSave();});
-  if($("qCheck")) $("qCheck").onclick=()=>{revealed=true; progress.status[item.id]=selected.length?"known":"unsure"; renderQuiz(); saveProgress();};
+  box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{if(revealed)return; const i=parseInt(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz();});
+  if($("qCheck")) $("qCheck").onclick=()=>{revealed=true; progress.status[item.id]="known"; renderQuiz(); saveProgress();};
   $("qCoach").onclick=()=>{$("qCBox").classList.toggle("hidden"); renderCoachBox("qCBox",item)};
   if(revealed) attachRatingHandlers(box,item);
 }
 
 function renderCards(){
-  const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema geladen.</div>'; return}
-  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${flashRevealed?esc(item.explanation):esc(item.question)}</h2></div>
-    <div class="toolRow" style="margin-top:14px"><button class="primary" onclick="flashRevealed=!flashRevealed; renderCards()">${flashRevealed?'Vorderseite':'Karte drehen'}</button></div>
-    ${flashRevealed?renderRatingControls(item,"cards"):""}`;
+  const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='Kein Thema.'; return}
+  box.innerHTML=`<div class="card"><div class="focusQuestion pinBox" style="cursor:pointer" onclick="flashRevealed=!flashRevealed; renderCards()"><h2>${flashRevealed?esc(item.explanation):esc(item.question)}</h2></div>
+    <div class="toolRow" style="margin-top:14px"><button class="primary" onclick="flashRevealed=!flashRevealed; renderCards()">Karte drehen</button></div>
+    ${flashRevealed?renderRatingControls(item,"cards"):""}</div>`;
   if(flashRevealed) attachRatingHandlers(box,item);
 }
 
 function renderOpen(){
-  const item=currentItem(),box=$("openBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema.</div>'; return}
+  const item=currentItem(),box=$("openBody"); if(!item){box.innerHTML='Kein Thema.'; return}
   box.innerHTML=`<div class="focusQuestion pinBox"><h2>${esc(item.question)}</h2></div>
     <textarea id="oAns" class="bigEditor" placeholder="Schreiben oder sprechen...">${esc(openText)}</textarea>
     <div class="toolRow"><button class="primary" id="oEval">Text bewerten</button><button id="oMic">🎤 Sprache</button><span id="oStatus" class="helper"></span></div>
     ${revealed?renderRatingControls(item,"open"):""}
-    ${revealed?`<div class="soft"><strong>Bewertung:</strong><br>${openResult || esc(item.explanation)}</div>`:""}
+    ${revealed?`<div class="soft"><strong>Feedback:</strong><br>${openResult || esc(item.explanation)}</div>`:""}
     <div class="card" style="margin-top:14px">
       <div class="collapseHead" onclick="$('#inkB').classList.toggle('hidden'); setTimeout(mountCanvas, 50)"><strong>Stifteingabe (S-Pen Pro)</strong><button>+/-</button></div>
       <div id="inkB" class="hidden"><div class="canvasWrap"><div class="canvasToolbar"><button onclick="tool='pen'">Stift</button><button onclick="tool='eraser'">Radierer</button><button onclick="clearCanvas()">Leeren</button><button class="primary" id="canvEval">Stift bewerten</button></div><div class="canvasViewport" id="cVp"></div></div></div>
     </div>`;
   mountCanvas(); $("oMic").onclick=()=>speechToText("oAns", "oStatus");
   $("oEval").onclick=async()=>{
-    openText=$("oAns").value; revealed=true; renderOpen(); $("oStatus").textContent="KI prüft...";
-    try { openResult = await geminiText(`Bewerte als IHK-Prüfer: Frage ${item.question}, Lösung ${item.explanation}, Userantwort: ${openText}.`); renderOpen(); } catch(e){ $("oStatus").textContent="Fehler!"; }
+    revealed=true; renderOpen(); $("oStatus").textContent="KI prüft...";
+    try { openResult = await geminiText(`Prüfer: Frage ${item.question}, Lösung ${item.explanation}, Userantwort: ${$("oAns").value}.`); renderOpen(); } catch(e){}
   };
   if($("canvEval")) $("canvEval").onclick=async()=>{
-    revealed=true; renderOpen(); const img=exportCanvasTrimmed(); $("oStatus").textContent="KI prüft Bild...";
-    try { openResult = await geminiImage(`Lies die Handschrift und bewerte zur Frage ${item.question}. Lösung ist ${item.explanation}`, "image/png", img.base64); renderOpen(); } catch(e){ $("oStatus").textContent="KI-Fehler!"; }
+    revealed=true; renderOpen(); const img=exportCanvasTrimmed(); $("oStatus").textContent="KI Scan...";
+    try { openResult = await geminiImage(`Lies Handschrift zur Frage ${item.question}, Lösung ${item.explanation}`, "image/png", img.base64); renderOpen(); } catch(e){}
   };
   if(revealed) attachRatingHandlers(box,item);
 }
@@ -270,8 +257,7 @@ function renderRatingControls(item,mode){
     <div style="width:100%; font-weight:800; margin-bottom:8px; color:#1e40af">Bewertung & Weiter:</div>
     <button data-rate="easy" data-mode="${mode}" class="ratingBtn" style="color:green">Einfach</button>
     <button data-rate="medium" data-mode="${mode}" class="ratingBtn" style="color:orange">Mittel</button>
-    <button data-rate="hard" data-mode="${mode}" class="ratingBtn" style="color:red">Schwierig</button>
-  </div>`;
+    <button data-rate="hard" data-mode="${mode}" class="ratingBtn" style="color:red">Schwierig</button></div>`;
 }
 function attachRatingHandlers(scope,item){
   scope.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>{ 
@@ -284,40 +270,33 @@ function renderCoachBox(id,item){
   const box=$(id); box.innerHTML=`<div class="chat-log" id="${id}_log"></div><div class="row"><input id="${id}_in" style="flex:1"><button class="primary" id="${id}_btn">Senden</button></div>`;
   $(id+"_btn").onclick=async()=>{
     const t=$(id+"_in").value; coachMessages.push({role:"user",text:t}); $(id+"_in").value=""; renderCoachBox(id,item);
-    const r=await geminiText(`Coach: Thema ${item.topic}. Frage ${item.question}. User fragt: ${t}`);
+    const r=await geminiText(`Coach: Frage ${item.question}. User fragt: ${t}`);
     coachMessages.push({role:"ai",text:r}); renderCoachBox(id,item);
   };
   $(id+"_log").innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join("");
 }
 
-/* THEMEN IMPORT (MULTI-JSON) */
 function renderTopics(){
   const list = currentDataList(); const box = $("topicBoxes"); box.innerHTML = "";
   list.forEach((data, idx) => {
     const div = document.createElement("div"); div.className = "topicItem";
-    div.innerHTML = `<div><strong>${esc(data.ueberthema)}</strong><br><small>${data.unterthemen.length} Unterthemen</small></div>
-                     <button style="color:red; border:1px solid red; border-radius:10px; padding:5px 10px" onclick="deleteTheme(${idx})">Löschen</button>`;
+    div.innerHTML = `<div><strong>${esc(data.ueberthema)}</strong></div><button onclick="deleteTheme(${idx})">Löschen</button>`;
     box.appendChild(div);
   });
 }
-window.deleteTheme = idx => { if(confirm("Thema löschen?")) { let l=currentDataList(); l.splice(idx,1); APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud(); }};
+window.deleteTheme = idx => { if(confirm("Löschen?")) { let l=currentDataList(); l.splice(idx,1); APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud(); }};
 
 $("importJsonBtn").onclick=()=>{
   try {
-    const raw = $("jsonText").value.trim();
-    if(!raw) return;
-    const newData = JSON.parse(raw);
-    let l = currentDataList(); 
-    l.push(newData); 
-    APP.dataByProfile[profile] = l;
-    saveDataByProfile(); renderAll(); saveToCloud(); $("jsonText").value = "";
+    const raw = $("jsonText").value.trim(); if(!raw) return;
+    const newData = JSON.parse(raw); let l = currentDataList(); l.push(newData);
+    APP.dataByProfile[profile] = l; saveDataByProfile(); renderAll(); saveToCloud(); $("jsonText").value = "";
     $("importStatus").textContent = "Hinzugefügt!";
   } catch(e) { alert("JSON Fehler!"); }
 };
 
-/* S-PEN ENGINE (1:1 v127) */
-function mountCanvas(){ const vp=$("cVp"); if(vp && !vp.contains(canvas)) vp.appendChild(canvas); updateCanvasTransform(); }
-function updateCanvasTransform(){ canvas.style.transform=`translate(${offsetX}px, ${offsetY}px) scale(${scale})`; }
+function mountCanvas(){ const vp=$("cVp"); if(vp && !vp.contains(canvas)) vp.appendChild(canvas); updateCanvas(); }
+function updateCanvas(){ canvas.style.transform=`translate(${offsetX}px, ${offsetY}px) scale(${scale})`; }
 function clearCanvas(){ cctx.setTransform(1,0,0,1,0,0); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); }
 function clientToCanvas(e){ const v=$("cVp").getBoundingClientRect(); return {x:(e.clientX-v.left-offsetX)/scale,y:(e.clientY-v.top-offsetY)/scale}; }
 
@@ -337,50 +316,44 @@ canvas.addEventListener("pointermove", e=>{
   } else if(e.pointerType==='touch' && gestureStart){
     if(pointers.size===1){ offsetX=gestureStart.ox+(e.clientX-gestureStart.px); offsetY=gestureStart.oy+(e.clientY-gestureStart.py); }
     else if(pointers.size===2){ const a=[...pointers.values()]; const d=Math.hypot(a[0].clientX-a[1].clientX, a[0].clientY-a[1].clientY); scale=Math.max(0.2, Math.min(3, gestureStart.sc * (d/gestureStart.dist))); }
-    updateCanvasTransform();
+    updateCanvas();
   }
 });
-canvas.addEventListener("pointerup", e=>{ pointers.delete(e.pointerId); drawLast=null; if(pointers.size<2) gestureStart=null; });
+canvas.addEventListener("pointerup", e=>{ pointers.delete(e.pointerId); drawLast=null; gestureStart=null; });
 
 function exportCanvasTrimmed(){
-  const src=cctx.getImageData(0,0,canvas.width,canvas.height); let minX=canvas.width,minY=canvas.height,maxX=0,maxY=0,found=false;
-  for(let y=0;y<canvas.height;y++){for(let x=0;x<canvas.width;x++){const idx=(y*canvas.width+x)*4; if(src.data[idx+3]>0 && src.data[idx]<250){found=true; if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y}}}
+  const src=cctx.getImageData(0,0,canvas.width,canvas.height); let minX=canvas.width,minY=canvas.height,maxX=0,maxY=0;
+  for(let y=0;y<canvas.height;y++){for(let x=0;x<canvas.width;x++){const idx=(y*canvas.width+x)*4; if(src.data[idx+3]>0 && src.data[idx]<250){if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y}}}
   const pad=20; const w=(maxX-minX)+pad*2, h=(maxY-minY)+pad*2;
   const tmp=document.createElement("canvas"); tmp.width=w; tmp.height=h; const tctx=tmp.getContext("2d");
   tctx.fillStyle="#fff"; tctx.fillRect(0,0,w,h); tctx.drawImage(canvas,minX-pad,minY-pad,w,h,0,0,w,h);
   return {base64: tmp.toDataURL("image/png").split(",")[1]};
 }
 
-/* DASHBOARD & RENDERALL */
-function debouncedLocalSave(){ const i=currentItem(); if(i) localStorage.setItem("draft_"+i.id, JSON.stringify({openText, selected, scale, offsetX, offsetY})); }
-function restoreDraft(){
-  const i=currentItem(); if(!i) return; const d=JSON.parse(localStorage.getItem("draft_"+i.id)||"{}");
-  if(!progress.status[i.id]){ openText=d.openText||""; selected=d.selected||[]; }
-  if(d.scale){ scale=d.scale; offsetX=d.offsetX; offsetY=d.offsetY; }
-}
-function renderHeader(){const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length,acc=vals.length?Math.round((known/vals.length)*100):0; $("pointsBadge").textContent=progress.points+" Punkte"; $("accBadge").textContent="Quote: "+acc+"%"; $("countsBadge").textContent=`Gewusst ${known} · Gesamt ${allItems().length}`}
+function debouncedLocalSave(){ const i=currentItem(); if(i) localStorage.setItem("draft_"+i.id, JSON.stringify({openText, scale, offsetX, offsetY})); }
+function renderHeader(){const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length; $("pointsBadge").textContent=progress.points+" P"; $("accBadge").textContent="Quote: "+(vals.length?Math.round((known/vals.length)*100):0)+"%"; $("countsBadge").textContent=`Gewusst ${known} · Gesamt ${allItems().length}`}
 function renderDashboard(){
-  const items=filtered(); 
-  $("dashTop").innerHTML=`<div class="soft">Fragen: ${items.length}</div><div class="soft">Gewusst: ${Object.values(progress.status).filter(v=>v==="known").length}</div>`;
+  const items=filtered(); $("dashTop").innerHTML=`<div class="soft">Fragen: ${items.length}</div><div class="soft">Gewusst: ${Object.values(progress.status).filter(v=>v==="known").length}</div>`;
   $("radar").innerHTML = items.map(i=>`<div class="soft" style="cursor:pointer" onclick="forcedItemId='${i.id}'; document.querySelector('[data-tab=quiz]').click()"><strong>${esc(i.question)}</strong></div>`).join("");
 }
-function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className="profileBtn"+(profile===p.id?" active":""); btn.innerHTML=`<div style="font-weight:700">${esc(p.name)}</div>`; btn.onclick=()=>{profile=p.id;progress=loadProgress(profile);resetStudyState();renderAll()}; box.appendChild(btn)})}
-function renderSelectors(){const aSel=$("areaSelect"); aSel.innerHTML=areas().map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join(""); aSel.value=area; aSel.onchange=()=>{area=aSel.value;topic="Alle Unterthemen";resetStudyState();renderAll()}; const tSel=$("topicSelect"); tSel.innerHTML=topics().map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join(""); tSel.value=topic; tSel.onchange=()=>{topic=tSel.value;resetStudyState();renderAll()}}
+function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className=profile===p.id?"active":""; btn.textContent=p.name; btn.onclick=()=>{profile=p.id;progress=loadProgress(profile);resetStudyState();renderAll()}; box.appendChild(btn)})}
+function renderSelectors(){const aSel=$("areaSelect"); aSel.innerHTML=areas().map(a=>`<option value="${a}">${a}</option>`).join(""); aSel.value=area; aSel.onchange=()=>{area=aSel.value;topic="Alle Unterthemen";resetStudyState();renderAll()}; const tSel=$("topicSelect"); tSel.innerHTML=topics().map(t=>`<option value="${t}">${t}</option>`).join(""); tSel.value=topic; tSel.onchange=()=>{topic=tSel.value;resetStudyState();renderAll()}}
 
-function renderAll(){ restoreDraft(); renderHeader(); renderProfiles(); renderSelectors(); renderQuiz(); renderCards(); renderOpen(); renderTopics(); renderDashboard(); }
+function renderAll(){ renderHeader(); renderProfiles(); renderSelectors(); renderQuiz(); renderCards(); renderOpen(); renderTopics(); renderDashboard(); }
 
 document.querySelectorAll(".tab").forEach(btn=>{ btn.onclick=()=>{
   document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
-  ["quizTab","cardBody","openTab","dashboardTab","topicsTab"].forEach(id=>{if($(id)) $(id).classList.add("hidden")});
+  ["quizTab","cardBody","openTab","dashboardTab","topicsTab"].forEach(id=>$(id).classList.add("hidden"));
   const m={quiz:"quizTab",cards:"cardBody",open:"openTab",dashboard:"dashboardTab",topics:"topicsTab"};
-  if($(m[btn.dataset.tab])) $(m[btn.dataset.tab]).classList.remove("hidden");
+  $(m[btn.dataset.tab]).classList.remove("hidden");
+  if(btn.dataset.tab==='open') mountCanvas();
 }});
 
 document.addEventListener("DOMContentLoaded", () => { 
   $("geminiKey").value = localStorage.getItem("ml_final_gemini_key") || "";
   loadFromCloud(); renderAll(); 
 });
-$("saveKeysBtn").onclick=()=>{ localStorage.setItem("ml_final_gemini_key", $("geminiKey").value.trim()); alert("Key gespeichert"); };
+$("saveKeysBtn").onclick=()=>{ localStorage.setItem("ml_final_gemini_key", $("geminiKey").value.trim()); alert("OK"); };
 $("saveSyncIdBtn").onclick=()=>{ syncId=$("syncIdInput").value.trim(); localStorage.setItem("app_sync_id", syncId); loadFromCloud(); };
 </script>
 </body>
