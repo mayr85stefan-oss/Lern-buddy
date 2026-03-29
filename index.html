@@ -1246,6 +1246,27 @@ function renderTopics(){
 
   box.querySelectorAll("[data-del-theme]").forEach(btn=>{
     btn.onclick = ()=>{
+      box.querySelectorAll("[data-del-subtheme]").forEach(btn=>{
+  btn.onclick = ()=>{
+    const [themeIdx, subIdx] = btn.dataset.delSubtheme.split("_").map(Number);
+    if(!confirm("Dieses Unterthema wirklich löschen?")) return;
+
+    const list = currentDataList();
+    if(!list[themeIdx] || !list[themeIdx].unterthemen) return;
+
+    list[themeIdx].unterthemen.splice(subIdx, 1);
+
+    APP.dataByProfile[profile] = list;
+    saveDataByProfile();
+    saveToCloud();
+
+    area = "Alle Oberthemen";
+    topic = "Alle Unterthemen";
+    forcedItemId = null;
+    resetStudyState();
+    renderAll();
+  };
+});
       const idx = Number(btn.dataset.delTheme);
       if(!confirm("Thema löschen?")) return;
       const list = currentDataList();
