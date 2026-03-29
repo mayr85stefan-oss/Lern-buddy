@@ -283,6 +283,8 @@ async function loadFromCloud(){
       .eq("id", syncId)
       .maybeSingle();
 
+    alert("SYNC=" + syncId + " | DATA=" + JSON.stringify(data));
+    
     if(data && data.data){
       if(data.data.all_data) APP.dataByProfile = data.data.all_data;
       if(data.data.all_progress) APP.progressByProfile = data.data.all_progress;
