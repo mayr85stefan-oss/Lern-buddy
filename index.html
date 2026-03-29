@@ -270,6 +270,7 @@ async function loadFromCloud(){
     updateBadge("local");
     return;
   }
+
   try{
     const { data } = await supabaseClient
       .from("progress")
@@ -285,12 +286,62 @@ async function loadFromCloud(){
       progress = loadProgress(profile);
       renderAll();
       updateBadge("ok");
-    }else{
+    } else {
       updateBadge("local");
     }
   }catch(e){
     updateBadge("err");
   }
+}
+let cloudWatcherStarted = false;
+let cloudWatcherInterval = null;
+
+function startCloudWatcher(){
+  if(cloudWatcherStarted) return;
+  cloudWatcherStarted = true;
+
+  async function safeCloudCheck(){
+    if(!syncId || !supabaseClient){
+      updateBadge("local");
+      return;
+    }
+
+    try{
+      const { error } = await supabaseClient
+        .from("progress")
+        .select("id")
+        .eq("id", syncId)
+        .limit(1);
+
+      if(error){
+        updateBadge("err");
+      } else {
+        updateBadge("ok");
+      }
+    }catch(e){
+      updateBadge("err");
+    }
+  }
+
+  safeCloudCheck();
+
+  cloudWatcherInterval = setInterval(()=>{
+    safeCloudCheck();
+  }, 30000);
+
+  document.addEventListener("visibilitychange", async ()=>{
+    if(document.visibilityState === "visible"){
+      await safeCloudCheck();
+    }
+  });
+
+  window.addEventListener("online", async ()=>{
+    await safeCloudCheck();
+  });
+
+  window.addEventListener("offline", ()=>{
+    updateBadge("err");
+  });
 }
 
 /* =========================
@@ -1522,9 +1573,16 @@ $("saveSyncIdBtn").onclick = async ()=>{
 document.addEventListener("DOMContentLoaded", async ()=>{
   $("geminiKey").value = localStorage.getItem("ml_v129_gemini_key") || "";
   $("syncIdInput").value = syncId || "";
-  if(syncId) await loadFromCloud();
-  else updateBadge("local");
+
+  if(syncId){
+    await loadFromCloud();
+  } else {
+    updateBadge("local");
+  }
+
   renderAll();
+
+  startCloudWatcher();
 });
 </script>
 </body>
