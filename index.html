@@ -115,7 +115,7 @@ const CONFIG = {
    🔗 SUPABASE
 ========================= */
 let supabaseClient = null;
-if (CONFIG.SUPABASE_KEY !== "HIER_DEINEN_ECHTEN_SUPABASE_KEY_EINTRAGEN") {
+if (CONFIG.SUPABASE_KEY !== "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9") {
     supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 }
 let syncId = localStorage.getItem("app_sync_id") || "";
