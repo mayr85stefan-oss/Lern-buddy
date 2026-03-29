@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v141</title>
+<title>Master Lern-App Final v143</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -45,14 +45,19 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
 hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 #syncStatusBadge { position: absolute; top: 16px; right: 16px; font-weight: 700; }
 .topicItem{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--border);padding:12px;border-radius:14px;margin-bottom:10px}
+/* Dashboard Grouping CSS */
+.dashGroup { margin-bottom: 25px; border-left: 4px solid var(--dark); padding-left: 12px; }
+.dashGroup h3 { margin: 0 0 10px; color: var(--dark); font-size: 1.2rem; }
+.dashTopic { margin-bottom: 15px; }
+.dashTopic h4 { margin: 5px 0 8px; color: var(--muted); font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card">
     <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App v141</h1>
-    <div class="muted">VOLLSTÄNDIGER v127 ABGLEICH: Alles aktiv + Multi-Themen Fix.</div>
+    <h1>Master Lern-App v143</h1>
+    <div class="muted">1:1 v127 RESTORE: Quiz, Karten, S-Pen Pro, Gruppen-Dash & Multi-JSON.</div>
     <div class="row" style="margin-top:10px">
       <div class="badge" id="pointsBadge">0 Punkte</div>
       <div class="badge" id="accBadge">Trefferquote: 0%</div>
@@ -102,12 +107,18 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* =========================
+   🚨 KONFIGURATION
+========================= */
 const CONFIG = {
   SUPABASE_KEY: "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9", 
   SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co",
   GEMINI_MODEL: "gemini-2.5-flash" 
 };
 
+/* =========================
+   🔗 SUPABASE
+========================= */
 const supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 let syncId = localStorage.getItem("app_sync_id") || "";
 
@@ -136,6 +147,9 @@ async function loadFromCloud() {
   } catch (e) { updateBadge("err"); }
 }
 
+/* =========================
+   CORE LOGIC (1:1 v127 Original)
+========================= */
 const APP={profiles:[{id:"stefan",name:"Stefan",program:"Technischer Betriebswirt",badge:"TBW"},{id:"lolla",name:"Lolla",program:"Wirtschaftsfachwirt",badge:"WFW"}],dataByProfile:JSON.parse(localStorage.getItem("v109_dataByProfile")||"{}")};
 const DEFAULT_PROGRESS={points:0,streak:0,status:{},ratings:{}};
 let profile="stefan",progress=loadProgress(profile),area="Alle Oberthemen",topic="Alle Unterthemen",selected=[],revealed=false,flashRevealed=false,openText="",openResult=null,coachMessages=[],voiceEnabled=false,forcedItemId=null;
@@ -150,7 +164,11 @@ function loadProgress(p){return JSON.parse(localStorage.getItem("master_lernapp_
 function saveDataByProfile(){localStorage.setItem("v109_dataByProfile",JSON.stringify(APP.dataByProfile))}
 function saveProgress(){ localStorage.setItem("master_lernapp_v109_"+profile,JSON.stringify(progress)); saveToCloud(); renderHeader(); }
 
-function currentDataList(){ let l = APP.dataByProfile[profile]; if(!l) return []; return Array.isArray(l) ? l : [l]; }
+function currentDataList(){ 
+  let l = APP.dataByProfile[profile]; 
+  if(!l) return []; 
+  return Array.isArray(l) ? l : [l]; 
+}
 
 function allItems(){
   const dataList = currentDataList(); const out = [];
@@ -184,6 +202,7 @@ function currentItem(){
 
 function resetStudyState(){selected=[];revealed=false;flashRevealed=false;openText="";openResult=null;coachMessages=[];clearCanvas()}
 
+/* KI & SPEECH */
 async function geminiText(prompt){
   const k=localStorage.getItem("ml_final_gemini_key"); if(!k) throw new Error("Key fehlt."); 
   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${k}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}]})});
@@ -201,6 +220,7 @@ async function speechToText(fieldId, statusId){
   rec.start();
 }
 
+/* RENDERING (v127 REPRO) */
 function renderQuiz(){
   const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='Kein Thema.'; return}
   const optHtml=item.optionMeta.map((o,i)=>{
@@ -232,7 +252,7 @@ function renderCards(){
 function renderOpen(){
   const item=currentItem(),box=$("openBody"); if(!item){box.innerHTML='Kein Thema.'; return}
   box.innerHTML=`<div class="focusQuestion pinBox"><h2>${esc(item.question)}</h2></div>
-    <textarea id="oAns" class="bigEditor" placeholder="Schreiben oder sprechen...">${esc(openText)}</textarea>
+    <textarea id="oAns" class="bigEditor" placeholder="Schreiben...">${esc(openText)}</textarea>
     <div class="toolRow"><button class="primary" id="oEval">Text bewerten</button><button id="oMic">🎤 Sprache</button><span id="oStatus" class="helper"></span></div>
     ${revealed?renderRatingControls(item,"open"):""}
     ${revealed?`<div class="soft"><strong>Feedback:</strong><br>${openResult || esc(item.explanation)}</div>`:""}
@@ -246,8 +266,8 @@ function renderOpen(){
     try { openResult = await geminiText(`Prüfer: Frage ${item.question}, Lösung ${item.explanation}, Userantwort: ${$("oAns").value}.`); renderOpen(); } catch(e){}
   };
   if($("canvEval")) $("canvEval").onclick=async()=>{
-    revealed=true; renderOpen(); const img=exportCanvasTrimmed(); $("oStatus").textContent="KI Scan...";
-    try { openResult = await geminiImage(`Lies Handschrift zur Frage ${item.question}, Lösung ${item.explanation}`, "image/png", img.base64); renderOpen(); } catch(e){}
+    revealed=true; renderOpen(); const img=exportCanvasTrimmed(); $("oStatus").textContent="KI prüft Bild...";
+    try { openResult = await geminiImage(`Lies Handschrift zur Frage ${item.question}`, "image/png", img.base64); renderOpen(); } catch(e){}
   };
   if(revealed) attachRatingHandlers(box,item);
 }
@@ -270,21 +290,21 @@ function renderCoachBox(id,item){
   const box=$(id); box.innerHTML=`<div class="chat-log" id="${id}_log"></div><div class="row"><input id="${id}_in" style="flex:1"><button class="primary" id="${id}_btn">Senden</button></div>`;
   $(id+"_btn").onclick=async()=>{
     const t=$(id+"_in").value; coachMessages.push({role:"user",text:t}); $(id+"_in").value=""; renderCoachBox(id,item);
-    const r=await geminiText(`Coach: Frage ${item.question}. User fragt: ${t}`);
-    coachMessages.push({role:"ai",text:r}); renderCoachBox(id,item);
+    const r=await geminiText(`Coach: Frage ${item.question}. User fragt: ${t}`); coachMessages.push({role:"ai",text:r}); renderCoachBox(id,item);
   };
   $(id+"_log").innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join("");
 }
 
+/* THEMEN & S-PEN (1:1 v127) */
 function renderTopics(){
   const list = currentDataList(); const box = $("topicBoxes"); box.innerHTML = "";
   list.forEach((data, idx) => {
     const div = document.createElement("div"); div.className = "topicItem";
-    div.innerHTML = `<div><strong>${esc(data.ueberthema)}</strong></div><button onclick="deleteTheme(${idx})">Löschen</button>`;
+    div.innerHTML = `<div><strong>${esc(data.ueberthema)}</strong></div><button style="color:red" onclick="deleteTheme(${idx})">Löschen</button>`;
     box.appendChild(div);
   });
 }
-window.deleteTheme = idx => { if(confirm("Löschen?")) { let l=currentDataList(); l.splice(idx,1); APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud(); }};
+window.deleteTheme = idx => { if(confirm("Thema löschen?")) { let l=currentDataList(); l.splice(idx,1); APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud(); }};
 
 $("importJsonBtn").onclick=()=>{
   try {
@@ -330,12 +350,37 @@ function exportCanvasTrimmed(){
   return {base64: tmp.toDataURL("image/png").split(",")[1]};
 }
 
+/* PERSISTENCE & GROUPED DASHBOARD */
 function debouncedLocalSave(){ const i=currentItem(); if(i) localStorage.setItem("draft_"+i.id, JSON.stringify({openText, scale, offsetX, offsetY})); }
 function renderHeader(){const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length; $("pointsBadge").textContent=progress.points+" P"; $("accBadge").textContent="Quote: "+(vals.length?Math.round((known/vals.length)*100):0)+"%"; $("countsBadge").textContent=`Gewusst ${known} · Gesamt ${allItems().length}`}
+
 function renderDashboard(){
-  const items=filtered(); $("dashTop").innerHTML=`<div class="soft">Fragen: ${items.length}</div><div class="soft">Gewusst: ${Object.values(progress.status).filter(v=>v==="known").length}</div>`;
-  $("radar").innerHTML = items.map(i=>`<div class="soft" style="cursor:pointer" onclick="forcedItemId='${i.id}'; document.querySelector('[data-tab=quiz]').click()"><strong>${esc(i.question)}</strong></div>`).join("");
+  const items=allItems();
+  const grouped = {};
+  items.forEach(i => {
+    if(!grouped[i.area]) grouped[i.area] = {};
+    if(!grouped[i.area][i.topic]) grouped[i.area][i.topic] = [];
+    grouped[i.area][i.topic].push(i);
+  });
+
+  $("dashTop").innerHTML=`<div class="soft">Fragen: ${items.length}</div><div class="soft">Gewusst: ${Object.values(progress.status).filter(v=>v==="known").length}</div>`;
+  
+  let html = "";
+  for(let a in grouped){
+    html += `<div class="dashGroup"><h3>${esc(a)}</h3>`;
+    for(let t in grouped[a]){
+      html += `<div class="dashTopic"><h4>${esc(t)}</h4>`;
+      grouped[a][t].forEach(i => {
+        const isK = progress.status[i.id] === "known" ? " (Gelöst)" : "";
+        html += `<div class="soft" style="cursor:pointer; margin-bottom:5px" onclick="forcedItemId='${i.id}'; area='${a}'; topic='${t}'; document.querySelector('[data-tab=quiz]').click()"><strong>${esc(i.question)}</strong>${isK}</div>`;
+      });
+      html += `</div>`;
+    }
+    html += `</div>`;
+  }
+  $("radar").innerHTML = html;
 }
+
 function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className=profile===p.id?"active":""; btn.textContent=p.name; btn.onclick=()=>{profile=p.id;progress=loadProgress(profile);resetStudyState();renderAll()}; box.appendChild(btn)})}
 function renderSelectors(){const aSel=$("areaSelect"); aSel.innerHTML=areas().map(a=>`<option value="${a}">${a}</option>`).join(""); aSel.value=area; aSel.onchange=()=>{area=aSel.value;topic="Alle Unterthemen";resetStudyState();renderAll()}; const tSel=$("topicSelect"); tSel.innerHTML=topics().map(t=>`<option value="${t}">${t}</option>`).join(""); tSel.value=topic; tSel.onchange=()=>{topic=tSel.value;resetStudyState();renderAll()}}
 
@@ -347,7 +392,7 @@ document.querySelectorAll(".tab").forEach(btn=>{ btn.onclick=()=>{
   const m={quiz:"quizTab",cards:"cardBody",open:"openTab",dashboard:"dashboardTab",topics:"topicsTab"};
   $(m[btn.dataset.tab]).classList.remove("hidden");
   if(btn.dataset.tab==='open') mountCanvas();
-}});
+}};
 
 document.addEventListener("DOMContentLoaded", () => { 
   $("geminiKey").value = localStorage.getItem("ml_final_gemini_key") || "";
