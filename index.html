@@ -246,7 +246,7 @@ function updateBadge(status){
   else if(status === "local"){ b.textContent = "Lokal"; b.style.background="var(--accent)"; b.style.color="var(--text)"; }
   else { b.textContent = "Fehler/Offline"; b.style.background="#fee2e2"; b.style.color="#991b1b"; }
 }
-
+async function saveToCloud(){
 if(!syncId){
   console.log("Keine Sync ID");
   return;
