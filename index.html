@@ -251,14 +251,14 @@ async function saveToCloud(){
   if(!syncId || !supabaseClient) return;
   updateBadge("syncing");
   try{
-    await supabaseClient.from("progress").upsert({
+    await supabaseClient.from("progress").upsert([{
       id: syncId,
       data: {
         all_data: APP.dataByProfile,
         all_progress: APP.progressByProfile
       },
       updated_at: new Date().toISOString()
-    });
+    }]);
     updateBadge("ok");
   }catch(e){
     updateBadge("err");
