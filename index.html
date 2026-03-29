@@ -277,10 +277,11 @@ async function loadFromCloud(){
   }
 
   try{
-    const { data } = await supabaseClient
+   const { data } = await supabaseClient
   .from("progress")
-  .select("data")
+  .select("data, updated_at")
   .eq("id", syncId)
+  .order("updated_at", { ascending: false })
   .limit(1);
 
     alert("URL=" + CONFIG.SUPABASE_URL + " | SYNC=" + syncId + " | DATA=" + JSON.stringify(data));
