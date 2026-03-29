@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v122</title>
+<title>Master Lern-App Final v127</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -29,41 +29,34 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
 @media (max-width:950px){
   .pinBox{position:sticky;top:0;z-index:10;border-radius:0 0 14px 14px;margin-top:-14px}
   .focusQuestion h2{font-size:24px;line-height:1.2;margin:0}
-  .focusQuestion .fq-meta{display:none}
 }
 .option{display:block;width:100%;text-align:left;border:1px solid var(--border);margin:0 0 10px;background:#fff;transition:0.2s}
 .option.active{background:#e2e8f0}.option.correct{background:var(--good);border-color:#10b981}.option.wrong{background:var(--bad);border-color:#ef4444}
 .good,.mid,.bad{border-radius:16px;padding:12px;margin-top:12px}.good{background:var(--good)}.mid{background:var(--mid)}.bad{background:var(--bad)}
 .merksatz{color:var(--red);font-weight:700}
-.soft{border:1px solid var(--border);border-radius:18px;background:#fbfdff;padding:14px}.kpi{font-size:28px;font-weight:700}.statusBox{background:#eef2ff;border-left:4px solid var(--dark);padding:12px;border-radius:12px}
-.profileBtn{width:100%;text-align:left}.profileBtn.active{background:#f1f5f9}.bigEditor{min-height:180px;font-size:18px}.answerScroll{max-height:240px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.soft{border:1px solid var(--border);border-radius:18px;background:#fbfdff;padding:14px}.kpi{font-size:28px;font-weight:700}
 .toolRow{display:flex;gap:8px;flex-wrap:wrap}
 .coachbox{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:14px}.chat-log{max-height:240px;overflow:auto;border:1px solid var(--border);border-radius:12px;padding:8px;background:#fff}.chat-user,.chat-ai{padding:10px 12px;border-radius:14px;margin-bottom:8px;white-space:pre-wrap}.chat-user{background:#ede9fe;margin-left:auto;max-width:88%}.chat-ai{background:#eef2f7;max-width:92%}
 .canvasWrap{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff}.canvasToolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border);background:#f8fafc;align-items:center}.canvasViewport{position:relative;width:100%;height:450px;overflow:hidden;touch-action:none;background:#fff}#drawCanvas{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0;touch-action:none}
 .helper{font-size:12px;color:var(--muted)}
 .ratingRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.ratingBtn{border-radius:999px;padding:8px 12px;font-weight:bold;cursor:pointer;background:#fff}
+.ratingBtn{border-radius:999px;padding:8px 12px;font-weight:bold;cursor:pointer;background:#fff;border:1px solid var(--border)}
 .ratingBtn.active{background:var(--dark);color:#fff!important;border-color:var(--dark)!important}
-.filterChip{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:8px 12px;margin:0 8px 8px 0;background:#fff;cursor:pointer;font-weight:bold}
-.filterChip.active{background:var(--dark);color:#fff;border-color:var(--dark)}
-.smallScroll{max-height:220px;overflow:auto}
-.collapseHead{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.collapseBody.hiddenBody{display:none}
 hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 #syncStatusBadge { position: absolute; top: 16px; right: 16px; font-weight: 700; }
+.topicItem{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--border);padding:12px;border-radius:14px;margin-bottom:10px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card">
     <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App v122</h1>
-    <div class="muted">Cache-Leak gefixt. Nächste-Frage-Buttons nach oben geholt.</div>
+    <h1>Master Lern-App v127</h1>
+    <div class="muted">KOMPLETT-VERSION: Quiz, Karteikarten, S-Pen Pro, Multi-JSON & Cloud.</div>
     <div class="row" style="margin-top:10px">
       <div class="badge" id="pointsBadge">0 Punkte</div>
-      <div class="badge" id="streakBadge">Serie: 0</div>
       <div class="badge" id="accBadge">Trefferquote: 0%</div>
-      <div class="badge" id="countsBadge">Gewusst 0 · Nicht gewusst 0 · Unsicher 0</div>
+      <div class="badge" id="countsBadge">Gewusst 0 · Insgesamt 0</div>
     </div>
   </div>
 
@@ -72,19 +65,15 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       <h3>Profile</h3>
       <div id="profiles"></div>
       <hr class="sep">
-      
       <h3>Cloud-Sync (ID)</h3>
-      <input type="text" id="syncIdInput" placeholder="Deine geheime ID..." style="margin-top:8px">
+      <input type="text" id="syncIdInput" placeholder="Deine ID...">
       <button class="primary" id="saveSyncIdBtn" style="width:100%;margin-top:8px">ID Koppeln & Laden</button>
       <hr class="sep">
-
-      <h3>KI Coach & API</h3>
-      <div style="margin-top:10px"><input id="geminiKey" type="password" placeholder="Gemini API Key hier rein..."></div>
-      <div class="row" style="margin-top:10px"><button id="saveKeysBtn" style="width:100%">KI Key speichern</button></div>
-      <div class="helper" style="margin-top:8px;color:#ef4444">Fehler 429? API-Limit erreicht. Google Cloud Billing aktivieren.</div>
+      <h3>KI API Key</h3>
+      <input id="geminiKey" type="password" placeholder="Key hier rein...">
+      <button id="saveKeysBtn" style="width:100%;margin-top:8px">Key speichern</button>
       <hr class="sep">
-
-      <label class="muted" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="voiceToggle" style="width:auto"> Sprachcoach vorlesen</label>
+      <label class="muted"><input type="checkbox" id="voiceToggle"> Sprachcoach vorlesen</label>
       <div class="row" style="margin-top:12px"><button id="resetProgressBtn">Fortschritt zurücksetzen</button></div>
     </div>
 
@@ -93,7 +82,6 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
         <div><div class="muted">Oberthema</div><select id="areaSelect"></select></div>
         <div><div class="muted">Unterthema</div><select id="topicSelect"></select></div>
       </div>
-
       <div class="card">
         <div class="tabbar">
           <button class="tab active" data-tab="quiz">Quiz</button>
@@ -103,534 +91,294 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
           <button class="tab" data-tab="topics">Themen / Import</button>
         </div>
       </div>
-
       <div id="quizTab"><div class="card"><div id="quizBody"></div></div></div>
       <div id="cardsTab" class="hidden"><div class="card"><div id="cardBody"></div></div></div>
-      <div id="openTab" class="hidden"><div class="card" id="openBodyWrapper"><div id="openBody"></div></div></div>
-      <div id="dashboardTab" class="hidden"><div class="card"><div class="grid grid4" id="dashTop"></div><div class="grid grid4" id="dashBottom" style="margin-top:12px"></div><div class="card" style="margin-top:12px"><h3>Themenradar</h3><div id="radar"></div></div></div></div>
-      <div id="topicsTab" class="hidden"><div class="card"><div id="topicBoxes"></div><div class="card" style="margin-top:12px"><h3>JSON Import</h3><textarea id="jsonText" rows="14" placeholder="Achtung: Neuer Upload überschreibt alte Fragen dieses Profils!"></textarea><div class="row" style="margin-top:12px"><button class="primary" id="importJsonBtn">JSON importieren</button></div><div id="importStatus" class="statusBox" style="margin-top:12px">Bereit.</div></div></div></div>
+      <div id="openTab" class="hidden"><div class="card"><div id="openBody"></div></div></div>
+      <div id="dashboardTab" class="hidden"><div class="card"><div class="grid grid4" id="dashTop"></div><div id="radar" style="margin-top:12px"></div></div></div>
+      <div id="topicsTab" class="hidden"><div class="card"><h3>Importierte Themen</h3><div id="topicBoxes"></div><hr class="sep"><h3>Thema anhängen</h3><textarea id="jsonText" rows="6" placeholder="JSON hier einfügen..."></textarea><button class="primary" id="importJsonBtn" style="margin-top:12px;width:100%">Thema hinzufügen</button><div id="importStatus" class="helper" style="margin-top:8px">Bereit.</div></div></div>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* =========================================================
-   🚨 APP KONFIGURATION (HIER DEINE KEYS EINTRAGEN) 🚨
-========================================================= */
+/* =========================
+   🚨 KONFIGURATION
+========================= */
 const CONFIG = {
-  // 1. Dein echter Supabase-Key (beginnt mit eyJ...)
   SUPABASE_KEY: "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9", 
   SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co",
-  
-  // 2. Welches KI-Modell soll genutzt werden? 
   GEMINI_MODEL: "gemini-2.5-flash" 
 };
 
-
 /* =========================
-   🔗 SUPABASE & SYNC ENGINE
+   🔗 SUPABASE
 ========================= */
 let supabaseClient = null;
 if (CONFIG.SUPABASE_KEY !== "HIER_DEINEN_ECHTEN_SUPABASE_KEY_EINTRAGEN") {
     supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 }
-
 let syncId = localStorage.getItem("app_sync_id") || "";
-if(syncId) document.getElementById("syncIdInput").value = syncId;
 
 function updateBadge(status) {
-  const badge = document.getElementById("syncStatusBadge");
-  if(status === "ok") { badge.textContent = "Cloud OK"; badge.style.background = "#dcfce7"; badge.style.color = "#166534"; }
-  else if(status === "syncing") { badge.textContent = "Speichert..."; badge.style.background = "#fef08a"; badge.style.color = "#854d0e"; }
-  else if(status === "nokey") { badge.textContent = "Key fehlt!"; badge.style.background = "#fee2e2"; badge.style.color = "#991b1b"; }
-  else { badge.textContent = "Sync Fehler"; badge.style.background = "#fee2e2"; badge.style.color = "#991b1b"; }
+  const b = $("syncStatusBadge");
+  if(status === "ok") { b.textContent = "Cloud OK"; b.style.background = "#dcfce7"; b.style.color = "#166534"; }
+  else if(status === "syncing") { b.textContent = "Speichert..."; b.style.background = "#fef08a"; b.style.color = "#854d0e"; }
+  else { b.textContent = "Fehler/Offline"; b.style.background = "#fee2e2"; b.style.color = "#991b1b"; }
 }
 
 async function saveToCloud() {
-  if(!syncId) return;
-  if(!supabaseClient) { updateBadge("nokey"); return; }
+  if(!syncId || !supabaseClient) return;
   updateBadge("syncing");
-  try {
-    await supabaseClient.from("progress").upsert({
-      id: syncId, data: { profile: profile, progress: progress, all_data: APP.dataByProfile }, updated_at: new Date().toISOString()
-    });
-    updateBadge("ok");
-  } catch (e) { updateBadge("error"); }
+  try { await supabaseClient.from("progress").upsert({id: syncId, data: { profile, progress, all_data: APP.dataByProfile }, updated_at: new Date().toISOString()}); updateBadge("ok"); } catch (e) { updateBadge("err"); }
 }
 
 async function loadFromCloud() {
-  if(!syncId) return;
-  if(!supabaseClient) { updateBadge("nokey"); return; }
+  if(!syncId || !supabaseClient) return;
   try {
-    const { data, error } = await supabaseClient.from("progress").select("data").eq("id", syncId).maybeSingle();
-    if(!error) updateBadge("ok");
+    const { data } = await supabaseClient.from("progress").select("data").eq("id", syncId).maybeSingle();
     if (data && data.data) {
       if(data.data.all_data) APP.dataByProfile = data.data.all_data;
       if(data.data.progress) progress = data.data.progress;
-      saveDataByProfile();
-      renderAll();
+      saveDataByProfile(); renderAll(); updateBadge("ok");
     }
-  } catch (e) { updateBadge("error"); }
+  } catch (e) { updateBadge("err"); }
 }
 
 /* =========================
-   ORIGINAL APP LOGIC
+   CORE LOGIC
 ========================= */
-const APP={profiles:[{id:"stefan",name:"Stefan",program:"Technischer Betriebswirt",badge:"TBW"},{id:"lolla",name:"Lolla",program:"Wirtschaftsfachwirt",badge:"WFW"}],dataByProfile:JSON.parse(localStorage.getItem("v109_dataByProfile")||"{}"),supabase:null,user:null};
+const APP={profiles:[{id:"stefan",name:"Stefan",program:"Technischer Betriebswirt",badge:"TBW"},{id:"lolla",name:"Lolla",program:"Wirtschaftsfachwirt",badge:"WFW"}],dataByProfile:JSON.parse(localStorage.getItem("v109_dataByProfile")||"{}")};
 const DEFAULT_PROGRESS={points:0,streak:0,status:{},ratings:{}};
 let profile="stefan",progress=loadProgress(profile),area="Alle Oberthemen",topic="Alle Unterthemen",selected=[],revealed=false,flashRevealed=false,openText="",openResult=null,coachMessages=[],voiceEnabled=false,forcedItemId=null;
 
-/* CANVAS GLOBALS */
 const canvas=document.createElement("canvas"); canvas.width=1800; canvas.height=1200; canvas.id="drawCanvas";
 const cctx=canvas.getContext("2d"); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); cctx.lineCap="round"; cctx.lineJoin="round";
-let tool="pen",brushSize=4,scale=0.6,offsetX=0,offsetY=0;
-let pointers=new Map(), drawLast=null, gestureStart=null;
+let tool="pen",brushSize=4,scale=0.6,offsetX=0,offsetY=0,pointers=new Map(),drawLast=null,gestureStart=null;
 
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function storageKey(p){return "master_lernapp_v109_"+p}
-function loadProgress(p){try{return JSON.parse(localStorage.getItem(storageKey(p))||JSON.stringify(DEFAULT_PROGRESS))}catch{return JSON.parse(JSON.stringify(DEFAULT_PROGRESS))}}
+function loadProgress(p){return JSON.parse(localStorage.getItem("master_lernapp_v109_"+p)||JSON.stringify(DEFAULT_PROGRESS))}
+function saveDataByProfile(){localStorage.setItem("v109_dataByProfile",JSON.stringify(APP.dataByProfile))}
+function saveProgress(){ localStorage.setItem("master_lernapp_v109_"+profile,JSON.stringify(progress)); saveToCloud(); renderHeader(); }
 
-function saveProgress(){
-  localStorage.setItem(storageKey(profile),JSON.stringify(progress));
-  saveToCloud(); renderHeader(); renderDashboard();
+function currentDataList(){ let l = APP.dataByProfile[profile]; if(!l) return []; return Array.isArray(l) ? l : [l]; }
+
+function allItems(){
+  const dataList = currentDataList(); const out = [];
+  dataList.forEach((data, dIdx) => {
+    (data.unterthemen||[]).forEach((u, ui) => {
+      (u.fragen||[]).forEach((q, qi) => {
+        const correct=(q.kernpunkte||q.signalwoerter||[]).slice(0,3).map(x=>({text:x,correct:true}));
+        const optionMeta=[...correct,{text:"Falsche Antwort-Option A",correct:false},{text:"Falsche Antwort-Option B",correct:false}].slice(0,5);
+        out.push({
+          id:`${profile}_${dIdx}_${ui}_${qi}`, area: data.ueberthema||"Oberthema", topic: u.name||"Unterthema",
+          question: q.frage||"", explanation: q.antwort||"", merksatz: q.merksatz||"",
+          mustHave: q.kernpunkte||q.signalwoerter||[], optionMeta,
+          answer: optionMeta.map((o,i)=>o.correct?i:null).filter(x=>x!==null)
+        });
+      });
+    });
+  });
+  return out;
 }
 
-function saveDataByProfile(){localStorage.setItem("v109_dataByProfile",JSON.stringify(APP.dataByProfile))}
-function currentData(){return APP.dataByProfile[profile]||null}
-function normalizeJson(data){if(!data||!Array.isArray(data.unterthemen)) throw new Error("Schema ungültig."); data.unterthemen.forEach(u=>{u.fragen=u.fragen||[];u.fragen.forEach(q=>{q.signalwoerter=q.signalwoerter||[];q.kernpunkte=q.kernpunkte||q.signalwoerter.slice(0,3);q.quiz_optionen=q.quiz_optionen||[...q.kernpunkte.slice(0,3).map(x=>({text:x,correct:true})),{text:"Nur die Überschrift nennen reicht als vollständige Antwort.",correct:false},{text:"Signalwörter sind für die Bewertung unwichtig.",correct:false}].slice(0,5)})}); return data}
-function buildQuizOptions(q){if(Array.isArray(q.quiz_optionen)&&q.quiz_optionen.length) return q.quiz_optionen.map(x=>({text:x.text,correct:!!x.correct})); const correct=(q.kernpunkte&&q.kernpunkte.length?q.kernpunkte:q.signalwoerter||[]).slice(0,3).map(x=>({text:x,correct:true})); return [...correct,{text:"Nur die Überschrift nennen reicht als vollständige Antwort.",correct:false},{text:"Signalwörter sind für die Bewertung unwichtig.",correct:false}].slice(0,5)}
-function allItems(){const data=currentData(); if(!data||!Array.isArray(data.unterthemen)) return []; const out=[]; data.unterthemen.forEach((u,ui)=>{(u.fragen||[]).forEach((q,qi)=>{const optionMeta=buildQuizOptions(q); out.push({id:`${profile}_${ui}_${qi}`,area:data.ueberthema||"Ohne Oberthema",topic:u.name||"Ohne Unterthema",operator:q.typ||"",question:q.frage||"",explanation:q.antwort||"",merksatz:q.merksatz||"",mustHave:q.kernpunkte||q.signalwoerter||[],hint:q.falle||"",optionMeta,answer:optionMeta.map((o,i)=>o.correct?i:null).filter(x=>x!==null),raw:q})})}); return out}
 function areas(){return ["Alle Oberthemen",...new Set(allItems().map(i=>i.area))]}
 function topics(){return ["Alle Unterthemen",...new Set(allItems().filter(i=>area==="Alle Oberthemen"||i.area===area).map(i=>i.topic))]}
 function filtered(){return allItems().filter(i=>(area==="Alle Oberthemen"||i.area===area)&&(topic==="Alle Unterthemen"||i.topic===topic))}
+
 function currentItem(){
   const a=filtered(); if(!a.length) return null;
-  if(forcedItemId){ const forced=a.find(x=>x.id===forcedItemId); if(forced) return forced; forcedItemId=null; }
-  const ratings = progress.ratings || {};
-  const unrated = a.find(x=>!ratings[x.id]); if(unrated) return unrated;
-  const unanswered = a.find(x=>!progress.status[x.id]); if(unanswered) return unanswered;
-  return a[0];
+  if(forcedItemId){ const f=a.find(x=>x.id===forcedItemId); if(f) return f; forcedItemId=null; }
+  const r = progress.ratings || {};
+  return a.find(x=>!r[x.id]) || a.find(x=>!progress.status[x.id]) || a[0];
 }
+
 function resetStudyState(){selected=[];revealed=false;flashRevealed=false;openText="";openResult=null;coachMessages=[];clearCanvas()}
-function setStatus(id,status,points=0){progress.points+=points;progress.streak=status==="known"?progress.streak+1:0;progress.status[id]=status;saveProgress(); debouncedLocalSave()}
-function arraysEqual(a,b){if(a.length!==b.length)return false; const sa=[...a].sort((x,y)=>x-y), sb=[...b].sort((x,y)=>x-y); return sa.every((v,i)=>v===sb[i])}
 
-function setRating(id, level, mode){
-  if(!progress.ratings) progress.ratings = {};
-  progress.ratings[id] = { level, mode };
-  saveProgress();
-  forcedItemId = null;
-  resetStudyState();
-  renderAll();
-}
-function getRating(id){ return progress.ratings && progress.ratings[id] ? progress.ratings[id] : null; }
-function renderRatingControls(item, mode){
-  const r = getRating(item.id); const active = (x)=> r && r.level===x ? " active" : "";
-  return `<div class="ratingRow" style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 14px; margin-top: 14px; margin-bottom: 14px; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);">
-    <div style="width:100%; font-weight: 800; margin-bottom: 10px; color: #1e40af; font-size: 16px;">Nächste Frage laden? Bitte kurz bewerten:</div>
-    <button type="button" class="ratingBtn${active('easy')}" data-rate="easy" data-mode="${mode}" style="color: #16a34a; border: 1px solid #cbd5e1; flex: 1;">Einfach</button>
-    <button type="button" class="ratingBtn${active('medium')}" data-rate="medium" data-mode="${mode}" style="color: #d97706; border: 1px solid #cbd5e1; flex: 1;">Mittel</button>
-    <button type="button" class="ratingBtn${active('hard')}" data-rate="hard" data-mode="${mode}" style="color: #dc2626; border: 1px solid #cbd5e1; flex: 1;">Schwierig</button>
-  </div>`;
-}
-function attachRatingHandlers(scope, item){
-  scope.querySelectorAll("[data-rate]").forEach(btn=>{
-    btn.onclick=()=>{ setRating(item.id, btn.dataset.rate, btn.dataset.mode); };
-  });
-}
-
-let dashboardFilter = "all"; let dashboardModeFilter = "all";
-function filteredByDashboard(items){
-  return items.filter(i=>{
-    const r = getRating(i.id);
-    const okLevel = dashboardFilter==="all" ? true : (r && r.level===dashboardFilter);
-    const okMode = dashboardModeFilter==="all" ? true : (r && r.mode===dashboardModeFilter);
-    return okLevel && okMode;
-  });
-}
-function attachDashboardFilterState(){
-  document.querySelectorAll("[data-dash-filter]").forEach(el=>{ 
-    el.classList.toggle("active", el.dataset.dashFilter===dashboardFilter); 
-    el.onclick = () => { dashboardFilter = el.dataset.dashFilter; renderDashboard(); };
-  });
-  document.querySelectorAll("[data-dash-mode]").forEach(el=>{ 
-    el.classList.toggle("active", el.dataset.dashMode===dashboardModeFilter); 
-    el.onclick = () => { dashboardModeFilter = el.dataset.dashMode; renderDashboard(); };
-  });
-}
-
-function renderHeader(){const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length,unknown=vals.filter(v=>v==="unknown").length,unsure=vals.filter(v=>v==="unsure").length,acc=vals.length?Math.round((known/vals.length)*100):0; $("pointsBadge").textContent=progress.points+" Punkte"; $("streakBadge").textContent="Serie: "+progress.streak; $("accBadge").textContent="Trefferquote: "+acc+"%"; $("countsBadge").textContent=`Gewusst ${known} · Nicht gewusst ${unknown} · Unsicher ${unsure}`}
-function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className="profileBtn"+(profile===p.id?" active":""); btn.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700">${esc(p.name)}</div><div class="muted">${esc(p.program)}</div></div><span class="badge">${esc(p.badge)}</span></div>`; btn.onclick=()=>{profile=p.id;progress=loadProgress(profile);area="Alle Oberthemen";topic="Alle Unterthemen";forcedItemId=null;resetStudyState();renderAll()}; box.appendChild(btn)})}
-function renderSelectors(){const aSel=$("areaSelect"); aSel.innerHTML=areas().map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join(""); aSel.value=areas().includes(area)?area:"Alle Oberthemen"; area=aSel.value; aSel.onchange=()=>{area=aSel.value;topic="Alle Unterthemen";forcedItemId=null;resetStudyState();renderAll()}; const tSel=$("topicSelect"); tSel.innerHTML=topics().map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join(""); tSel.value=topics().includes(topic)?topic:"Alle Unterthemen"; topic=tSel.value; tSel.onchange=()=>{topic=tSel.value;forcedItemId=null;resetStudyState();renderAll()}}
-function coachBase(item,mode){if(!item) return ""; if(mode==="short") return item.merksatz||item.explanation; if(mode==="normal") return item.explanation; if(mode==="long") return item.explanation+"\\n\\nWichtige Kernpunkte: "+(item.mustHave||[]).join(", "); if(mode==="exam") return "Achte auf diese Kernpunkte: "+(item.mustHave||[]).join(", "); if(mode==="analogy") return item.merksatz||item.explanation; return item.explanation}
-function speak(text){if(!voiceEnabled||!("speechSynthesis" in window)) return; window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang="de-DE"; window.speechSynthesis.speak(u)}
-function addCoachMessage(role,text){coachMessages.push({role,text}); if(role==="ai") speak(text)}
-
-/* === GEMINI API === */
+/* KI & SPEECH */
 async function geminiText(prompt){
-  const key=$("geminiKey").value.trim() || localStorage.getItem("ml_final_gemini_key"); 
-  if(!key) throw new Error("Gemini API Key fehlt."); 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=`+encodeURIComponent(key);
-  const body={contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{temperature:0.3,maxOutputTokens:700}}; 
-  const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); 
-  if(!res.ok){const txt=await res.text(); throw new Error(txt.slice(0,260))} 
-  const data=await res.json(); 
-  return data?.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("\\n").trim()||"Keine Antwort erhalten."
+  const k=localStorage.getItem("ml_final_gemini_key"); if(!k) throw new Error("Key fehlt."); 
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${k}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}]})});
+  const d=await res.json(); return d.candidates[0].content.parts[0].text;
 }
+
 async function geminiImage(prompt,mimeType,data){
-  const key=$("geminiKey").value.trim() || localStorage.getItem("ml_final_gemini_key"); 
-  if(!key) throw new Error("Gemini API Key fehlt."); 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=`+encodeURIComponent(key);
-  const body={contents:[{role:"user",parts:[{text:prompt},{inlineData:{mimeType,data}}]}],generationConfig:{temperature:0.2,maxOutputTokens:800}}; 
-  const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); 
-  if(!res.ok){const txt=await res.text(); throw new Error(txt.slice(0,260))} 
-  const json=await res.json(); 
-  return json?.candidates?.[0]?.content?.parts?.map(p=>p.text||"").join("\\n").trim()||"Keine Antwort erhalten."
+  const k=localStorage.getItem("ml_final_gemini_key"); if(!k) throw new Error("Key fehlt."); 
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${k}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt},{inlineData:{mimeType,data}}]}]})});
+  const d=await res.json(); return d.candidates[0].content.parts[0].text;
 }
 
-function renderCoachBox(id,item){const box=$(id); box.innerHTML=`<div style="font-weight:700">Lerncoach</div><div class="toolRow" style="margin-top:10px"><button data-coach="short">Kurz</button><button data-coach="normal">Normal</button><button data-coach="long">Ausführlich</button><button data-coach="analogy">Analogie</button><button data-coach="exam">Prüfungsbezug</button><button id="${id}_why">Warum falsch?</button><button id="${id}_simple">Noch einfacher</button><button id="${id}_speak">Vorlesen</button><button id="${id}_mic">🎤 Sprache</button></div><div class="chat-log" id="${id}_log" style="margin-top:12px"></div><div class="row" style="margin-top:10px"><input id="${id}_input" placeholder="Frag die KI zum Thema..."><button class="primary" id="${id}_send">Senden</button></div>`; const redraw=()=>{$(id+"_log").innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join(""); $(id+"_log").scrollTop=$(id+"_log").scrollHeight}; if(!coachMessages.length) addCoachMessage("ai",coachBase(item,"normal")); redraw(); box.querySelectorAll("[data-coach]").forEach(btn=>btn.onclick=()=>{addCoachMessage("ai",coachBase(item,btn.dataset.coach)); redraw()}); $(id+"_speak").onclick=()=>{if(coachMessages.length) speak(coachMessages[coachMessages.length-1].text)}; $(id+"_mic").onclick=()=>speechToTextField(id+"_input"); $(id+"_why").onclick=()=>{addCoachMessage("ai","Typische Fehler: zu allgemein antworten, Kernpunkte auslassen und Begriffe nicht sauber abgrenzen."); redraw()}; $(id+"_simple").onclick=()=>{addCoachMessage("ai",coachBase(item,"short")); redraw()}; $(id+"_send").onclick=async()=>{const inp=$(id+"_input"); const txt=inp.value.trim(); if(!txt) return; addCoachMessage("user",txt); redraw(); inp.value=""; addCoachMessage("ai","Denke nach ..."); redraw(); try{const reply=await geminiText(`Du bist ein IHK-Lerncoach.\\nThema: ${item.topic}\\nFrage: ${item.question}\\nMusterantwort: ${item.explanation}\\nMerksatz: ${item.merksatz}\\nKernpunkte: ${(item.mustHave||[]).join(", ")}\\n\\nBenutzerfrage:\\n${txt}\\n\\nAntworte in einfachem Deutsch, kurz und prüfungsnah.`); coachMessages.pop(); addCoachMessage("ai",reply)}catch(e){coachMessages.pop(); addCoachMessage("ai","Coach-Fehler: "+e.message)} redraw()}}
+async function speechToText(fieldId, statusId){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return;
+  const rec=new SR(); rec.lang="de-DE"; rec.onstart=()=>{$(statusId).textContent="Ich höre...";};
+  rec.onresult=e=>{$(fieldId).value += " " + e.results[0][0].transcript; $(statusId).textContent="OK"; openText=$(fieldId).value; debouncedLocalSave();};
+  rec.start();
+}
 
-/* QUIZ & CARDS */
-function renderQuiz(){const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='<div class="muted">Noch keine Inhalte da. Importiere zuerst dein JSON im Tab „Themen / Import“.</div>'; return} 
+/* RENDERING TABS */
+function renderQuiz(){
+  const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema geladen.</div>'; return}
   const optHtml=item.optionMeta.map((o,i)=>{
     const active=selected.includes(i)?" active":""; 
-    let cls="", dis=""; 
-    if(revealed){
-      dis = "disabled"; 
-      if(o.correct) cls=" correct"; else if(selected.includes(i)) cls=" wrong";
-    } 
+    let cls="", dis=revealed?"disabled":""; 
+    if(revealed){if(o.correct) cls=" correct"; else if(selected.includes(i)) cls=" wrong"} 
     return `<button class="option${active}${cls}" data-opt="${i}" ${dis}>${esc(o.text)}</button>`
-  }).join(""); 
-  
-  box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(item.question)}</h2><div class="muted" style="margin-top:6px">Tippe die Aussagen an, die fachlich passen.</div></div>
-  <div style="margin-top:14px">
-    ${optHtml}
-    <div class="toolRow" style="margin-top:12px">
-      ${!revealed?'<button class="primary" id="quizCheckBtn">Antwort prüfen</button>':''}
-      <button id="quizCoachBtn">Coach öffnen</button>
-    </div>
-    ${revealed?renderRatingControls(item,"quiz"):""}
-    ${revealed?`<div class="${progress.status[item.id]==='known'?'good':progress.status[item.id]==='unsure'?'mid':'bad'}"><div style="font-weight:700">${progress.status[item.id]==='known'?'Richtig':'Feedback'}</div><div style="margin-top:8px">${esc(item.explanation)}</div><div class="merksatz" style="margin-top:8px">Merksatz: ${esc(item.merksatz)}</div></div>`:""}
-    <div id="quizCoachBox" class="coachbox hidden"></div>
-  </div>`; 
-  
-  box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{
-    if(revealed) return;
-    const i=Number(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz()
-  }); 
-  
-  $("quizCoachBtn").onclick=()=>{$("quizCoachBox").classList.remove("hidden"); renderCoachBox("quizCoachBox",item)}; 
-  const check=$("quizCheckBtn"); 
-  if(check) check.onclick=()=>{const ok=arraysEqual(selected,item.answer); if(ok) setStatus(item.id,"known",10); else if(selected.length) setStatus(item.id,"unsure",3); else setStatus(item.id,"unknown",0); revealed=true; renderQuiz()}; 
+  }).join("");
+  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${esc(item.question)}</h2></div>
+    <div style="margin-top:14px">${optHtml}
+      <div class="toolRow">${!revealed?'<button class="primary" id="qCheck">Prüfen</button>':''}<button id="qCoach">Coach</button></div>
+      ${revealed?renderRatingControls(item,"quiz"):""}
+      ${revealed?`<div class="good"><strong>Lösung:</strong><br>${esc(item.explanation)}<br><br><strong>Merksatz:</strong> ${esc(item.merksatz)}</div>`:""}
+      <div id="qCBox" class="coachbox hidden"></div>`;
+  box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{if(revealed)return; const i=parseInt(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz(); debouncedLocalSave();});
+  if($("qCheck")) $("qCheck").onclick=()=>{revealed=true; progress.status[item.id]=selected.length?"known":"unsure"; renderQuiz(); saveProgress();};
+  $("qCoach").onclick=()=>{$("qCBox").classList.toggle("hidden"); renderCoachBox("qCBox",item)};
   if(revealed) attachRatingHandlers(box,item);
 }
 
-function renderCards(){const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='<div class="muted">Keine Karteikarten verfügbar.</div>'; return} 
-  box.innerHTML=`<div class="focusQuestion pinBox"><div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div><h2 style="margin-top:10px">${esc(flashRevealed?item.explanation:item.question)}</h2>${flashRevealed?`<div class="merksatz" style="margin-top:12px">Merksatz: ${esc(item.merksatz)}</div>`:''}</div>
-  <div class="toolRow" style="margin-top:14px">
-    <button class="primary" id="flipBtn">${flashRevealed?'Vorderseite':'Karte drehen'}</button>
-    <button id="cardCoachBtn">Coach öffnen</button>
-  </div>
-  ${flashRevealed?renderRatingControls(item,"cards"):""}
-  <div id="cardCoachBox" class="coachbox hidden"></div>`; 
-  
-  $("flipBtn").onclick=()=>{flashRevealed=!flashRevealed; renderCards()}; 
-  $("cardCoachBtn").onclick=()=>{$("cardCoachBox").classList.remove("hidden"); renderCoachBox("cardCoachBox",item)}; 
+function renderCards(){
+  const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema geladen.</div>'; return}
+  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${flashRevealed?esc(item.explanation):esc(item.question)}</h2></div>
+    <div class="toolRow" style="margin-top:14px"><button class="primary" onclick="flashRevealed=!flashRevealed; renderCards()">${flashRevealed?'Vorderseite':'Karte drehen'}</button></div>
+    ${flashRevealed?renderRatingControls(item,"cards"):""}`;
   if(flashRevealed) attachRatingHandlers(box,item);
 }
 
-function localEvaluate(item,text){const txt=(text||"").toLowerCase(), must=(item.mustHave||[]).map(x=>String(x).toLowerCase()), found=must.filter(k=>txt.includes(k)); if(txt.trim().length<6) return {cls:"bad",label:"Zu kurz",body:"Bitte nenne mindestens einen fachlichen Kernpunkt.",status:"unknown",found}; if(found.length>=Math.max(2,Math.ceil(must.length/2))) return {cls:"good",label:"Gut",body:"Mehrere Kernpunkte sind enthalten.",status:"known",found}; if(found.length>=1) return {cls:"mid",label:"Teilweise",body:"Einige Kernpunkte fehlen.",status:"unsure",found}; return {cls:"bad",label:"Nicht ausreichend",body:"Keine zentralen Kernpunkte erkannt.",status:"unknown",found}}
-
-/* OPEN-MODUS */
 function renderOpen(){
-  const item=currentItem(),box=$("openBody");
-  if(!item){box.innerHTML='<div class="muted">Keine offenen Fragen verfügbar.</div>'; return}
-  
-  box.innerHTML=`
-  <div class="focusQuestion pinBox">
-    <div class="row fq-meta"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div>
-    <h2 style="margin-top:10px">${esc(item.question)}</h2>
-  </div>
-
-  <div class="soft" style="margin-top:12px">
-    <textarea id="openAnswer" class="bigEditor" placeholder="Hier deine Antwort schreiben oder sprechen...">${esc(openText)}</textarea>
-    <div class="toolRow" style="margin-top:12px">
-      <button type="button" class="primary" id="evalTextBtn">Text bewerten</button>
-      <button type="button" id="speechTextBtn">🎤 Sprache</button>
-      <button type="button" id="speakExpectationBtn">Antwort vorlesen</button>
-    </div>
-    <div class="helper" style="margin-top:8px" id="openStatusLine">Hinweis: Spracheingabe füllt das Feld. Danach einfach auf "Text bewerten" klicken.</div>
-  </div>
-  
-  ${revealed ? renderRatingControls(item,"open") : ""}
-
-  ${revealed ? `
-  <div class="soft" style="margin-top:14px; border: 2px solid var(--border);">
-    <div style="font-weight:700; margin-bottom:8px">Bewertung & Erwartungshorizont</div>
-    ${openResult ? `<div class="${openResult.cls}" style="margin-bottom:12px"><div style="font-weight:700">${esc(openResult.label)}</div><div class="answerScroll">${esc(openResult.body)}</div></div>` : ""}
-    <div style="padding-top:12px; border-top:1px solid var(--border)">
-      <div class="merksatz" style="font-size:16px;">Merksatz: ${esc(item.merksatz)}</div>
-      <div class="answerScroll" style="margin-top:10px; font-weight:500;">${esc(item.explanation)}</div>
-      <div style="margin-top:10px"><strong>Kernpunkte:</strong> ${(item.mustHave||[]).map(x=>`<span class="pill">${esc(x)}</span>`).join("")}</div>
-    </div>
-  </div>
-  ` : ""}
-
-  <div class="soft" style="margin-top:14px">
-    <div class="collapseHead" id="toggleInkHead"><div style="font-weight:700">Stifteingabe (Ausklappen)</div><button type="button" id="toggleInkBtn">${window.__inkCollapsed ? "Öffnen" : "Schließen"}</button></div>
-    <div class="helper" style="margin-top:8px">S-Pen = Malen. 1 Finger = Verschieben. 2 Finger = Zoomen.</div>
-    <div id="inkBody" class="collapseBody ${window.__inkCollapsed ? "hiddenBody" : ""}" style="margin-top:12px">
-      <div class="canvasWrap">
-        <div class="canvasToolbar">
-          <button type="button" id="penToolBtn">Stift</button>
-          <button type="button" id="eraserToolBtn">Radierer</button>
-          <input type="range" id="sizeRange" min="2" max="28" value="${brushSize}" style="width:80px">
-          <button type="button" id="clearCanvasBtn">Leeren</button>
-          <button type="button" class="primary" id="evalCanvasBtn">Stifteingabe bewerten</button>
-        </div>
-        <div class="canvasViewport" id="canvasViewport"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="openCoachBox" class="coachbox" style="margin-top:14px"></div>`;
-
-  mountCanvas(); updateCanvasTransform();
-  renderCoachBox("openCoachBox",item);
+  const item=currentItem(),box=$("openBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema.</div>'; return}
+  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${esc(item.question)}</h2></div>
+    <textarea id="oAns" class="bigEditor" placeholder="Schreiben oder sprechen...">${esc(openText)}</textarea>
+    <div class="toolRow"><button class="primary" id="oEval">Text bewerten</button><button id="oMic">🎤 Sprache</button><span id="oStatus" class="helper"></span></div>
+    ${revealed?renderRatingControls(item,"open"):""}
+    ${revealed?`<div class="soft"><strong>Bewertung:</strong><br>${openResult || esc(item.explanation)}</div>`:""}
+    <div class="card" style="margin-top:14px">
+      <div class="collapseHead" onclick="$('#inkB').classList.toggle('hidden'); setTimeout(mountCanvas, 50)"><strong>Stifteingabe (S-Pen Pro)</strong><button>+/-</button></div>
+      <div id="inkB" class="hidden"><div class="canvasWrap"><div class="canvasToolbar"><button onclick="tool='pen'">Stift</button><button onclick="tool='eraser'">Radierer</button><button onclick="clearCanvas()">Leeren</button><button class="primary" id="canvEval">Stift bewerten</button></div><div class="canvasViewport" id="cVp"></div></div></div>
+    </div>`;
+  mountCanvas(); $("oMic").onclick=()=>speechToText("oAns", "oStatus");
+  $("oEval").onclick=async()=>{
+    openText=$("oAns").value; revealed=true; renderOpen(); $("oStatus").textContent="KI prüft...";
+    try { openResult = await geminiText(`Bewerte als IHK-Prüfer: Frage ${item.question}, Lösung ${item.explanation}, Userantwort: ${openText}.`); renderOpen(); } catch(e){ $("oStatus").textContent="Fehler!"; }
+  };
+  if($("canvEval")) $("canvEval").onclick=async()=>{
+    revealed=true; renderOpen(); const img=exportCanvasTrimmed(); $("oStatus").textContent="KI prüft Bild...";
+    try { openResult = await geminiImage(`Lies die Handschrift und bewerte zur Frage ${item.question}. Lösung ist ${item.explanation}`, "image/png", img.base64); renderOpen(); } catch(e){ $("oStatus").textContent="KI-Fehler!"; }
+  };
   if(revealed) attachRatingHandlers(box,item);
-
-  $("toggleInkBtn").onclick=()=>{ window.__inkCollapsed = !window.__inkCollapsed; renderOpen(); setTimeout(updateCanvasTransform,60); };
-  if($("penToolBtn")) $("penToolBtn").onclick=()=>tool="pen";
-  if($("eraserToolBtn")) $("eraserToolBtn").onclick=()=>tool="eraser";
-  if($("sizeRange")) $("sizeRange").oninput=e=>brushSize=Number(e.target.value);
-  if($("clearCanvasBtn")) $("clearCanvasBtn").onclick=()=>clearCanvas();
-
-  $("speechTextBtn").onclick=()=>speechToTextField("openAnswer");
-  $("speakExpectationBtn").onclick=()=>speak(item.explanation);
-
-  $("evalTextBtn").onclick=async()=>{
-    const status=$("openStatusLine"); if(status) status.textContent="Text wird bewertet ...";
-    openText=$("openAnswer").value;
-    const local=localEvaluate(item,openText); openResult=local; revealed=true; renderOpen();
-    try{
-      const ai=await geminiText(`Du bist ein IHK-Prüfer.\nFrage: ${item.question}\n\nMusterantwort:\n${item.explanation}\n\nKernpunkte:\n${(item.mustHave||[]).join(", ")}\n\nNutzerantwort:\n${openText}\n\nBewerte kurz und prüfungsnah in Deutsch:\nBewertung: Gut / Teilweise / Falsch\nBegründung:\nFehlende Punkte:`);
-      openResult={cls:local.cls,label:local.label,body:ai,status:local.status,found:local.found};
-    }catch(e){
-      openResult={cls:local.cls,label:local.label,body:local.body+"\n\nKI-Hinweis: "+e.message,status:local.status,found:local.found};
-    }
-    setStatus(item.id,openResult.status,openResult.status==="known"?12:openResult.status==="unsure"?4:0);
-    renderOpen();
-  };
-
-  if($("evalCanvasBtn")) $("evalCanvasBtn").onclick=async()=>{
-    const status=$("openStatusLine"); if(status) status.textContent="Stifteingabe wird bewertet ...";
-    const trimmed=exportCanvasTrimmed(); revealed=true; renderOpen();
-    try{
-      const ai=await geminiImage(`Lies die handschriftliche Antwort und bewerte sie zur Frage:\n${item.question}\n\nMusterantwort:\n${item.explanation}\n\nKernpunkte:\n${(item.mustHave||[]).join(", ")}\n\nAntworte kurz in Deutsch:\nBewertung: Gut / Teilweise / Falsch\nBegründung:`,`image/png`,trimmed.base64);
-      openResult={cls:"mid",label:"KI-Bewertung Stift",body:ai,status:"unsure",found:[]};
-    }catch(e){
-      openResult={cls:"bad",label:"Stifteingabe nicht bewertet",body:e.message,status:"unknown",found:[]};
-    }
-    renderOpen();
-  };
 }
 
-/* DASHBOARD */
-function renderDashboard(){
-  const items=filtered();
-  const vals=Object.entries(progress.status).filter(([id])=>items.find(i=>i.id===id)).map(([,v])=>v);
-  const known=vals.filter(v=>v==="known").length, unsure=vals.filter(v=>v==="unsure").length, unknown=vals.filter(v=>v==="unknown").length, total=items.length, done=known+unsure+unknown;
-  const ratings = progress.ratings || {};
-  const relevantRated = items.filter(i=>ratings[i.id]);
-  const easy = relevantRated.filter(i=>ratings[i.id].level==="easy").length;
-  const medium = relevantRated.filter(i=>ratings[i.id].level==="medium").length;
-  const hard = relevantRated.filter(i=>ratings[i.id].level==="hard").length;
-  $("dashTop").innerHTML=`<div class="soft"><div class="muted">Fragen im Filter</div><div class="kpi">${total}</div></div><div class="soft"><div class="muted">Bearbeitet</div><div class="kpi">${done}</div></div><div class="soft"><div class="muted">Gewusst</div><div class="kpi">${known}</div></div><div class="soft"><div class="muted">Unsicher / Nicht gewusst</div><div class="kpi">${unsure+unknown}</div></div>`;
-  $("dashBottom").innerHTML=`<div class="soft"><div class="muted">Einfach</div><div class="kpi">${easy}</div></div><div class="soft"><div class="muted">Mittel</div><div class="kpi">${medium}</div></div><div class="soft"><div class="muted">Schwierig</div><div class="kpi">${hard}</div></div><div class="soft"><div class="muted">Trefferquote</div><div class="kpi">${done?Math.round((known/done)*100):0}%</div></div>`;
-
-  const filteredList = filteredByDashboard(items);
-  $("radar").innerHTML = `
-    <div class="soft" style="margin-bottom:12px">
-      <div style="font-weight:700">Wiederholung aus dem Dashboard</div>
-      <div class="muted" style="margin-top:8px">Du kannst nach Schwierigkeit und Lernmodus filtern und so gezielt wiederholen.</div>
-      <div style="margin-top:12px">
-        <span class="filterChip" data-dash-filter="all">Alle</span>
-        <span class="filterChip" data-dash-filter="easy">Einfach</span>
-        <span class="filterChip" data-dash-filter="medium">Mittel</span>
-        <span class="filterChip" data-dash-filter="hard">Schwierig</span>
-      </div>
-      <div style="margin-top:8px">
-        <span class="filterChip" data-dash-mode="all">Alle Modi</span>
-        <span class="filterChip" data-dash-mode="quiz">Quiz</span>
-        <span class="filterChip" data-dash-mode="cards">Karteikarten</span>
-        <span class="filterChip" data-dash-mode="open">Freitext / Stift</span>
-      </div>
-      <div class="smallScroll" style="margin-top:12px" id="dashRepeatList">
-        ${filteredList.length ? filteredList.map(i=>{
-          const r = ratings[i.id];
-          return `<div class="soft" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div><div style="font-weight:700">${esc(i.question)}</div><div class="muted">${esc(i.topic)} · ${r ? esc(r.mode) : "ohne Modus"} · ${r ? esc(r.level) : "ohne Einstufung"}</div></div><button type="button" data-repeat-id="${i.id}">Jetzt lernen</button></div></div>`;
-        }).join("") : '<div class="muted">Für diesen Filter gibt es aktuell keine markierten Inhalte.</div>'}
-      </div>
-    </div>
-    ${topics().slice(1).map(t=>{
-      const sub=items.filter(i=>i.topic===t), doneSub=sub.filter(i=>progress.status[i.id]).length, knownSub=sub.filter(i=>progress.status[i.id]==="known").length, acc=doneSub?Math.round((knownSub/doneSub)*100):0;
-      return `<div class="soft" style="margin-bottom:10px"><div style="font-weight:700">${esc(t)}</div><div class="muted">Bearbeitet ${doneSub}/${sub.length} · Trefferquote ${acc}%</div></div>`;
-    }).join("")||'<div class="muted">Noch keine Unterthemen verfügbar.</div>'}
-  `;
-  attachDashboardFilterState();
-  document.querySelectorAll("[data-repeat-id]").forEach(el=>{
-    el.onclick=()=>{
-      const target = items.find(x=>x.id===el.dataset.repeatId); if(!target) return;
-      const r = ratings[target.id]; area = target.area; topic = target.topic; forcedItemId = target.id;
-      selected=[]; revealed=false; flashRevealed=false; openText=""; openResult=null; coachMessages=[];
-      document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
-      ["quizTab","cardsTab","openTab","dashboardTab","topicsTab"].forEach(id=>$(id).classList.add("hidden"));
-      let tab = "quiz"; if(r && r.mode==="cards") tab = "cards"; if(r && r.mode==="open") tab = "open";
-      const targetBtn = document.querySelector(`.tab[data-tab="${tab}"]`); if(targetBtn) targetBtn.classList.add("active");
-      $(tab+"Tab").classList.remove("hidden"); renderAll();
-    };
+function renderRatingControls(item,mode){
+  return `<div class="ratingRow" style="background:#eff6ff; border:2px solid #3b82f6; border-radius:12px; padding:12px">
+    <div style="width:100%; font-weight:800; margin-bottom:8px; color:#1e40af">Bewertung & Weiter:</div>
+    <button data-rate="easy" data-mode="${mode}" class="ratingBtn" style="color:green">Einfach</button>
+    <button data-rate="medium" data-mode="${mode}" class="ratingBtn" style="color:orange">Mittel</button>
+    <button data-rate="hard" data-mode="${mode}" class="ratingBtn" style="color:red">Schwierig</button>
+  </div>`;
+}
+function attachRatingHandlers(scope,item){
+  scope.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>{ 
+    if(!progress.ratings) progress.ratings={}; progress.ratings[item.id]={level:b.dataset.rate, mode:b.dataset.mode};
+    saveProgress(); resetStudyState(); renderAll(); 
   });
 }
 
-function renderTopics(){const data=currentData(),box=$("topicBoxes"); if(!data){box.innerHTML='<div class="muted">Noch kein JSON importiert.</div>'; return} box.innerHTML=`<div class="soft"><div style="font-weight:700">${esc(data.ueberthema)}</div><div class="muted" style="margin-top:8px">Importierter Prüfungstrainer für ${esc(profile)}.</div><div style="margin-top:10px">${data.unterthemen.map(u=>`<div class="soft" style="margin-bottom:10px"><div style="font-weight:700">${esc(u.name)}</div><div class="muted">${(u.fragen||[]).length} Fragen</div></div>`).join("")}</div></div>`}
-
-function debouncedLocalSave(){
-    try{
-        const item = currentItem(); if(!item) return;
-        const draftKey="ml_draft_v4_"+profile+"_"+item.id; 
-        localStorage.setItem(draftKey, JSON.stringify({openText, selected, scale, offsetX, offsetY, brushSize, tool}));
-    }catch(e){}
-}
-function restoreDraft(){
-    try{
-        const item = currentItem(); if(!item) return;
-        const draftKey="ml_draft_v4_"+profile+"_"+item.id; 
-        const raw=localStorage.getItem(draftKey); 
-        if(!raw) return; 
-        const d=JSON.parse(raw); 
-        
-        // Verhindert den Leak: Alter Text wird NUR bei unbeantworteten Fragen geladen
-        if (!progress.status[item.id]) {
-            openText=d.openText||""; 
-            selected=d.selected||[]; 
-        }
-        
-        scale=typeof d.scale==="number"?d.scale:scale; 
-        offsetX=typeof d.offsetX==="number"?d.offsetX:offsetX; 
-        offsetY=typeof d.offsetY==="number"?d.offsetY:offsetY; 
-        brushSize=typeof d.brushSize==="number"?d.brushSize:brushSize; 
-        tool=d.tool||tool;
-    }catch(e){}
-}
-function renderAll(){restoreDraft(); renderHeader();renderProfiles();renderSelectors();renderQuiz();renderCards();renderOpen();renderDashboard();renderTopics()}
-
-document.querySelectorAll(".tab").forEach(btn=>{btn.onclick=()=>{document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); const map={quiz:"quizTab",cards:"cardsTab",open:"openTab",dashboard:"dashboardTab",topics:"topicsTab"}; Object.values(map).forEach(id=>$(id).classList.add("hidden")); $(map[btn.dataset.tab]).classList.remove("hidden"); if(btn.dataset.tab==="open") setTimeout(updateCanvasTransform,50)}})
-$("voiceToggle").onchange=e=>voiceEnabled=e.target.checked;
-$("resetProgressBtn").onclick=()=>{if(!confirm("Wirklich den Fortschritt dieses Profils zurücksetzen?")) return; progress=JSON.parse(JSON.stringify(DEFAULT_PROGRESS)); saveProgress(); renderAll()}
-
-/* =========================
-   CANVAS: GOODNOTES-STYLE
-========================= */
-function mountCanvas(){const vp=$("canvasViewport"); if(vp&&!vp.contains(canvas)) vp.appendChild(canvas)}
-function updateCanvasTransform(){canvas.style.transform=`translate(${offsetX}px, ${offsetY}px) scale(${scale})`}
-function clearCanvas(){cctx.setTransform(1,0,0,1,0,0); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height)}
-function clientToCanvas(e){const vp=$("canvasViewport").getBoundingClientRect(); return {x:(e.clientX-vp.left-offsetX)/scale,y:(e.clientY-vp.top-offsetY)/scale}}
-function getDistance(a,b){return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)} function getCenter(a,b){return {x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2}}
-
-canvas.addEventListener("pointerdown", e=>{
-  canvas.setPointerCapture(e.pointerId); pointers.set(e.pointerId,e); 
-  if(e.pointerType === 'pen' || e.pointerType === 'mouse'){
-    if(pointers.size===1) drawLast=clientToCanvas(e);
-  } else if(e.pointerType === 'touch'){
-    if(pointers.size===1){
-      gestureStart={panX:e.clientX, panY:e.clientY, offsetX, offsetY};
-    } else if(pointers.size===2){
-      const arr=[...pointers.values()];
-      gestureStart={dist:getDistance(arr[0],arr[1]), center:getCenter(arr[0],arr[1]), scale, offsetX, offsetY};
-    }
-  }
-});
-canvas.addEventListener("pointermove",e=>{
-  if(!pointers.has(e.pointerId)) return; pointers.set(e.pointerId,e); 
-  if((e.pointerType === 'pen' || e.pointerType === 'mouse') && drawLast){
-    const p=clientToCanvas(e); cctx.save(); 
-    if(tool==="eraser"){cctx.globalCompositeOperation="destination-out"; cctx.strokeStyle="rgba(0,0,0,1)"; cctx.lineWidth=brushSize*3}
-    else{cctx.globalCompositeOperation="source-over"; cctx.strokeStyle="#111827"; cctx.lineWidth=brushSize} 
-    cctx.beginPath(); cctx.moveTo(drawLast.x,drawLast.y); cctx.lineTo(p.x,p.y); cctx.stroke(); cctx.restore(); drawLast=p
-  } else if(e.pointerType === 'touch' && gestureStart){
-    if(pointers.size===1 && gestureStart.panX!==undefined){
-      offsetX = gestureStart.offsetX + (e.clientX - gestureStart.panX);
-      offsetY = gestureStart.offsetY + (e.clientY - gestureStart.panY);
-      updateCanvasTransform();
-    } else if(pointers.size===2 && gestureStart.dist!==undefined){
-      const arr=[...pointers.values()]; const newDist=getDistance(arr[0],arr[1]); const center=getCenter(arr[0],arr[1]); 
-      scale=Math.min(3,Math.max(0.25,gestureStart.scale*(newDist/gestureStart.dist))); 
-      offsetX=gestureStart.offsetX+(center.x-gestureStart.center.x); offsetY=gestureStart.offsetY+(center.y-gestureStart.center.y); 
-      updateCanvasTransform();
-    }
-  }
-});
-function endPointer(e){
-  pointers.delete(e.pointerId); 
-  if(e.pointerType==='pen' || e.pointerType==='mouse') drawLast=null;
-  if(pointers.size===0) gestureStart=null;
-  else if(pointers.size===1 && [...pointers.values()][0].pointerType==='touch'){
-    const first=[...pointers.values()][0]; gestureStart={panX:first.clientX, panY:first.clientY, offsetX, offsetY};
-  }
-}
-canvas.addEventListener("pointerup",endPointer); canvas.addEventListener("pointercancel",endPointer)
-function exportCanvasTrimmed(){const src=cctx.getImageData(0,0,canvas.width,canvas.height); let minX=canvas.width,minY=canvas.height,maxX=0,maxY=0,found=false; for(let y=0;y<canvas.height;y++){for(let x=0;x<canvas.width;x++){const idx=(y*canvas.width+x)*4, r=src.data[idx], g=src.data[idx+1], b=src.data[idx+2], a=src.data[idx+3]; if(a>0 && !(r>245&&g>245&&b>245)){found=true; if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y}}} if(!found) return {base64:canvas.toDataURL("image/png").split(",")[1]}; const pad=20; minX=Math.max(0,minX-pad); minY=Math.max(0,minY-pad); maxX=Math.min(canvas.width-1,maxX+pad); maxY=Math.min(canvas.height-1,maxY+pad); const w=maxX-minX+1,h=maxY-minY+1; const tmp=document.createElement("canvas"); tmp.width=w; tmp.height=h; const tctx=tmp.getContext("2d"); tctx.fillStyle="#fff"; tctx.fillRect(0,0,w,h); tctx.drawImage(canvas,minX,minY,w,h,0,0,w,h); return {base64:tmp.toDataURL("image/png").split(",")[1]}}
-
-/* SPEECH RECOGNITION */
-async function speechToTextField(fieldId){
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-const status=$("openStatusLine"); const el=$(fieldId);
-if(!window.isSecureContext){ if(status) status.textContent="HTTPS nötig."; return;}
-if(!SR){
-  if(status) status.textContent="Spracheingabe hier nicht unterstützt.";
-  const fallback = window.prompt("Hier einfügen:", "");
-  if(fallback && el){ el.value=(el.value?el.value+" ":"")+fallback; if(fieldId==="openAnswer"){ openText=el.value; debouncedLocalSave(); } } return;
-}
-try{ if(navigator.permissions && navigator.permissions.query){ const p = await navigator.permissions.query({name:'microphone'}); if(p.state === 'denied'){ alert("Mikrofon blockiert."); return;} } }catch(e){}
-const rec=new SR(); rec.lang="de-DE"; rec.interimResults=true; rec.maxAlternatives=1; let finalText="";
-rec.onstart=()=>{ if(status) status.textContent="Spracheingabe läuft ... (Danach auf 'Text bewerten' klicken)"; };
-rec.onerror=(e)=>{ if(status) status.textContent="Fehler: "+(e.error||"unbekannt"); };
-rec.onend=()=>{ if(finalText && el){ el.value=(el.value?el.value+" ":"")+finalText.trim(); if(fieldId==="openAnswer"){ openText=el.value; debouncedLocalSave(); } if(status) status.textContent="Übernommen. Jetzt auf 'Text bewerten' klicken."; } else { if(status) status.textContent="Nichts erkannt."; } };
-rec.onresult=ev=>{ let interim=""; for(let i=ev.resultIndex;i<ev.results.length;i++){ const part=ev.results[i][0].transcript; if(ev.results[i].isFinal) finalText += " " + part; else interim += part; } if(status) status.textContent = interim ? ("Ich höre: "+interim) : "Spracheingabe läuft ..."; };
-try{ rec.start(); }catch(e){ if(status) status.textContent="Fehler beim Start."; }
+function renderCoachBox(id,item){
+  const box=$(id); box.innerHTML=`<div class="chat-log" id="${id}_log"></div><div class="row"><input id="${id}_in" style="flex:1"><button class="primary" id="${id}_btn">Senden</button></div>`;
+  $(id+"_btn").onclick=async()=>{
+    const t=$(id+"_in").value; coachMessages.push({role:"user",text:t}); $(id+"_in").value=""; renderCoachBox(id,item);
+    const r=await geminiText(`Coach: Thema ${item.topic}. Frage ${item.question}. User fragt: ${t}`);
+    coachMessages.push({role:"ai",text:r}); renderCoachBox(id,item);
+  };
+  $(id+"_log").innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join("");
 }
 
-/* BUTTONS / INIT */
-$("saveSyncIdBtn").onclick=()=>{
-  syncId = $("syncIdInput").value.trim();
-  localStorage.setItem("app_sync_id", syncId);
-  loadFromCloud();
-  alert("Gerät gekoppelt.");
-};
-
-$("saveKeysBtn").onclick=()=>{
-  localStorage.setItem("ml_final_gemini_key", $("geminiKey").value.trim());
-  alert("KI Key gespeichert. Coach & Stift sind bereit!");
-};
+/* THEMEN IMPORT */
+function renderTopics(){
+  const list = currentDataList(); const box = $("topicBoxes"); box.innerHTML = "";
+  list.forEach((data, idx) => {
+    const div = document.createElement("div"); div.className = "topicItem";
+    div.innerHTML = `<div><strong>${esc(data.ueberthema)}</strong><br><small>${data.unterthemen.length} Unterthemen</small></div>
+                     <button style="color:red; border:1px solid red; border-radius:10px; padding:5px 10px" onclick="deleteTheme(${idx})">Löschen</button>`;
+    box.appendChild(div);
+  });
+}
+window.deleteTheme = idx => { if(confirm("Thema löschen?")) { let l=currentDataList(); l.splice(idx,1); APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud(); }};
 
 $("importJsonBtn").onclick=()=>{
-  try{
-    const data=normalizeJson(JSON.parse($("jsonText").value.trim())); 
-    APP.dataByProfile[profile]=data; saveDataByProfile(); 
-    resetStudyState(); area="Alle Oberthemen"; topic="Alle Unterthemen"; 
-    $("importStatus").textContent="JSON importiert."; 
-    saveToCloud(); 
-    renderAll();
-  }catch(e){$("importStatus").textContent="Import fehlgeschlagen: "+e.message}
+  try {
+    const newData = JSON.parse($("jsonText").value.trim()); let l=currentDataList(); l.push(newData);
+    APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud(); $("jsonText").value="";
+    $("importStatus").textContent="Hinzugefügt!";
+  } catch(e) { alert("JSON Fehler!"); }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-    $("geminiKey").value = localStorage.getItem("ml_final_gemini_key") || "";
-    loadFromCloud();
-    renderAll();
+/* S-PEN ENGINE */
+function mountCanvas(){ const vp=$("cVp"); if(vp && !vp.contains(canvas)) vp.appendChild(canvas); updateCanvasTransform(); }
+function updateCanvasTransform(){ canvas.style.transform=`translate(${offsetX}px, ${offsetY}px) scale(${scale})`; }
+function clearCanvas(){ cctx.setTransform(1,0,0,1,0,0); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); }
+function clientToCanvas(e){ const v=$("cVp").getBoundingClientRect(); return {x:(e.clientX-v.left-offsetX)/scale,y:(e.clientY-v.top-offsetY)/scale}; }
+
+canvas.addEventListener("pointerdown", e=>{
+  canvas.setPointerCapture(e.pointerId); pointers.set(e.pointerId,e);
+  if(e.pointerType==='pen'||e.pointerType==='mouse'){ if(pointers.size===1) drawLast=clientToCanvas(e); }
+  else if(pointers.size===1) gestureStart={px:e.clientX, py:e.clientY, ox:offsetX, oy:offsetY};
+  else if(pointers.size===2){ const a=[...pointers.values()]; gestureStart={dist:Math.hypot(a[0].clientX-a[1].clientX, a[0].clientY-a[1].clientY), sc:scale, ox:offsetX, oy:offsetY}; }
 });
+canvas.addEventListener("pointermove", e=>{
+  if(!pointers.has(e.pointerId)) return; pointers.set(e.pointerId,e);
+  if((e.pointerType==='pen'||e.pointerType==='mouse') && drawLast){
+    const p=clientToCanvas(e); cctx.save();
+    if(tool==='eraser'){ cctx.globalCompositeOperation="destination-out"; cctx.lineWidth=brushSize*5; }
+    else { cctx.strokeStyle="#111"; cctx.lineWidth=brushSize; }
+    cctx.beginPath(); cctx.moveTo(drawLast.x,drawLast.y); cctx.lineTo(p.x,p.y); cctx.stroke(); cctx.restore(); drawLast=p;
+  } else if(e.pointerType==='touch' && gestureStart){
+    if(pointers.size===1){ offsetX=gestureStart.ox+(e.clientX-gestureStart.px); offsetY=gestureStart.oy+(e.clientY-gestureStart.py); }
+    else if(pointers.size===2){ const a=[...pointers.values()]; const d=Math.hypot(a[0].clientX-a[1].clientX, a[0].clientY-a[1].clientY); scale=Math.max(0.2, Math.min(3, gestureStart.sc * (d/gestureStart.dist))); }
+    updateCanvasTransform();
+  }
+});
+canvas.addEventListener("pointerup", e=>{ pointers.delete(e.pointerId); drawLast=null; if(pointers.size<2) gestureStart=null; });
+
+function exportCanvasTrimmed(){
+  const src=cctx.getImageData(0,0,canvas.width,canvas.height); let minX=canvas.width,minY=canvas.height,maxX=0,maxY=0,found=false;
+  for(let y=0;y<canvas.height;y++){for(let x=0;x<canvas.width;x++){const idx=(y*canvas.width+x)*4; if(src.data[idx+3]>0 && src.data[idx]<250){found=true; if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y}}}
+  const pad=20; const w=(maxX-minX)+pad*2, h=(maxY-minY)+pad*2;
+  const tmp=document.createElement("canvas"); tmp.width=w; tmp.height=h; const tctx=tmp.getContext("2d");
+  tctx.fillStyle="#fff"; tctx.fillRect(0,0,w,h); tctx.drawImage(canvas,minX-pad,minY-pad,w,h,0,0,w,h);
+  return {base64: tmp.toDataURL("image/png").split(",")[1]};
+}
+
+/* PERSISTENCE & RENDERALL */
+function debouncedLocalSave(){ const i=currentItem(); if(i) localStorage.setItem("draft_"+i.id, JSON.stringify({openText, selected, scale, offsetX, offsetY})); }
+function restoreDraft(){
+  const i=currentItem(); if(!i) return; const d=JSON.parse(localStorage.getItem("draft_"+i.id)||"{}");
+  if(!progress.status[i.id]){ openText=d.openText||""; selected=d.selected||[]; }
+  if(d.scale){ scale=d.scale; offsetX=d.offsetX; offsetY=d.offsetY; }
+}
+function renderHeader(){const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length,acc=vals.length?Math.round((known/vals.length)*100):0; $("pointsBadge").textContent=progress.points+" Punkte"; $("accBadge").textContent="Quote: "+acc+"%"; $("countsBadge").textContent=`Gewusst ${known} · Gesamt ${allItems().length}`}
+function renderDashboard(){
+  const items=filtered(); $("dashTop").innerHTML=`<div class="soft">Fragen: ${items.length}</div><div class="soft">Gewusst: ${Object.values(progress.status).filter(v=>v==="known").length}</div>`;
+  $("radar").innerHTML = items.map(i=>`<div class="soft"><strong>${esc(i.question)}</strong></div>`).join("");
+}
+function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className="profileBtn"+(profile===p.id?" active":""); btn.innerHTML=`<div style="font-weight:700">${esc(p.name)}</div>`; btn.onclick=()=>{profile=p.id;progress=loadProgress(profile);resetStudyState();renderAll()}; box.appendChild(btn)})}
+function renderSelectors(){const aSel=$("areaSelect"); aSel.innerHTML=areas().map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join(""); aSel.value=area; aSel.onchange=()=>{area=aSel.value;topic="Alle Unterthemen";resetStudyState();renderAll()}; const tSel=$("topicSelect"); tSel.innerHTML=topics().map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join(""); tSel.value=topic; tSel.onchange=()=>{topic=tSel.value;resetStudyState();renderAll()}}
+
+function renderAll(){ restoreDraft(); renderHeader(); renderProfiles(); renderSelectors(); renderQuiz(); renderCards(); renderOpen(); renderTopics(); renderDashboard(); }
+
+document.querySelectorAll(".tab").forEach(btn=>{ btn.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
+  ["quizTab","cardBody","openTab","dashboardTab","topicsTab"].forEach(id=>{if($(id)) $(id).classList.add("hidden")});
+  const m={quiz:"quizTab",cards:"cardBody",open:"openTab",dashboard:"dashboardTab",topics:"topicsTab"};
+  if($(m[btn.dataset.tab])) $(m[btn.dataset.tab]).classList.remove("hidden");
+}});
+
+document.addEventListener("DOMContentLoaded", () => { 
+  $("geminiKey").value = localStorage.getItem("ml_final_gemini_key") || "";
+  loadFromCloud(); renderAll(); 
+});
+$("saveKeysBtn").onclick=()=>{ localStorage.setItem("ml_final_gemini_key", $("geminiKey").value.trim()); alert("Key gespeichert"); };
+$("saveSyncIdBtn").onclick=()=>{ syncId=$("syncIdInput").value.trim(); localStorage.setItem("app_sync_id", syncId); loadFromCloud(); };
 </script>
 </body>
 </html>
