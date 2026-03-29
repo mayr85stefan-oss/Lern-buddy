@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v145</title>
+<title>Master Lern-App Final v150</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -27,7 +27,9 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
 @media (max-width:950px){ .pinBox{position:sticky;top:0;z-index:10;border-radius:0 0 14px 14px;margin-top:-14px} }
 .option{display:block;width:100%;text-align:left;border:1px solid var(--border);margin:0 0 10px;background:#fff;transition:0.2s}
 .option.active{background:#e2e8f0}.option.correct{background:var(--good);border-color:#10b981}.option.wrong{background:var(--bad);border-color:#ef4444}
-.coachbox{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:14px}.chat-log{max-height:240px;overflow:auto;border:1px solid var(--border);border-radius:12px;padding:8px;background:#fff}.chat-user,.chat-ai{padding:10px 12px;border-radius:14px;margin-bottom:8px;white-space:pre-wrap}.chat-user{background:#ede9fe;margin-left:auto;max-width:88%}.chat-ai{background:#eef2f7;max-width:92%}
+.merksatz{color:var(--red);font-weight:700;margin-top:10px;padding:10px;border-left:4px solid var(--red);background:#fff5f5;border-radius:10px}
+.coachbox{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:14px}.chat-log{max-height:240px;overflow-y:auto;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff}
+.chat-user,.chat-ai{padding:10px 12px;border-radius:14px;margin-bottom:8px;white-space:pre-wrap}.chat-user{background:#ede9fe;margin-left:auto;max-width:88%}.chat-ai{background:#eef2f7;max-width:92%}
 .canvasWrap{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff}.canvasToolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border);background:#f8fafc;align-items:center}.canvasViewport{position:relative;width:100%;height:450px;overflow:hidden;touch-action:none;background:#fff}#drawCanvas{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0;touch-action:none}
 .ratingRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.ratingBtn{border-radius:999px;padding:8px 12px;font-weight:bold;cursor:pointer;background:#fff;border:1px solid var(--border)}
 #syncStatusBadge { position: absolute; top: 16px; right: 16px; font-weight: 700; }
@@ -37,60 +39,25 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
 </head>
 <body>
 <div class="wrap">
-  <div class="card">
-    <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App v145</h1>
-    <div class="muted">VOLLVERSION: Coach, S-Pen & Gruppen-Dashboard (v127 Restore).</div>
-    <div class="row" style="margin-top:10px">
-      <div class="badge" id="pointsBadge">0 Punkte</div>
-      <div class="badge" id="accBadge">Quote: 0%</div>
-      <div class="badge" id="countsBadge">Gewusst 0 · Gesamt 0</div>
-    </div>
-  </div>
-
+  <div class="card"><div id="syncStatusBadge" class="badge">Lokal</div><h1>Master Lern-App v150</h1><div class="row"><div class="badge" id="pointsBadge">0 P</div><div class="badge" id="accBadge">0%</div><div class="badge" id="countsBadge">0 / 0</div></div></div>
   <div class="grid grid2">
     <div class="card">
-      <h3>Profile & Sync</h3>
-      <div id="profiles"></div>
-      <hr style="margin:15px 0; border:0; border-top:1px solid var(--border)">
-      <input type="text" id="syncIdInput" placeholder="Deine Cloud ID...">
-      <button class="primary" id="saveSyncIdBtn" style="width:100%;margin-top:8px">ID Koppeln & Laden</button>
-      <hr style="margin:15px 0; border:0; border-top:1px solid var(--border)">
-      <input id="geminiKey" type="password" placeholder="KI API Key...">
-      <button id="saveKeysBtn" style="width:100%;margin-top:8px">Key speichern</button>
+      <h3>Profile & Sync</h3><div id="profiles"></div><hr style="margin:15px 0; border:0; border-top:1px solid var(--border)"><input type="text" id="syncIdInput" placeholder="Cloud ID..."><button class="primary" id="saveSyncIdBtn" style="width:100%;margin-top:8px">ID Koppeln & Laden</button><hr style="margin:15px 0; border:0; border-top:1px solid var(--border)"><input id="geminiKey" type="password" placeholder="KI Key..."><button id="saveKeysBtn" style="width:100%;margin-top:8px">Key speichern</button>
     </div>
-
     <div>
-      <div class="card grid grid2a">
-        <div><div class="muted">Oberthema</div><select id="areaSelect"></select></div>
-        <div><div class="muted">Unterthema</div><select id="topicSelect"></select></div>
-      </div>
-      <div class="card">
-        <div class="tabbar">
-          <button class="tab active" data-tab="quiz">Quiz</button>
-          <button class="tab" data-tab="cards">Karten</button>
-          <button class="tab" data-tab="open">Stift</button>
-          <button class="tab" data-tab="dashboard">Dash</button>
-          <button class="tab" data-tab="topics">Themen</button>
-        </div>
-      </div>
+      <div class="card grid grid2a"><div><div class="muted">Oberthema</div><select id="areaSelect"></select></div><div><div class="muted">Unterthema</div><select id="topicSelect"></select></div></div>
+      <div class="card"><div class="tabbar"><button class="tab active" data-tab="quiz">Quiz</button><button class="tab" data-tab="cards">Karten</button><button class="tab" data-tab="open">Stift</button><button class="tab" data-tab="dashboard">Dash</button><button class="tab" data-tab="topics">Themen</button></div></div>
       <div id="quizTab"><div class="card"><div id="quizBody"></div></div></div>
       <div id="cardBody" class="hidden"></div>
       <div id="openTab" class="hidden"><div class="card"><div id="openBody"></div></div></div>
       <div id="dashboardTab" class="hidden"><div class="card"><div id="dashTop"></div><div id="radar" style="margin-top:12px"></div></div></div>
-      <div id="topicsTab" class="hidden"><div class="card"><h3>Themen Import</h3><div id="topicBoxes"></div><hr style="margin:15px 0; border:0; border-top:1px solid var(--border)"><h3>Anhängen</h3><textarea id="jsonText" rows="6" placeholder="JSON hier..."></textarea><button class="primary" id="importJsonBtn" style="margin-top:8px; width:100%">Importieren</button></div></div>
+      <div id="topicsTab" class="hidden"><div class="card"><h3>Themen Import</h3><div id="topicBoxes"></div><hr style="margin:15px 0; border:0; border-top:1px solid var(--border)"><textarea id="jsonText" rows="6" placeholder="JSON hier einfügen..."></textarea><button class="primary" id="importJsonBtn" style="margin-top:8px; width:100%">Importieren</button></div></div>
     </div>
   </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const CONFIG = {
-  SUPABASE_KEY: "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9", 
-  SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co",
-  GEMINI_MODEL: "gemini-2.5-flash" 
-};
-
+const CONFIG = { SUPABASE_KEY: "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9", SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co", GEMINI_MODEL: "gemini-2.5-flash" };
 const supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 let syncId = localStorage.getItem("app_sync_id") || "";
 
@@ -123,8 +90,7 @@ async function loadFromCloud() {
 }
 
 const APP={profiles:[{id:"stefan",name:"Stefan"},{id:"lolla",name:"Lolla"}],dataByProfile:JSON.parse(localStorage.getItem("v109_dataByProfile")||"{}")};
-const DEFAULT_PROGRESS={points:0,status:{},ratings:{}};
-let profile="stefan",progress=JSON.parse(localStorage.getItem("master_lernapp_v109_"+profile)||JSON.stringify(DEFAULT_PROGRESS));
+let profile="stefan",progress=JSON.parse(localStorage.getItem("master_lernapp_v109_"+profile)||JSON.stringify({points:0,status:{},ratings:{}}));
 let area="Alle Oberthemen",topic="Alle Unterthemen",selected=[],revealed=false,flashRevealed=false,openText="",openResult=null,coachMessages=[];
 
 const canvas=document.createElement("canvas"); canvas.width=1800; canvas.height=1200; canvas.id="drawCanvas";
@@ -137,8 +103,8 @@ function allItems(){
   dataList.forEach((data, dIdx) => {
     (data.unterthemen||[]).forEach((u, ui) => {
       (u.fragen||[]).forEach((q, qi) => {
-        let opt = q.quiz_optionen || [...(q.kernpunkte||[]).slice(0,3).map(x=>({text:x,correct:true})),{text:"Falsche Option A",correct:false},{text:"Falsche Option B",correct:false}].slice(0,5);
-        out.push({id:`${profile}_${dIdx}_${ui}_${qi}`, area:data.ueberthema||"Unkategorisiert", topic:u.name||"Allgemein", question:q.frage, explanation:q.antwort, optionMeta:opt});
+        let opt = q.quiz_optionen || [...(q.kernpunkte||[]).slice(0,3).map(x=>({text:x,correct:true})),{text:"Falsch A",correct:false},{text:"Falsch B",correct:false}].slice(0,5);
+        out.push({id:`${profile}_${dIdx}_${ui}_${qi}`, area:data.ueberthema||"Unkategorisiert", topic:u.name||"Allgemein", question:q.frage, explanation:q.antwort, merksatz:q.merksatz||"", optionMeta:opt});
       });
     });
   }); return out;
@@ -160,53 +126,66 @@ async function geminiImage(prompt,mimeType,data){
   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${k}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt},{inlineData:{mimeType,data}}]}]})});
   const d=await res.json(); return d.candidates[0].content.parts[0].text;
 }
-function speechToText(fieldId, statusId){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return;
-  const rec=new SR(); rec.lang="de-DE"; rec.onstart=()=>{$(statusId).textContent="Höre...";};
-  rec.onresult=e=>{$(fieldId).value += " " + e.results[0][0].transcript; $(statusId).textContent="OK"; openText=$(fieldId).value;};
-  rec.start();
-}
+function speechToText(f, s){ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return; const rec=new SR(); rec.lang="de-DE"; rec.onstart=()=>$(s).textContent="Höre..."; rec.onresult=e=>{$(f).value+=" "+e.results[0][0].transcript; $(s).textContent="OK"; openText=$(f).value;}; rec.start(); }
 
-/* RENDERING (v127) */
+/* RENDERING v127 Original */
 function renderQuiz(){
   const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='Kein Thema.'; return}
   const optHtml=item.optionMeta.map((o,i)=>{
     const active=selected.includes(i)?" active":""; 
-    let cls=""; if(revealed){if(o.correct) cls=" correct"; else if(selected.includes(i)) cls=" wrong"} 
-    return `<button class="option${active}${cls}" onclick="handleQuizOpt(${i})" ${revealed?'disabled':''}>${esc(o.text)}</button>`
+    let cls="", dis=revealed?"disabled":""; 
+    if(revealed){if(o.correct) cls=" correct"; else if(selected.includes(i)) cls=" wrong"} 
+    return `<button class="option${active}${cls}" data-opt="${i}" ${dis}>${esc(o.text)}</button>`
   }).join("");
-  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${esc(item.question)}</h2></div><div style="margin-top:14px">${optHtml}<div class="toolRow">${!revealed?'<button class="primary" onclick="checkQuiz()">Prüfen</button>':''}<button onclick="$('#qCoachBox').classList.toggle('hidden'); renderCoach('qCoachBox')">KI Coach</button></div>${revealed?renderRating(item):""}${revealed?`<div class="good">${esc(item.explanation)}</div>`:""}<div id="qCoachBox" class="coachbox hidden"></div>`;
+  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${esc(item.question)}</h2></div>
+    <div style="margin-top:14px">${optHtml}
+      <div class="toolRow">${!revealed?'<button class="primary" id="qCheck">Prüfen</button>':''}<button id="qCoach">KI Coach</button></div>
+      ${revealed?renderRating(item):""}
+      ${revealed?`<div class="good"><strong>Lösung:</strong><br>${esc(item.explanation)} ${item.merksatz?`<div class="merksatz">${esc(item.merksatz)}</div>`:""}</div>`:""}
+      <div id="qCBox" class="coachbox hidden"></div>`;
+  box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{if(revealed)return; const i=parseInt(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz();});
+  if($("qCheck")) $("qCheck").onclick=()=>{revealed=true; progress.status[item.id]="known"; renderQuiz(); saveProgress();};
+  $("qCoach").onclick=()=>{$("qCBox").classList.toggle("hidden"); renderCoachBox("qCBox",item)};
 }
-window.handleQuizOpt=i=>{if(revealed)return; selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz();};
-window.checkQuiz=()=>{revealed=true; progress.status[currentItem().id]="known"; renderQuiz(); saveProgress();};
 
 function renderCards(){
   const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='Kein Thema.'; return}
-  box.innerHTML=`<div class="focusQuestion pinBox" style="cursor:pointer" onclick="flashRevealed=!flashRevealed; renderCards()"><h2>${flashRevealed?esc(item.explanation):esc(item.question)}</h2></div><div class="toolRow" style="margin-top:14px"><button class="primary" onclick="flashRevealed=!flashRevealed; renderCards()">Karte drehen</button></div>${flashRevealed?renderRating(item):""}`;
+  box.innerHTML=`<div class="card"><div class="focusQuestion pinBox" style="cursor:pointer" onclick="flashRevealed=!flashRevealed; renderCards()"><h2>${flashRevealed?esc(item.explanation):esc(item.question)}</h2></div>
+    ${flashRevealed && item.merksatz?`<div class="merksatz">${esc(item.merksatz)}</div>`:""}
+    <div class="toolRow" style="margin-top:14px"><button class="primary" onclick="flashRevealed=!flashRevealed; renderCards()">Karte drehen</button></div>
+    ${flashRevealed?renderRating(item):""}</div>`;
 }
 
 function renderOpen(){
   const item=currentItem(),box=$("openBody"); if(!item){box.innerHTML='Kein Thema.'; return}
-  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${esc(item.question)}</h2></div><textarea id="oAns" oninput="openText=this.value" placeholder="Antwort tippen..." style="height:120px">${esc(openText)}</textarea><div class="toolRow"><button class="primary" onclick="evalOpen()">KI Bewerten</button><button onclick="speechToText('oAns','oStatus')">🎤 Sprache</button><span id="oStatus" class="muted"></span></div>${revealed?renderRating(item):""}${revealed?`<div class="soft"><strong>Feedback:</strong><br>${openResult || esc(item.explanation)}</div>`:""}<div class="card" style="margin-top:14px"><div onclick="$('#inkB').classList.toggle('hidden'); mountCanvas()" style="cursor:pointer;font-weight:700">Stifteingabe (S-Pen Pro) +/-</div><div id="inkB" class="hidden"><div class="canvasWrap"><div class="canvasToolbar"><button onclick="tool='pen'">Stift</button><button onclick="tool='eraser'">Eraser</button><button onclick="clearCanvas()">Leeren</button><button class="primary" onclick="evalCanvas()">Zeichnung bewerten</button></div><div class="canvasViewport" id="cVp"></div></div></div></div>`;
+  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${esc(item.question)}</h2></div>
+    <textarea id="oAns" oninput="openText=this.value" placeholder="Antwort..." style="height:120px">${esc(openText)}</textarea>
+    <div class="toolRow"><button class="primary" onclick="evalOpen()">KI Bewerten</button><button onclick="speechToText('oAns','oStatus')">🎤 Sprache</button><span id="oStatus" class="muted"></span></div>
+    ${revealed?renderRating(item):""}
+    ${revealed?`<div class="soft"><strong>Feedback:</strong><br>${openResult || esc(item.explanation)} ${item.merksatz?`<div class="merksatz">${esc(item.merksatz)}</div>`:""}</div>`:""}
+    <div class="card" style="margin-top:14px">
+      <div onclick="$('#inkB').classList.toggle('hidden'); setTimeout(mountCanvas, 50)" style="cursor:pointer;font-weight:700">Stifteingabe (S-Pen Pro) +/-</div>
+      <div id="inkB" class="hidden"><div class="canvasWrap"><div class="canvasToolbar"><button onclick="tool='pen'">Stift</button><button onclick="tool='eraser'">Eraser</button><button onclick="clearCanvas()">Leeren</button><button class="primary" onclick="evalCanvas()">Zeichnung bewerten</button></div><div class="canvasViewport" id="cVp"></div></div></div>
+    </div>`;
+  mountCanvas();
 }
-window.evalOpen=async()=>{ revealed=true; renderOpen(); try { $("oStatus").textContent="KI prüft..."; openResult=await geminiText(`Prüfer: Frage ${currentItem().question}, User: ${openText}`); renderOpen(); } catch(e){} };
-window.evalCanvas=async()=>{ revealed=true; renderOpen(); const img=exportCanvasTrimmed(); try { $("oStatus").textContent="KI Scan..."; openResult=await geminiImage(`Lies Handschrift zur Frage ${currentItem().question}`, "image/png", img.base64); renderOpen(); } catch(e){} };
+window.evalOpen=async()=>{ revealed=true; renderOpen(); try { $("oStatus").textContent="KI prüft..."; openResult=await geminiText(`Prüfer: Frage ${currentItem().question}, Lösung ${currentItem().explanation}, User: ${openText}`); renderOpen(); } catch(e){} };
+window.evalCanvas=async()=>{ revealed=true; renderOpen(); const img=exportCanvasTrimmed(); try { $("oStatus").textContent="Scan..."; openResult=await geminiImage(`Lies Handschrift zur Frage ${currentItem().question}`, "image/png", img.base64); renderOpen(); } catch(e){} };
 
-function renderRating(item){
-  return `<div class="ratingRow"><button class="ratingBtn" style="color:green" onclick="setRate('${item.id}','easy')">Einfach</button><button class="ratingBtn" style="color:orange" onclick="setRate('${item.id}','med')">Mittel</button><button class="ratingBtn" style="color:red" onclick="setRate('${item.id}','hard')">Schwer</button></div>`;
-}
-window.setRate=(id,l)=>{ if(!progress.ratings) progress.ratings={}; progress.ratings[id]=l; saveProgress(); resetStudyState(); renderAll(); };
+function renderRating(item){ return `<div class="ratingRow"><button class="ratingBtn" style="color:green" onclick="sRate('${item.id}','easy')">Einfach</button><button class="ratingBtn" style="color:orange" onclick="sRate('${item.id}','med')">Mittel</button><button class="ratingBtn" style="color:red" onclick="sRate('${item.id}','hard')">Schwer</button></div>`; }
+window.sRate=(id,l)=>{ if(!progress.ratings) progress.ratings={}; progress.ratings[id]=l; saveProgress(); resetStudyState(); renderAll(); };
 
-function renderCoach(id){
-  const box=$(id); box.innerHTML=`<div class="chat-log" id="${id}_log"></div><div class="row"><input id="${id}_in" style="flex:1" placeholder="Frage stellen..."><button onclick="sendCoach('${id}')">Senden</button></div>`;
-  $(id+"_log").innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join("");
+function renderCoachBox(id,item){
+  const box=$(id); box.innerHTML=`<div class="chat-log" id="${id}_log"></div><div class="row"><input id="${id}_in" style="flex:1" placeholder="Frage..."><button onclick="sendCoach('${id}')">Senden</button></div>`;
+  const log=$(id+"_log"); log.innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join("");
+  log.scrollTop = log.scrollHeight;
 }
 window.sendCoach=async(id)=>{
-  const t=$(id+"_in").value; coachMessages.push({role:"user",text:t}); $(id+"_in").value=""; renderCoach(id);
-  const r=await geminiText(`Coach: Thema ${currentItem().topic}, User fragt: ${t}`); coachMessages.push({role:"ai",text:r}); renderCoach(id);
+  const t=$(id+"_in").value; if(!t)return; coachMessages.push({role:"user",text:t}); $(id+"_in").value=""; renderCoachBox(id,currentItem());
+  const r=await geminiText(`Coach: Frage ${currentItem().question}. User: ${t}`); coachMessages.push({role:"ai",text:r}); renderCoachBox(id,currentItem());
 };
 
-/* DASHBOARD GROUPED */
+/* DASHBOARD OPTIMIERUNG */
 function renderDashboard(){
   const items=allItems(); const grouped = {};
   items.forEach(i => { if(!grouped[i.area]) grouped[i.area] = {}; if(!grouped[i.area][i.topic]) grouped[i.area][i.topic] = []; grouped[i.area][i.topic].push(i); });
@@ -216,7 +195,7 @@ function renderDashboard(){
   $("radar").innerHTML = html;
 }
 
-/* S-PEN ENGINE */
+/* S-PEN ENGINE v127 */
 function mountCanvas(){ const vp=$("cVp"); if(vp && !vp.contains(canvas)) vp.appendChild(canvas); updateCanvas(); }
 function updateCanvas(){ canvas.style.transform=`translate(${offsetX}px, ${offsetY}px) scale(${scale})`; }
 function clearCanvas(){ cctx.setTransform(1,0,0,1,0,0); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); }
@@ -230,14 +209,12 @@ function exportCanvasTrimmed(){ const src=cctx.getImageData(0,0,canvas.width,can
 function renderTopics(){ const list = currentDataList(); const box = $("topicBoxes"); box.innerHTML = ""; list.forEach((data, idx) => { const div = document.createElement("div"); div.className = "topicItem"; div.innerHTML = `<div><strong>${esc(data.ueberthema)}</strong></div><button onclick="delTheme(${idx})">Löschen</button>`; box.appendChild(div); }); }
 window.delTheme=i=>{if(confirm("Löschen?")){let l=currentDataList(); l.splice(i,1); APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud();}};
 $("importJsonBtn").onclick=()=>{ try { const newData=JSON.parse($("jsonText").value.trim()); let l=currentDataList(); l.push(newData); APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud(); $("jsonText").value=""; } catch(e){ alert("Fehler!"); } };
-
+function saveDataByProfile(){localStorage.setItem("v109_dataByProfile",JSON.stringify(APP.dataByProfile))}
 function saveProgress(){localStorage.setItem("master_lernapp_v109_"+profile,JSON.stringify(progress)); saveToCloud(); renderHeader();}
-function renderHeader(){ const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length; $("pointsBadge").textContent=progress.points+" P"; $("accBadge").textContent=(vals.length?Math.round((known/vals.length)*100):0)+"%"; $("countsBadge").textContent=`${known} / ${allItems().length}`; }
-function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className=profile===p.id?"primary":""; btn.textContent=p.name; btn.onclick=()=>{profile=p.id;progress=JSON.parse(localStorage.getItem("master_lernapp_v109_"+profile)||JSON.stringify(DEFAULT_PROGRESS));resetStudyState();renderAll()}; box.appendChild(btn)})}
+function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className=profile===p.id?"primary":""; btn.textContent=p.name; btn.onclick=()=>{profile=p.id;progress=JSON.parse(localStorage.getItem("master_lernapp_v109_"+profile)||JSON.stringify({points:0,status:{},ratings:{}}));resetStudyState();renderAll()}; box.appendChild(btn)})}
 function renderSelectors(){const aSel=$("areaSelect"); aSel.innerHTML=areas().map(a=>`<option value="${a}">${a}</option>`).join(""); aSel.value=area; aSel.onchange=()=>{area=aSel.value;topic="Alle Unterthemen";resetStudyState();renderAll()}; const tSel=$("topicSelect"); tSel.innerHTML=topics().map(t=>`<option value="${t}">${t}</option>`).join(""); tSel.value=topic; tSel.onchange=()=>{topic=tSel.value;resetStudyState();renderAll()}}
 function renderAll(){ renderHeader(); renderProfiles(); renderSelectors(); renderQuiz(); renderCards(); renderOpen(); renderTopics(); renderDashboard(); }
 
-/* TAB LOGIC FIXED */
 document.querySelectorAll(".tab").forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
@@ -248,8 +225,6 @@ document.querySelectorAll(".tab").forEach(btn => {
     if (btn.dataset.tab === 'open') mountCanvas();
   };
 });
-
-/* START FIX (ASYNCHRON) */
 document.addEventListener("DOMContentLoaded", () => { 
   $("geminiKey").value = localStorage.getItem("ml_final_gemini_key") || "";
   loadFromCloud().then(() => renderAll()); 
