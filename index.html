@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v132</title>
+<title>Master Lern-App v133 Final</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -43,8 +43,8 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
 <div class="wrap">
   <div class="card">
     <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App v132</h1>
-    <div class="muted">UNGEKÜRZT: S-Pen Pro Suite, Smart-Crop, Multi-JSON & Cloud Fix.</div>
+    <h1>Master Lern-App v133</h1>
+    <div class="muted">KOMPLETT: S-Pen Pro Suite, Smart-Crop, Multi-Themen & Cloud OK.</div>
     <div class="row" style="margin-top:10px">
       <div class="badge" id="pointsBadge">0 Punkte</div>
       <div class="badge" id="accBadge">Quote: 0%</div>
@@ -154,7 +154,7 @@ function allItems(){
       (u.fragen||[]).forEach((q, qi) => {
         let opt = q.quiz_optionen;
         if(!opt || opt.length === 0) {
-           opt=[...(q.kernpunkte||[]).slice(0,3).map(x=>({text:x,correct:true})),{text:"Falsch A",correct:false},{text:"Falsch B",correct:false}].slice(0,5);
+           opt=[...(q.kernpunkte||[]).slice(0,3).map(x=>({text:x,correct:true})),{text:"Nur die Überschrift reicht.",correct:false},{text:"Details sind unwichtig.",correct:false}].slice(0,5);
         }
         out.push({id:`${profile}_${dIdx}_${ui}_${qi}`, area:data.ueberthema, topic:u.name, question:q.frage, explanation:q.antwort, merksatz:q.merksatz, optionMeta:opt, answer:opt.map((o,i)=>o.correct?i:null).filter(x=>x!==null)});
       });
