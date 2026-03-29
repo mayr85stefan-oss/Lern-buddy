@@ -1330,14 +1330,14 @@ function renderTopics(){
   });
 }
 
-$("importJsonBtn").onclick = ()=>{
+$("importJsonBtn").onclick = async ()=>{
   try{
     const parsed = normalizeImportedData(JSON.parse($("jsonText").value.trim()));
     const list = currentDataList();
     list.push(parsed);
     APP.dataByProfile[profile] = list;
     saveDataByProfile();
-    saveToCloud();
+    await saveToCloud();
     $("jsonText").value = "";
     $("importStatus").textContent = "Thema hinzugefügt.";
     area = "Alle Oberthemen";
