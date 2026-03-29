@@ -3,7 +3,19 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v150</title>
+<title>Master Lern-App Final v151</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* =========================================================
+   HIER DEINE KEYS EINTRAGEN (WICHTIG FÜR CLOUD)
+   ========================================================= */
+const CONFIG = { 
+  SUPABASE_KEY: "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9", 
+  SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co", 
+  GEMINI_MODEL: "gemini-2.5-flash" 
+};
+/* ========================================================= */
+</script>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -39,10 +51,10 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
 </head>
 <body>
 <div class="wrap">
-  <div class="card"><div id="syncStatusBadge" class="badge">Lokal</div><h1>Master Lern-App v150</h1><div class="row"><div class="badge" id="pointsBadge">0 P</div><div class="badge" id="accBadge">0%</div><div class="badge" id="countsBadge">0 / 0</div></div></div>
+  <div class="card"><div id="syncStatusBadge" class="badge">Lokal</div><h1>Master Lern-App v151</h1><div class="row"><div class="badge" id="pointsBadge">0 P</div><div class="badge" id="accBadge">0%</div><div class="badge" id="countsBadge">0 / 0</div></div></div>
   <div class="grid grid2">
     <div class="card">
-      <h3>Profile & Sync</h3><div id="profiles"></div><hr style="margin:15px 0; border:0; border-top:1px solid var(--border)"><input type="text" id="syncIdInput" placeholder="Cloud ID..."><button class="primary" id="saveSyncIdBtn" style="width:100%;margin-top:8px">ID Koppeln & Laden</button><hr style="margin:15px 0; border:0; border-top:1px solid var(--border)"><input id="geminiKey" type="password" placeholder="KI Key..."><button id="saveKeysBtn" style="width:100%;margin-top:8px">Key speichern</button>
+      <h3>Profile & Sync</h3><div id="profiles"></div><hr style="margin:15px 0; border:0; border-top:1px solid var(--border)"><input type="text" id="syncIdInput" placeholder="Cloud ID..."><button class="primary" id="saveSyncIdBtn" style="width:100%;margin-top:8px">ID Laden</button><hr style="margin:15px 0; border:0; border-top:1px solid var(--border)"><input id="geminiKey" type="password" placeholder="KI API Key..."><button id="saveKeysBtn" style="width:100%;margin-top:8px">Key speichern</button>
     </div>
     <div>
       <div class="card grid grid2a"><div><div class="muted">Oberthema</div><select id="areaSelect"></select></div><div><div class="muted">Unterthema</div><select id="topicSelect"></select></div></div>
@@ -55,10 +67,9 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-const CONFIG = { SUPABASE_KEY: "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9", SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co", GEMINI_MODEL: "gemini-2.5-flash" };
-const supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+const supabaseClient = (CONFIG.SUPABASE_KEY !== "HIER_DEINEN_ECHTEN_SUPABASE_KEY_EINTRAGEN") ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY) : null;
 let syncId = localStorage.getItem("app_sync_id") || "";
 
 function $(id){return document.getElementById(id)}
@@ -68,16 +79,17 @@ function updateBadge(status) {
   const b = $("syncStatusBadge");
   if(status === "ok") { b.textContent = "Cloud OK"; b.style.background = "#dcfce7"; b.style.color = "#166534"; }
   else if(status === "syncing") { b.textContent = "Speichert..."; b.style.background = "#fef08a"; b.style.color = "#854d0e"; }
+  else if(status === "err") { b.textContent = "Sync Fehler"; b.style.background = "#fee2e2"; b.style.color = "#991b1b"; }
   else { b.textContent = "Lokal"; b.style.background = "#f3f4f6"; b.style.color = "#6b7280"; }
 }
 
 async function saveToCloud() {
-  if(!syncId) return; updateBadge("syncing");
+  if(!syncId || !supabaseClient) return; updateBadge("syncing");
   try { await supabaseClient.from("progress").upsert({id: syncId, data: { profile, progress, all_data: APP.dataByProfile }, updated_at: new Date().toISOString()}); updateBadge("ok"); } catch (e) { updateBadge("err"); }
 }
 
 async function loadFromCloud() {
-  if(!syncId) return;
+  if(!syncId || !supabaseClient) return;
   try {
     const { data } = await supabaseClient.from("progress").select("data").eq("id", syncId).maybeSingle();
     if (data && data.data) {
@@ -103,7 +115,7 @@ function allItems(){
   dataList.forEach((data, dIdx) => {
     (data.unterthemen||[]).forEach((u, ui) => {
       (u.fragen||[]).forEach((q, qi) => {
-        let opt = q.quiz_optionen || [...(q.kernpunkte||[]).slice(0,3).map(x=>({text:x,correct:true})),{text:"Falsch A",correct:false},{text:"Falsch B",correct:false}].slice(0,5);
+        let opt = q.quiz_optionen || [...(q.kernpunkte||[]).slice(0,3).map(x=>({text:x,correct:true})),{text:"Option A",correct:false},{text:"Option B",correct:false}].slice(0,5);
         out.push({id:`${profile}_${dIdx}_${ui}_${qi}`, area:data.ueberthema||"Unkategorisiert", topic:u.name||"Allgemein", question:q.frage, explanation:q.antwort, merksatz:q.merksatz||"", optionMeta:opt});
       });
     });
@@ -128,7 +140,6 @@ async function geminiImage(prompt,mimeType,data){
 }
 function speechToText(f, s){ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return; const rec=new SR(); rec.lang="de-DE"; rec.onstart=()=>$(s).textContent="Höre..."; rec.onresult=e=>{$(f).value+=" "+e.results[0][0].transcript; $(s).textContent="OK"; openText=$(f).value;}; rec.start(); }
 
-/* RENDERING v127 Original */
 function renderQuiz(){
   const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='Kein Thema.'; return}
   const optHtml=item.optionMeta.map((o,i)=>{
@@ -169,7 +180,7 @@ function renderOpen(){
     </div>`;
   mountCanvas();
 }
-window.evalOpen=async()=>{ revealed=true; renderOpen(); try { $("oStatus").textContent="KI prüft..."; openResult=await geminiText(`Prüfer: Frage ${currentItem().question}, Lösung ${currentItem().explanation}, User: ${openText}`); renderOpen(); } catch(e){} };
+window.evalOpen=async()=>{ revealed=true; renderOpen(); try { $("oStatus").textContent="Prüfe..."; openResult=await geminiText(`Prüfer: Frage ${currentItem().question}, Lösung ${currentItem().explanation}, User: ${openText}`); renderOpen(); } catch(e){} };
 window.evalCanvas=async()=>{ revealed=true; renderOpen(); const img=exportCanvasTrimmed(); try { $("oStatus").textContent="Scan..."; openResult=await geminiImage(`Lies Handschrift zur Frage ${currentItem().question}`, "image/png", img.base64); renderOpen(); } catch(e){} };
 
 function renderRating(item){ return `<div class="ratingRow"><button class="ratingBtn" style="color:green" onclick="sRate('${item.id}','easy')">Einfach</button><button class="ratingBtn" style="color:orange" onclick="sRate('${item.id}','med')">Mittel</button><button class="ratingBtn" style="color:red" onclick="sRate('${item.id}','hard')">Schwer</button></div>`; }
@@ -185,7 +196,6 @@ window.sendCoach=async(id)=>{
   const r=await geminiText(`Coach: Frage ${currentItem().question}. User: ${t}`); coachMessages.push({role:"ai",text:r}); renderCoachBox(id,currentItem());
 };
 
-/* DASHBOARD OPTIMIERUNG */
 function renderDashboard(){
   const items=allItems(); const grouped = {};
   items.forEach(i => { if(!grouped[i.area]) grouped[i.area] = {}; if(!grouped[i.area][i.topic]) grouped[i.area][i.topic] = []; grouped[i.area][i.topic].push(i); });
@@ -195,7 +205,6 @@ function renderDashboard(){
   $("radar").innerHTML = html;
 }
 
-/* S-PEN ENGINE v127 */
 function mountCanvas(){ const vp=$("cVp"); if(vp && !vp.contains(canvas)) vp.appendChild(canvas); updateCanvas(); }
 function updateCanvas(){ canvas.style.transform=`translate(${offsetX}px, ${offsetY}px) scale(${scale})`; }
 function clearCanvas(){ cctx.setTransform(1,0,0,1,0,0); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); }
@@ -205,10 +214,25 @@ canvas.addEventListener("pointermove", e=>{ if(!pointers.has(e.pointerId)) retur
 canvas.addEventListener("pointerup", e=>{ pointers.delete(e.pointerId); drawLast=null; if(pointers.size<2) gestureStart=null; });
 function exportCanvasTrimmed(){ const src=cctx.getImageData(0,0,canvas.width,canvas.height); let minX=canvas.width,minY=canvas.height,maxX=0,maxY=0; for(let y=0;y<canvas.height;y++){for(let x=0;x<canvas.width;x++){const idx=(y*canvas.width+x)*4; if(src.data[idx+3]>0 && src.data[idx]<250){if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y}}} const w=(maxX-minX)+40, h=(maxY-minY)+40; const tmp=document.createElement("canvas"); tmp.width=w; tmp.height=h; tmp.getContext("2d").drawImage(canvas,minX-20,minY-20,w,h,0,0,w,h); return {base64: tmp.toDataURL("image/png").split(",")[1]}; }
 
-/* LOGIC */
 function renderTopics(){ const list = currentDataList(); const box = $("topicBoxes"); box.innerHTML = ""; list.forEach((data, idx) => { const div = document.createElement("div"); div.className = "topicItem"; div.innerHTML = `<div><strong>${esc(data.ueberthema)}</strong></div><button onclick="delTheme(${idx})">Löschen</button>`; box.appendChild(div); }); }
 window.delTheme=i=>{if(confirm("Löschen?")){let l=currentDataList(); l.splice(i,1); APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud();}};
-$("importJsonBtn").onclick=()=>{ try { const newData=JSON.parse($("jsonText").value.trim()); let l=currentDataList(); l.push(newData); APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud(); $("jsonText").value=""; } catch(e){ alert("Fehler!"); } };
+
+$("importJsonBtn").onclick=()=>{
+  try {
+    const raw = $("jsonText").value.trim();
+    if(!raw) { alert("Bitte JSON Text einfügen!"); return; }
+    const newData=JSON.parse(raw); 
+    let l=currentDataList(); 
+    l.push(newData); 
+    APP.dataByProfile[profile]=l; 
+    saveDataByProfile(); 
+    renderAll(); 
+    saveToCloud(); 
+    $("jsonText").value="";
+    alert("Erfolgreich importiert!");
+  } catch(e){ alert("JSON Fehler: Bitte prüfe ob der Text vollständig kopiert wurde (Klammern am Anfang/Ende)."); }
+};
+
 function saveDataByProfile(){localStorage.setItem("v109_dataByProfile",JSON.stringify(APP.dataByProfile))}
 function saveProgress(){localStorage.setItem("master_lernapp_v109_"+profile,JSON.stringify(progress)); saveToCloud(); renderHeader();}
 function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className=profile===p.id?"primary":""; btn.textContent=p.name; btn.onclick=()=>{profile=p.id;progress=JSON.parse(localStorage.getItem("master_lernapp_v109_"+profile)||JSON.stringify({points:0,status:{},ratings:{}}));resetStudyState();renderAll()}; box.appendChild(btn)})}
@@ -227,7 +251,7 @@ document.querySelectorAll(".tab").forEach(btn => {
 });
 document.addEventListener("DOMContentLoaded", () => { 
   $("geminiKey").value = localStorage.getItem("ml_final_gemini_key") || "";
-  loadFromCloud().then(() => renderAll()); 
+  if(supabaseClient) { loadFromCloud().then(() => renderAll()); } else { renderAll(); }
 });
 $("saveKeysBtn").onclick=()=>{ localStorage.setItem("ml_final_gemini_key", $("geminiKey").value.trim()); alert("OK"); };
 $("saveSyncIdBtn").onclick=()=>{ syncId=$("syncIdInput").value.trim(); localStorage.setItem("app_sync_id", syncId); loadFromCloud().then(()=>renderAll()); };
