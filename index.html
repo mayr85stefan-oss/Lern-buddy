@@ -284,7 +284,6 @@ async function loadFromCloud(){
   .order("updated_at", { ascending: false })
   .limit(1);
 
-    alert("URL=" + CONFIG.SUPABASE_URL + " | SYNC=" + syncId + " | DATA=" + JSON.stringify(data));
     
     if(data && data.length > 0 && data[0].data){
       if(data[0].data.all_data) APP.dataByProfile = data[0].data.all_data;
