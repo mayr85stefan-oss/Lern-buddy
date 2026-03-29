@@ -278,16 +278,16 @@ async function loadFromCloud(){
 
   try{
     const { data } = await supabaseClient
-      .from("progress")
-      .select("data")
-      .eq("id", syncId)
-      .maybeSingle();
+  .from("progress")
+  .select("data")
+  .eq("id", syncId)
+  .limit(1);
 
     alert("URL=" + CONFIG.SUPABASE_URL + " | SYNC=" + syncId + " | DATA=" + JSON.stringify(data));
     
-    if(data && data.data){
-      if(data.data.all_data) APP.dataByProfile = data.data.all_data;
-      if(data.data.all_progress) APP.progressByProfile = data.data.all_progress;
+    if(data && data.length > 0 && data[0].data){
+      if(data[0].data.all_data) APP.dataByProfile = data[0].data.all_data;
+      if(data[0].data.all_progress) APP.progressByProfile = data[0].data.all_progress;
       saveDataByProfile();
       saveAllProgress();
       progress = loadProgress(profile);
