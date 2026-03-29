@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v128</title>
+<title>Master Lern-App Final v129</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -18,30 +18,48 @@ html,body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(-
 .grid2a{grid-template-columns:repeat(2,minmax(0,1fr))}
 .grid4{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:950px){.grid2,.grid2a,.grid4{grid-template-columns:1fr}}
+
 .row{display:flex;gap:10px;flex-wrap:wrap}
 .muted{color:var(--muted);font-size:14px}
 .helper{font-size:12px;color:var(--muted)}
 .badge,.pill{display:inline-block;background:var(--accent);border-radius:999px;padding:6px 10px;font-size:13px}
 .pill{font-size:12px;margin:0 8px 8px 0}
+
 button,input,select,textarea{font:inherit;border-radius:14px;padding:12px 14px}
 button{border:1px solid var(--border);background:#fff;cursor:pointer}
 button.primary{background:var(--dark);color:#fff;border-color:var(--dark)}
 button:disabled{opacity:.6;cursor:not-allowed}
 input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
 textarea{resize:vertical}
+
 .tabbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;border:1px solid var(--border);padding:6px;border-radius:16px;background:#fff}
 .tab.active{background:var(--dark);color:#fff}
 .hidden{display:none!important}
-.focusQuestion{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
-.pinBox{position:sticky;top:8px;z-index:12}
-@media (max-width:950px){
-  .pinBox{position:sticky;top:0;z-index:12;border-radius:0 0 14px 14px;margin-top:-14px}
-  .focusQuestion h2{font-size:26px;line-height:1.15;margin:0}
+
+.focusQuestion{
+  background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px;
+  box-shadow:0 4px 14px rgba(0,0,0,.05)
 }
+.pinBox{position:sticky;top:8px;z-index:12}
+.questionCompact{
+  position:sticky;top:0;z-index:12;background:#fff;border:1px solid var(--border);
+  border-radius:14px;padding:10px 12px;box-shadow:0 3px 10px rgba(0,0,0,.05)
+}
+.questionCompact h2{
+  margin:0;font-size:20px;line-height:1.2
+}
+.questionCompact .muted{font-size:13px;margin-top:6px}
+@media (max-width:950px){
+  .pinBox{top:0}
+  .focusQuestion h2{font-size:26px;line-height:1.15;margin:0}
+  .questionCompact h2{font-size:18px}
+}
+
 .option{display:block;width:100%;text-align:left;border:1px solid var(--border);margin:0 0 10px;background:#fff;transition:.2s}
 .option.active{background:#e2e8f0}
 .option.correct{background:var(--good);border-color:#10b981}
 .option.wrong{background:var(--bad);border-color:#ef4444}
+
 .good,.mid,.bad{border-radius:16px;padding:12px;margin-top:12px}
 .good{background:var(--good)}
 .mid{background:var(--mid)}
@@ -50,39 +68,50 @@ textarea{resize:vertical}
 .soft{border:1px solid var(--border);border-radius:18px;background:#fbfdff;padding:14px}
 .kpi{font-size:28px;font-weight:700}
 .toolRow{display:flex;gap:8px;flex-wrap:wrap}
+
 .coachbox{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:14px}
 .chat-log{max-height:260px;overflow:auto;border:1px solid var(--border);border-radius:12px;padding:8px;background:#fff}
 .chat-user,.chat-ai{padding:10px 12px;border-radius:14px;margin-bottom:8px;white-space:pre-wrap}
 .chat-user{background:#ede9fe;margin-left:auto;max-width:88%}
 .chat-ai{background:#eef2f7;max-width:92%}
+
 .canvasWrap{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff}
 .canvasToolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border);background:#f8fafc;align-items:center}
-.canvasViewport{position:relative;width:100%;height:460px;overflow:hidden;touch-action:none;background:#fff}
+.canvasViewport{position:relative;width:100%;height:420px;overflow:hidden;touch-action:none;background:#fff}
 #drawCanvas{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0;touch-action:none}
+.inkQuestionBar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--border);padding:10px 12px;font-weight:700}
+
 .ratingRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .ratingBtn{border-radius:999px;padding:8px 12px;font-weight:700;background:#fff;border:1px solid var(--border)}
 .ratingBtn.active{background:var(--dark);color:#fff!important;border-color:var(--dark)!important}
-.filterChip{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:8px 12px;margin:0 8px 8px 0;background:#fff;cursor:pointer}
-.filterChip.active{background:var(--dark);color:#fff;border-color:var(--dark)}
-.smallScroll{max-height:260px;overflow:auto}
+
+.modeCard{border:1px solid var(--border);border-radius:18px;padding:14px;background:#fbfdff;margin-bottom:12px}
+.modeHeader{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.stackChip{
+  display:inline-block;border:1px solid var(--border);border-radius:999px;padding:8px 12px;margin:0 8px 8px 0;
+  background:#fff;cursor:pointer
+}
+.stackChip.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.smallScroll{max-height:320px;overflow:auto}
+.repeatCard{border:1px solid var(--border);border-radius:16px;padding:12px;background:#fff;margin-bottom:10px}
+
 hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 #syncStatusBadge{position:absolute;top:16px;right:16px;font-weight:700}
 .topicItem{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--border);padding:12px;border-radius:14px;margin-bottom:10px;gap:10px}
 .profileBtn{width:100%;text-align:left}
 .profileBtn.active{background:#f1f5f9}
-.bigEditor{min-height:220px;font-size:20px}
+.bigEditor{min-height:180px;font-size:18px}
 .answerScroll{max-height:260px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .collapseHead{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
 .hiddenBody{display:none}
-.inkQuestionBar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--border);padding:10px 12px;font-weight:700}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card">
     <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App v128</h1>
-    <div class="muted">Final-Version: Quiz, Karteikarten, Freitext, S-Pen, Dashboard, Lerncoach, Multi-JSON und Cloud.</div>
+    <h1>Master Lern-App v129</h1>
+    <div class="muted">Final-Version: Quiz, Karteikarten, Freitext, S-Pen, Dashboard-Stapel, Lerncoach, Multi-JSON und Cloud.</div>
     <div class="row" style="margin-top:10px">
       <div class="badge" id="pointsBadge">0 Punkte</div>
       <div class="badge" id="streakBadge">Serie: 0</div>
@@ -95,6 +124,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
     <div class="card">
       <h3>Profile</h3>
       <div id="profiles"></div>
+
       <hr class="sep">
 
       <h3>Cloud-Sync (ID)</h3>
@@ -103,11 +133,13 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       <button class="primary" id="saveSyncIdBtn" style="width:100%;margin-top:8px">ID koppeln & Cloud laden</button>
 
       <hr class="sep">
+
       <h3>KI API Key</h3>
       <input id="geminiKey" type="password" placeholder="Gemini API Key hier einfügen...">
       <button id="saveKeysBtn" style="width:100%;margin-top:8px">Key speichern</button>
 
       <hr class="sep">
+
       <label class="muted" style="display:flex;align-items:center;gap:8px">
         <input type="checkbox" id="voiceToggle" style="width:auto"> Sprachcoach vorlesen
       </label>
@@ -165,21 +197,22 @@ const CONFIG = {
 };
 
 /* =========================
-   GRUNDZUSTAND
+   APP-STATE
 ========================= */
 const APP = {
   profiles: [
     {id:"stefan",name:"Stefan",program:"Technischer Betriebswirt",badge:"TBW"},
     {id:"lolla",name:"Lolla",program:"Wirtschaftsfachwirt",badge:"WFW"}
   ],
-  dataByProfile: JSON.parse(localStorage.getItem("ml_v128_dataByProfile") || "{}"),
-  progressByProfile: JSON.parse(localStorage.getItem("ml_v128_progressByProfile") || "{}")
+  dataByProfile: JSON.parse(localStorage.getItem("ml_v129_dataByProfile") || "{}"),
+  progressByProfile: JSON.parse(localStorage.getItem("ml_v129_progressByProfile") || "{}")
 };
 
 const DEFAULT_PROGRESS = {points:0,streak:0,status:{},ratings:{}};
 
 let profile = "stefan";
 let progress = loadProgress(profile);
+
 let area = "Alle Oberthemen";
 let topic = "Alle Unterthemen";
 let selected = [];
@@ -190,11 +223,12 @@ let openResult = null;
 let coachMessages = [];
 let voiceEnabled = false;
 let forcedItemId = null;
-let dashboardFilter = "all";
-let dashboardModeFilter = "all";
+
+let dashboardSelectedMode = "quiz";
+let dashboardSelectedLevel = "easy";
 
 /* =========================
-   SUPABASE / CLOUD
+   CLOUD
 ========================= */
 let supabaseClient = null;
 let syncId = localStorage.getItem("app_sync_id") || "";
@@ -220,7 +254,6 @@ async function saveToCloud(){
     await supabaseClient.from("progress").upsert({
       id: syncId,
       data: {
-        profile,
         all_data: APP.dataByProfile,
         all_progress: APP.progressByProfile
       },
@@ -261,23 +294,20 @@ async function loadFromCloud(){
 }
 
 /* =========================
-   HILFSFUNKTIONEN
+   HELPERS
 ========================= */
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
 function saveDataByProfile(){
-  localStorage.setItem("ml_v128_dataByProfile", JSON.stringify(APP.dataByProfile));
+  localStorage.setItem("ml_v129_dataByProfile", JSON.stringify(APP.dataByProfile));
 }
-
 function saveAllProgress(){
-  localStorage.setItem("ml_v128_progressByProfile", JSON.stringify(APP.progressByProfile));
+  localStorage.setItem("ml_v129_progressByProfile", JSON.stringify(APP.progressByProfile));
 }
-
 function loadProgress(p){
   return APP.progressByProfile[p] ? JSON.parse(JSON.stringify(APP.progressByProfile[p])) : JSON.parse(JSON.stringify(DEFAULT_PROGRESS));
 }
-
 function saveProgress(){
   APP.progressByProfile[profile] = JSON.parse(JSON.stringify(progress));
   saveAllProgress();
@@ -285,7 +315,6 @@ function saveProgress(){
   renderHeader();
   renderDashboard();
 }
-
 function resetStudyState(){
   selected = [];
   revealed = false;
@@ -314,8 +343,8 @@ function normalizeImportedData(data){
         const kp = (q.kernpunkte || []).slice(0,3);
         q.quiz_optionen = [
           ...kp.map(x=>({text:x, correct:true})),
-          {text:"Die Preisbildung ist unabhängig von Angebot und Nachfrage.", correct:false},
-          {text:"Nur die Überschrift zu nennen reicht als vollständige fachliche Antwort.", correct:false}
+          {text:"Die Aussage gilt unabhängig von Marktform und Rahmenbedingungen immer absolut.", correct:false},
+          {text:"Für die Bewertung reichen Überschrift und ein Beispiel ohne Kernbegriff aus.", correct:false}
         ].slice(0,5);
       }
     });
@@ -475,7 +504,7 @@ function speak(text){
 }
 
 async function geminiText(prompt){
-  const key = localStorage.getItem("ml_v128_gemini_key") || "";
+  const key = localStorage.getItem("ml_v129_gemini_key") || "";
   if(!key) throw new Error("Gemini API Key fehlt.");
   const body = {
     contents:[{role:"user",parts:[{text:prompt}]}],
@@ -495,7 +524,7 @@ async function geminiText(prompt){
 }
 
 async function geminiImage(prompt, mimeType, data){
-  const key = localStorage.getItem("ml_v128_gemini_key") || "";
+  const key = localStorage.getItem("ml_v129_gemini_key") || "";
   if(!key) throw new Error("Gemini API Key fehlt.");
   const body = {
     contents:[{role:"user",parts:[{text:prompt},{inlineData:{mimeType,data}}]}],
@@ -518,6 +547,7 @@ async function speechToText(fieldId, statusId){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const status = $(statusId);
   const el = $(fieldId);
+
   if(!window.isSecureContext){
     if(status) status.textContent = "Spracheingabe braucht HTTPS.";
     return;
@@ -526,11 +556,13 @@ async function speechToText(fieldId, statusId){
     if(status) status.textContent = "Browser unterstützt Spracheingabe hier nicht.";
     return;
   }
+
   const rec = new SR();
   rec.lang = "de-DE";
   rec.interimResults = true;
   rec.maxAlternatives = 1;
   let finalText = "";
+
   rec.onstart = ()=>{ if(status) status.textContent = "Ich höre..."; };
   rec.onerror = e=>{ if(status) status.textContent = "Fehler: " + (e.error || "unbekannt"); };
   rec.onresult = ev=>{
@@ -593,7 +625,6 @@ function renderCoachBox(id, item){
       <input id="${id}_input" placeholder="Frag die KI zum Thema...">
       <button class="primary" id="${id}_send">Senden</button>
     </div>
-    <div class="helper" style="margin-top:8px">Coach arbeitet direkt auf Frage, Lösung, Merksatz und Kernpunkten.</div>
   `;
 
   const redraw = ()=>{
@@ -616,7 +647,9 @@ function renderCoachBox(id, item){
   $(id+"_speak").onclick = ()=>{
     if(coachMessages.length) speak(coachMessages[coachMessages.length-1].text);
   };
+
   $(id+"_mic").onclick = ()=>speechToText(id+"_input", id+"_log");
+
   $(id+"_send").onclick = async ()=>{
     const inp = $(id+"_input");
     const txt = inp.value.trim();
@@ -651,11 +684,18 @@ Antworte in einfachem Deutsch, kurz und prüfungsnah.`
 }
 
 /* =========================
-   BEWERTUNG / NÄCHSTE FRAGE
+   ABSCHLUSS / WEITER
 ========================= */
-function completeAndNext(item, level, mode, status, points){
+function completeAndNext(item, level, mode){
   if(!progress.ratings) progress.ratings = {};
   if(!progress.status) progress.status = {};
+
+  let status = "known";
+  let points = 0;
+
+  if(level === "easy"){ status = "known"; points = 3; }
+  if(level === "medium"){ status = "unsure"; points = 2; }
+  if(level === "hard"){ status = "unknown"; points = 1; }
 
   progress.ratings[item.id] = { level, mode };
   progress.status[item.id] = status;
@@ -687,21 +727,10 @@ function renderRatingControls(item, mode){
     </div>
   `;
 }
-
 function attachRatingHandlers(scope, item){
   scope.querySelectorAll("[data-rate]").forEach(btn=>{
     btn.onclick = ()=>{
-      const level = btn.dataset.rate;
-      const mode = btn.dataset.mode;
-
-      let status = "known";
-      let points = 0;
-
-      if(level === "easy"){ status = "known"; points = 3; }
-      if(level === "medium"){ status = "unsure"; points = 2; }
-      if(level === "hard"){ status = "unknown"; points = 1; }
-
-      completeAndNext(item, level, mode, status, points);
+      completeAndNext(item, btn.dataset.rate, btn.dataset.mode);
     };
   });
 }
@@ -840,21 +869,18 @@ function renderCards(){
       progress.status[item.id] = "known";
       progress.points = (progress.points || 0) + 6;
       saveProgress();
-      flashRevealed = false;
-      renderAll();
+      renderCards();
     };
     $("cardUnsureBtn").onclick = ()=>{
       progress.status[item.id] = "unsure";
       progress.points = (progress.points || 0) + 2;
       saveProgress();
-      flashRevealed = false;
-      renderAll();
+      renderCards();
     };
     $("cardUnknownBtn").onclick = ()=>{
       progress.status[item.id] = "unknown";
       saveProgress();
-      flashRevealed = false;
-      renderAll();
+      renderCards();
     };
   }
 
@@ -884,14 +910,14 @@ function renderOpen(){
   }
 
   box.innerHTML = `
-    <div class="focusQuestion pinBox">
+    <div class="questionCompact pinBox">
       <div class="row">
         <span class="badge">${esc(item.area)}</span>
         <span class="badge">${esc(item.topic)}</span>
         ${item.operator ? `<span class="badge">${esc(item.operator)}</span>` : ""}
       </div>
-      <h2 style="margin-top:10px">${esc(item.question)}</h2>
-      <div class="muted" style="margin-top:6px">Antworte kurz und fachlich. Bewertung und Coach bleiben direkt im Lernfluss.</div>
+      <h2>${esc(item.question)}</h2>
+      <div class="muted">Kurz antworten. Danach direkt bewerten und zur nächsten Frage weitergehen.</div>
     </div>
 
     <div class="soft" style="margin-top:12px">
@@ -905,7 +931,7 @@ function renderOpen(){
         <button type="button" id="speakExpectationBtn">Antwort vorlesen</button>
       </div>
 
-      <div class="helper" style="margin-top:8px" id="oStatus">Texteingabe und Bewertung sind oben kompakt angeordnet. Die Stifteingabe kannst du nur bei Bedarf aufklappen.</div>
+      <div class="helper" style="margin-top:8px" id="oStatus">Bewertung, Merksatz und Abschluss bleiben direkt im sichtbaren Lernfluss.</div>
 
       ${revealed ? `
         <div id="openFeedbackBox" class="${openResult?.cls || 'mid'}" style="margin-top:12px">
@@ -935,11 +961,11 @@ function renderOpen(){
     </div>
 
     <div class="soft" style="margin-top:14px">
-      <div class="collapseHead" id="toggleInkHead">
+      <div class="collapseHead">
         <div style="font-weight:700">Stifteingabe</div>
         <button type="button" id="toggleInkBtn">${window.__inkCollapsed ? "Stifteingabe öffnen" : "Stifteingabe schließen"}</button>
       </div>
-      <div class="helper" style="margin-top:8px">Finger = verschieben/zoomen. Stift oder Maus = schreiben. Die Frage bleibt auch direkt über dem Canvas sichtbar.</div>
+      <div class="helper" style="margin-top:8px">Finger = verschieben/zoomen. Stift oder Maus = schreiben. Die Frage bleibt direkt über dem Canvas sichtbar.</div>
 
       <div id="inkBody" class="${window.__inkCollapsed ? 'hiddenBody' : ''}" style="margin-top:12px">
         <div class="canvasWrap">
@@ -980,10 +1006,7 @@ function renderOpen(){
   $("clearCanvasBtn").onclick = ()=>clearCanvas();
 
   $("oMic").onclick = ()=>speechToText("oAns", "oStatus");
-
-  $("showExpectationBtn").onclick = ()=>{
-    $("expectationBox").classList.toggle("hidden");
-  };
+  $("showExpectationBtn").onclick = ()=>{ $("expectationBox").classList.toggle("hidden"); };
   $("speakExpectationBtn").onclick = ()=>speak(item.explanation);
 
   $("oEval").onclick = async ()=>{
@@ -1032,6 +1055,7 @@ Minimalantwort:`
     $("oStatus").textContent = "Stifteingabe wird bewertet ...";
     const img = exportCanvasTrimmed();
     revealed = true;
+
     try{
       const ai = await geminiImage(
 `Lies die Handschrift und bewerte sie als IHK-Prüfer.
@@ -1051,6 +1075,7 @@ Minimalantwort:`,
     }catch(e){
       openResult = {cls:"bad", label:"Stifteingabe nicht bewertet", body:e.message, status:"unknown", found:[]};
     }
+
     progress.status[item.id] = openResult.status;
     saveProgress();
     renderOpen();
@@ -1067,14 +1092,52 @@ Minimalantwort:`,
 /* =========================
    DASHBOARD
 ========================= */
-function filteredByDashboard(items){
+function getRatedItemsBy(mode, level){
+  const items = allItems();
   const ratings = progress.ratings || {};
-  return items.filter(i=>{
-    const r = ratings[i.id];
-    const okLevel = dashboardFilter==="all" ? true : (r && r.level===dashboardFilter);
-    const okMode = dashboardModeFilter==="all" ? true : (r && r.mode===dashboardModeFilter);
-    return okLevel && okMode;
-  });
+  return items.filter(i => ratings[i.id] && ratings[i.id].mode === mode && ratings[i.id].level === level);
+}
+
+function renderDashboardModeSection(mode, title){
+  const easyItems = getRatedItemsBy(mode, "easy");
+  const mediumItems = getRatedItemsBy(mode, "medium");
+  const hardItems = getRatedItemsBy(mode, "hard");
+
+  const activeMode = dashboardSelectedMode === mode;
+  const listItems = activeMode
+    ? (dashboardSelectedLevel === "easy" ? easyItems : dashboardSelectedLevel === "medium" ? mediumItems : hardItems)
+    : [];
+
+  return `
+    <div class="modeCard">
+      <div class="modeHeader">
+        <div style="font-weight:700;font-size:18px">${title}</div>
+        <div class="badge">${easyItems.length + mediumItems.length + hardItems.length} markiert</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <span class="stackChip ${dashboardSelectedMode===mode && dashboardSelectedLevel==='easy' ? 'active' : ''}" data-stack-mode="${mode}" data-stack-level="easy">Einfach ${easyItems.length}</span>
+        <span class="stackChip ${dashboardSelectedMode===mode && dashboardSelectedLevel==='medium' ? 'active' : ''}" data-stack-mode="${mode}" data-stack-level="medium">Mittel ${mediumItems.length}</span>
+        <span class="stackChip ${dashboardSelectedMode===mode && dashboardSelectedLevel==='hard' ? 'active' : ''}" data-stack-mode="${mode}" data-stack-level="hard">Schwierig ${hardItems.length}</span>
+      </div>
+
+      ${activeMode ? `
+        <div class="smallScroll" style="margin-top:12px">
+          ${listItems.length ? listItems.map(i=>`
+            <div class="repeatCard">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+                <div>
+                  <div style="font-weight:700">${esc(i.question)}</div>
+                  <div class="muted">${esc(i.area)} · ${esc(i.topic)}</div>
+                </div>
+                <button type="button" data-repeat-id="${i.id}" data-repeat-mode="${mode}">Jetzt lernen</button>
+              </div>
+            </div>
+          `).join("") : `<div class="muted">Für diesen Stapel gibt es aktuell keine markierten Inhalte.</div>`}
+        </div>
+      ` : ``}
+    </div>
+  `;
 }
 
 function renderDashboard(){
@@ -1085,11 +1148,6 @@ function renderDashboard(){
   const unknown = vals.filter(v=>v==="unknown").length;
   const total = items.length;
   const done = known + unsure + unknown;
-  const ratings = progress.ratings || {};
-  const relevantRated = items.filter(i=>ratings[i.id]);
-  const easy = relevantRated.filter(i=>ratings[i.id].level==="easy").length;
-  const medium = relevantRated.filter(i=>ratings[i.id].level==="medium").length;
-  const hard = relevantRated.filter(i=>ratings[i.id].level==="hard").length;
 
   $("dashTop").innerHTML = `
     <div class="soft"><div class="muted">Fragen im Filter</div><div class="kpi">${total}</div></div>
@@ -1098,70 +1156,30 @@ function renderDashboard(){
     <div class="soft"><div class="muted">Unsicher / Nicht gewusst</div><div class="kpi">${unsure + unknown}</div></div>
   `;
 
-  const filteredList = filteredByDashboard(items);
-
   $("radar").innerHTML = `
     <div class="soft" style="margin-bottom:12px">
-      <div style="font-weight:700">Wiederholung aus dem Dashboard</div>
-      <div class="muted" style="margin-top:8px">Hier kannst du gezielt nach Schwierigkeit und Lernmodus wiederholen.</div>
-
-      <div style="margin-top:12px">
-        <span class="filterChip ${dashboardFilter==='all'?'active':''}" data-dash-filter="all">Alle</span>
-        <span class="filterChip ${dashboardFilter==='easy'?'active':''}" data-dash-filter="easy">Einfach</span>
-        <span class="filterChip ${dashboardFilter==='medium'?'active':''}" data-dash-filter="medium">Mittel</span>
-        <span class="filterChip ${dashboardFilter==='hard'?'active':''}" data-dash-filter="hard">Schwierig</span>
-      </div>
-
-      <div style="margin-top:8px">
-        <span class="filterChip ${dashboardModeFilter==='all'?'active':''}" data-dash-mode="all">Alle Modi</span>
-        <span class="filterChip ${dashboardModeFilter==='quiz'?'active':''}" data-dash-mode="quiz">Quiz</span>
-        <span class="filterChip ${dashboardModeFilter==='cards'?'active':''}" data-dash-mode="cards">Karteikarten</span>
-        <span class="filterChip ${dashboardModeFilter==='open'?'active':''}" data-dash-mode="open">Freitext / Stift</span>
-      </div>
-
-      <div class="row" style="margin-top:12px">
-        <div class="badge">Einfach ${easy}</div>
-        <div class="badge">Mittel ${medium}</div>
-        <div class="badge">Schwierig ${hard}</div>
-      </div>
-
-      <div class="smallScroll" style="margin-top:12px">
-        ${filteredList.length ? filteredList.map(i=>{
-          const r = ratings[i.id];
-          return `
-            <div class="soft" style="margin-bottom:10px">
-              <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
-                <div>
-                  <div style="font-weight:700">${esc(i.question)}</div>
-                  <div class="muted">${esc(i.topic)} · ${r ? esc(r.mode) : "ohne Modus"} · ${r ? esc(r.level) : "ohne Einstufung"}</div>
-                </div>
-                <button type="button" data-repeat-id="${i.id}">Jetzt lernen</button>
-              </div>
-            </div>`;
-        }).join("") : `<div class="muted">Für diesen Filter gibt es aktuell keine markierten Inhalte.</div>`}
-      </div>
+      <div style="font-weight:700;font-size:20px">Wiederholung aus dem Dashboard</div>
+      <div class="muted" style="margin-top:8px">Die Inhalte sind jetzt getrennt nach Lernmodus und Schwierigkeit organisiert.</div>
     </div>
+
+    ${renderDashboardModeSection("quiz","Quiz")}
+    ${renderDashboardModeSection("cards","Karteikarten")}
+    ${renderDashboardModeSection("open","Freitext / Stift")}
   `;
 
-  document.querySelectorAll("[data-dash-filter]").forEach(el=>{
+  document.querySelectorAll("[data-stack-mode]").forEach(el=>{
     el.onclick = ()=>{
-      dashboardFilter = el.dataset.dashFilter;
-      renderDashboard();
-    };
-  });
-
-  document.querySelectorAll("[data-dash-mode]").forEach(el=>{
-    el.onclick = ()=>{
-      dashboardModeFilter = el.dataset.dashMode;
+      dashboardSelectedMode = el.dataset.stackMode;
+      dashboardSelectedLevel = el.dataset.stackLevel;
       renderDashboard();
     };
   });
 
   document.querySelectorAll("[data-repeat-id]").forEach(el=>{
     el.onclick = ()=>{
-      const target = items.find(x=>x.id===el.dataset.repeatId);
+      const target = allItems().find(x=>x.id===el.dataset.repeatId);
       if(!target) return;
-      const r = ratings[target.id];
+
       area = target.area;
       topic = target.topic;
       forcedItemId = target.id;
@@ -1170,13 +1188,13 @@ function renderDashboard(){
       document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
       ["quizTab","cardsTab","openTab","dashboardTab","topicsTab"].forEach(id=>$(id).classList.add("hidden"));
 
-      let tab = "quiz";
-      if(r && r.mode==="cards") tab = "cards";
-      if(r && r.mode==="open") tab = "open";
-
-      const targetBtn = document.querySelector(`.tab[data-tab="${tab}"]`);
+      const mode = el.dataset.repeatMode;
+      const targetBtn = document.querySelector(`.tab[data-tab="${mode}"]`);
       if(targetBtn) targetBtn.classList.add("active");
-      $(tab + "Tab").classList.remove("hidden");
+
+      if(mode === "quiz") $("quizTab").classList.remove("hidden");
+      if(mode === "cards") $("cardsTab").classList.remove("hidden");
+      if(mode === "open") $("openTab").classList.remove("hidden");
 
       renderAll();
     };
@@ -1385,16 +1403,15 @@ function debouncedLocalSave(){
   try{
     const item = currentItem();
     if(!item) return;
-    const draftKey = "ml_v128_draft_" + item.id;
+    const draftKey = "ml_v129_draft_" + item.id;
     localStorage.setItem(draftKey, JSON.stringify({openText, selected, revealed, flashRevealed, scale, offsetX, offsetY, brushSize, tool}));
   }catch(e){}
 }
-
 function restoreDraft(){
   try{
     const item = currentItem();
     if(!item) return;
-    const draftKey = "ml_v128_draft_" + item.id;
+    const draftKey = "ml_v129_draft_" + item.id;
     const raw = localStorage.getItem(draftKey);
     if(!raw) return;
     const d = JSON.parse(raw);
@@ -1454,7 +1471,7 @@ $("resetProgressBtn").onclick = ()=>{
 };
 
 $("saveKeysBtn").onclick = ()=>{
-  localStorage.setItem("ml_v128_gemini_key", $("geminiKey").value.trim());
+  localStorage.setItem("ml_v129_gemini_key", $("geminiKey").value.trim());
   alert("Gemini Key gespeichert.");
 };
 
@@ -1465,7 +1482,7 @@ $("saveSyncIdBtn").onclick = async ()=>{
 };
 
 document.addEventListener("DOMContentLoaded", async ()=>{
-  $("geminiKey").value = localStorage.getItem("ml_v128_gemini_key") || "";
+  $("geminiKey").value = localStorage.getItem("ml_v129_gemini_key") || "";
   $("syncIdInput").value = syncId || "";
   if(syncId) await loadFromCloud();
   else updateBadge("local");
