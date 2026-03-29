@@ -290,6 +290,7 @@ async function loadFromCloud(){
       if(data[0].data.all_progress) APP.progressByProfile = data[0].data.all_progress;
       saveDataByProfile();
       saveAllProgress();
+      saveDataByProfile();
       progress = loadProgress(profile);
       renderAll();
       updateBadge("ok");
