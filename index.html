@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v137 (Restore & Multi-JSON)</title>
+<title>Master Lern-App Final v139 (v127 Restore + Multi-JSON)</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
@@ -51,8 +51,8 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 <div class="wrap">
   <div class="card">
     <div id="syncStatusBadge" class="badge">Lokal</div>
-    <h1>Master Lern-App v137</h1>
-    <div class="muted">KOMPLETT-VERSION (RESTORED): Quiz, Karteikarten, S-Pen Pro, Multi-JSON & Cloud Fix.</div>
+    <h1>Master Lern-App v139</h1>
+    <div class="muted">1:1 v127 RESTORE: Quiz, Karten, S-Pen Pro, Multi-JSON & Cloud Fix.</div>
     <div class="row" style="margin-top:10px">
       <div class="badge" id="pointsBadge">0 Punkte</div>
       <div class="badge" id="accBadge">Trefferquote: 0%</div>
@@ -114,7 +114,6 @@ const CONFIG = {
 /* =========================
    🔗 SUPABASE
 ========================= */
-// WICHTIG: Kein IF-Block mehr, der den Start verhindert!
 const supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 let syncId = localStorage.getItem("app_sync_id") || "";
 
@@ -126,13 +125,13 @@ function updateBadge(status) {
 }
 
 async function saveToCloud() {
-  if(!syncId) return;
+  if(!syncId || !supabaseClient) return;
   updateBadge("syncing");
   try { await supabaseClient.from("progress").upsert({id: syncId, data: { profile, progress, all_data: APP.dataByProfile }, updated_at: new Date().toISOString()}); updateBadge("ok"); } catch (e) { updateBadge("err"); }
 }
 
 async function loadFromCloud() {
-  if(!syncId) return;
+  if(!syncId || !supabaseClient) return;
   try {
     const { data } = await supabaseClient.from("progress").select("data").eq("id", syncId).maybeSingle();
     if (data && data.data) {
@@ -151,7 +150,7 @@ const DEFAULT_PROGRESS={points:0,streak:0,status:{},ratings:{}};
 let profile="stefan",progress=loadProgress(profile),area="Alle Oberthemen",topic="Alle Unterthemen",selected=[],revealed=false,flashRevealed=false,openText="",openResult=null,coachMessages=[],voiceEnabled=false,forcedItemId=null;
 
 const canvas=document.createElement("canvas"); canvas.width=1800; canvas.height=1200; canvas.id="drawCanvas";
-const cctx=canvas.getContext("2d"); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); cctx.lineCap="round"; cctx.lineJoin="round";
+const cctx=canvas.getContext("2d"); cctx.fillStyle="#fff"; cctx.fillRect(0,0,1800,1200); cctx.lineCap="round"; cctx.lineJoin="round";
 let tool="pen",brushSize=4,scale=0.6,offsetX=0,offsetY=0,pointers=new Map(),drawLast=null,gestureStart=null;
 
 function $(id){return document.getElementById(id)}
@@ -160,11 +159,7 @@ function loadProgress(p){return JSON.parse(localStorage.getItem("master_lernapp_
 function saveDataByProfile(){localStorage.setItem("v109_dataByProfile",JSON.stringify(APP.dataByProfile))}
 function saveProgress(){ localStorage.setItem("master_lernapp_v109_"+profile,JSON.stringify(progress)); saveToCloud(); renderHeader(); }
 
-function currentDataList(){ 
-  let l = APP.dataByProfile[profile]; 
-  if(!l) return []; 
-  return Array.isArray(l) ? l : [l]; 
-}
+function currentDataList(){ let l = APP.dataByProfile[profile]; if(!l) return []; return Array.isArray(l) ? l : [l]; }
 
 function allItems(){
   const dataList = currentDataList(); const out = [];
@@ -218,7 +213,7 @@ async function speechToText(fieldId, statusId){
   rec.start();
 }
 
-/* RENDERING (v127 ORIGINAL) */
+/* RENDERING TABS (1:1 v127) */
 function renderQuiz(){
   const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema geladen.</div>'; return}
   const optHtml=item.optionMeta.map((o,i)=>{
@@ -241,7 +236,7 @@ function renderQuiz(){
 
 function renderCards(){
   const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema geladen.</div>'; return}
-  box.innerHTML=`<div class="focusQuestion pinBox" onclick="this.dataset.flip='1'"><h2>${flashRevealed?esc(item.explanation):esc(item.question)}</h2></div>
+  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${flashRevealed?esc(item.explanation):esc(item.question)}</h2></div>
     <div class="toolRow" style="margin-top:14px"><button class="primary" onclick="flashRevealed=!flashRevealed; renderCards()">${flashRevealed?'Vorderseite':'Karte drehen'}</button></div>
     ${flashRevealed?renderRatingControls(item,"cards"):""}`;
   if(flashRevealed) attachRatingHandlers(box,item);
@@ -295,7 +290,7 @@ function renderCoachBox(id,item){
   $(id+"_log").innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join("");
 }
 
-/* THEMEN IMPORT (MULTI-FIX) */
+/* THEMEN IMPORT (MULTI-JSON) */
 function renderTopics(){
   const list = currentDataList(); const box = $("topicBoxes"); box.innerHTML = "";
   list.forEach((data, idx) => {
@@ -313,12 +308,9 @@ $("importJsonBtn").onclick=()=>{
     if(!raw) return;
     const newData = JSON.parse(raw);
     let l = currentDataList(); 
-    l.push(newData);
+    l.push(newData); 
     APP.dataByProfile[profile] = l;
-    saveDataByProfile(); 
-    renderAll(); 
-    saveToCloud(); 
-    $("jsonText").value = "";
+    saveDataByProfile(); renderAll(); saveToCloud(); $("jsonText").value = "";
     $("importStatus").textContent = "Hinzugefügt!";
   } catch(e) { alert("JSON Fehler!"); }
 };
@@ -359,7 +351,7 @@ function exportCanvasTrimmed(){
   return {base64: tmp.toDataURL("image/png").split(",")[1]};
 }
 
-/* PERSISTENCE & RENDERALL */
+/* DASHBOARD & RENDERALL */
 function debouncedLocalSave(){ const i=currentItem(); if(i) localStorage.setItem("draft_"+i.id, JSON.stringify({openText, selected, scale, offsetX, offsetY})); }
 function restoreDraft(){
   const i=currentItem(); if(!i) return; const d=JSON.parse(localStorage.getItem("draft_"+i.id)||"{}");
@@ -368,8 +360,9 @@ function restoreDraft(){
 }
 function renderHeader(){const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length,acc=vals.length?Math.round((known/vals.length)*100):0; $("pointsBadge").textContent=progress.points+" Punkte"; $("accBadge").textContent="Quote: "+acc+"%"; $("countsBadge").textContent=`Gewusst ${known} · Gesamt ${allItems().length}`}
 function renderDashboard(){
-  const items=filtered(); $("dashTop").innerHTML=`<div class="soft">Fragen: ${items.length}</div><div class="soft">Gewusst: ${Object.values(progress.status).filter(v=>v==="known").length}</div>`;
-  $("radar").innerHTML = items.map(i=>`<div class="soft"><strong>${esc(i.question)}</strong></div>`).join("");
+  const items=filtered(); 
+  $("dashTop").innerHTML=`<div class="soft">Fragen: ${items.length}</div><div class="soft">Gewusst: ${Object.values(progress.status).filter(v=>v==="known").length}</div>`;
+  $("radar").innerHTML = items.map(i=>`<div class="soft" style="cursor:pointer" onclick="forcedItemId='${i.id}'; document.querySelector('[data-tab=quiz]').click()"><strong>${esc(i.question)}</strong></div>`).join("");
 }
 function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className="profileBtn"+(profile===p.id?" active":""); btn.innerHTML=`<div style="font-weight:700">${esc(p.name)}</div>`; btn.onclick=()=>{profile=p.id;progress=loadProgress(profile);resetStudyState();renderAll()}; box.appendChild(btn)})}
 function renderSelectors(){const aSel=$("areaSelect"); aSel.innerHTML=areas().map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join(""); aSel.value=area; aSel.onchange=()=>{area=aSel.value;topic="Alle Unterthemen";resetStudyState();renderAll()}; const tSel=$("topicSelect"); tSel.innerHTML=topics().map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join(""); tSel.value=topic; tSel.onchange=()=>{topic=tSel.value;resetStudyState();renderAll()}}
