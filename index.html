@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v155</title>
+<title>Master Lern-App Final v157</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* =========================================================
-   WICHTIG: SETZE DEINEN SUPABASE-KEY IN ZEILE 14 EIN!
+   WICHTIG: TRAGE DEINEN KEY HIER IN ZEILE 14 EIN!
+   Ohne diesen Eintrag bleibt die App auf "Lokal".
    ========================================================= */
 const CONFIG = { 
   SUPABASE_KEY: "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9", 
@@ -42,6 +43,7 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
 .chat-user{background:#ede9fe;margin-left:auto;max-width:88%}.chat-ai{background:#eef2f7;max-width:92%}
 .canvasViewport{position:relative;width:100%;height:450px;overflow:hidden;touch-action:none;background:#fff;border:1px solid var(--border);border-radius:18px}
 #drawCanvas{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0}
+.canvasToolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border);background:#f8fafc;align-items:center;border-radius:14px 14px 0 0}
 #syncStatusBadge { position: absolute; top: 16px; right: 16px; font-weight: 700; }
 .dashGroup{margin-bottom:20px; border-left:4px solid var(--dark); padding-left:15px}
 .dashItem{background:#fff; border:1px solid var(--border); padding:10px; border-radius:12px; margin-bottom:6px; cursor:pointer}
@@ -49,7 +51,7 @@ input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
 </head>
 <body>
 <div class="wrap">
-  <div class="card"><div id="syncStatusBadge" class="badge">Lokal</div><h1>Master Lern-App v155</h1><div class="row"><div class="badge" id="pointsBadge">0 P</div><div class="badge" id="accBadge">0%</div><div class="badge" id="countsBadge">0 / 0</div></div></div>
+  <div class="card"><div id="syncStatusBadge" class="badge">Lokal</div><h1>Master Lern-App v157</h1><div class="row"><div class="badge" id="pointsBadge">0 P</div><div class="badge" id="accBadge">0%</div><div class="badge" id="countsBadge">0 / 0</div></div></div>
   <div class="grid grid2">
     <div class="card">
       <h3>Profile & Sync</h3><div id="profiles"></div><hr><input type="text" id="syncIdInput" placeholder="Cloud ID..."><button class="primary" id="saveSyncIdBtn" style="margin-top:8px">ID Laden</button><hr><input id="geminiKey" type="password" placeholder="KI Key..."><button id="saveKeysBtn" style="width:100%;margin-top:8px">Speichern</button>
@@ -114,6 +116,11 @@ async function geminiText(prompt){
   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${k}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}]})});
   const d=await res.json(); return d.candidates[0].content.parts[0].text;
 }
+async function geminiImage(prompt,mimeType,data){
+  const k=localStorage.getItem("ml_final_gemini_key"); if(!k) return "Key fehlt."; 
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${k}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt},{inlineData:{mimeType,data}}]}]})});
+  const d=await res.json(); return d.candidates[0].content.parts[0].text;
+}
 
 function renderQuiz(){
   const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='Kein Thema.'; return}
@@ -136,15 +143,19 @@ function renderCards(){
 
 function renderOpen(){
   const item=currentItem(),box=$("openBody"); if(!item){box.innerHTML='Kein Thema.'; return}
-  box.innerHTML=`<div class="focusQuestion"><h2>${esc(item.question)}</h2></div><textarea id="oAns" oninput="openText=this.value" placeholder="Antwort..." style="height:120px">${esc(openText)}</textarea>
-    <div class="row"><button class="primary" onclick="evalOpen()">KI Bewerten</button><button id="oMic">🎤 Sprache</button><span id="oStatus" class="muted"></span></div>
+  box.innerHTML=`<div class="focusQuestion"><h2>${esc(item.question)}</h2></div><textarea id="oAns" placeholder="Antwort..." style="height:120px">${esc(openText)}</textarea>
+    <div class="row"><button class="primary" onclick="evalOpen()">Text bewerten</button></div>
     ${revealed?renderRating(item):""}${revealed?`<div class="soft"><strong>Feedback:</strong><br>${openResult || esc(item.explanation)} ${item.merksatz?`<div class="merksatz">${esc(item.merksatz)}</div>`:""}</div>`:""}
     <div class="card" style="margin-top:14px">
       <button class="primary" style="margin-bottom:10px" id="sPenToggleBtn">Stifteingabe (S-Pen Pro) +/-</button>
-      <div id="inkB" class="hidden"><div class="canvasViewport" id="cVp"></div><button class="primary" style="margin-top:10px" onclick="clearCanvas()">Leeren</button></div>
+      <div id="inkB" class="hidden">
+        <div class="canvasToolbar">
+          <button onclick="tool='pen'">Stift</button><button onclick="tool='eraser'">Radierer</button><button onclick="clearCanvas()">Leeren</button><button class="primary" onclick="evalCanvas()">Stift bewerten</button>
+        </div>
+        <div class="canvasViewport" id="cVp"></div>
+      </div>
     </div>`;
   if($("sPenToggleBtn")) $("sPenToggleBtn").onclick=()=> { $("inkB").classList.toggle("hidden"); setTimeout(mountCanvas, 50); };
-  if($("oMic")) $("oMic").onclick=()=>speechToText("oAns","oStatus");
   mountCanvas();
 }
 
@@ -165,10 +176,9 @@ function renderCoachBox(id){
   log.scrollTop = log.scrollHeight;
 }
 window.quickCoach=async(id,type)=>{ 
-  const q={Analogie:"Erkläre mir das mit einer Analogie.", Einfacher:"Erkläre es mir viel einfacher.", Beispiel:"Gib mir ein praktisches Beispiel.", Merksatz:"Erstelle mir einen kurzen Merksatz dazu."}[type]; 
+  const q={Analogie:"Analogie.", Einfacher:"Einfacher.", Beispiel:"Beispiel.", Merksatz:"Merksatz."}[type]; 
   coachMessages.push({role:"user",text:q}); renderCoachBox(id); 
-  const r=await geminiText(`Kontext Frage: ${currentItem().question}. User: ${q}`); 
-  coachMessages.push({role:"ai",text:r}); renderCoachBox(id); 
+  const r=await geminiText(`Kontext: ${currentItem().question}. User: ${q}`); coachMessages.push({role:"ai",text:r}); renderCoachBox(id); 
 };
 window.sendCoach=async(id)=>{ 
   const t=$(id+"_in").value; if(!t)return; coachMessages.push({role:"user",text:t}); $(id+"_in").value=""; renderCoachBox(id); 
@@ -188,10 +198,16 @@ function clientToCanvas(e){ const v=$("cVp").getBoundingClientRect(); return {x:
 canvas.addEventListener("pointerdown", e=>{ canvas.setPointerCapture(e.pointerId); pointers.set(e.pointerId,e); if(e.pointerType==='pen'||e.pointerType==='mouse'){ if(pointers.size===1) drawLast=clientToCanvas(e); } else if(pointers.size===1) gestureStart={px:e.clientX, py:e.clientY, ox:offsetX, oy:offsetY}; else if(pointers.size===2){ const a=[...pointers.values()]; gestureStart={dist:Math.hypot(a[0].clientX-a[1].clientX, a[0].clientY-a[1].clientY), sc:scale, ox:offsetX, oy:offsetY}; } });
 canvas.addEventListener("pointermove", e=>{ if(!pointers.has(e.pointerId)) return; pointers.set(e.pointerId,e); if((e.pointerType==='pen'||e.pointerType==='mouse') && drawLast){ const p=clientToCanvas(e); cctx.save(); if(tool==='eraser'){ cctx.globalCompositeOperation="destination-out"; cctx.lineWidth=40; } else { cctx.strokeStyle="#111"; cctx.lineWidth=brushSize; } cctx.beginPath(); cctx.moveTo(drawLast.x,drawLast.y); cctx.lineTo(p.x,p.y); cctx.stroke(); cctx.restore(); drawLast=p; } else if(e.pointerType==='touch' && gestureStart){ if(pointers.size===1){ offsetX=gestureStart.ox+(e.clientX-gestureStart.px); offsetY=gestureStart.oy+(e.clientY-gestureStart.py); updateCanvas(); } else if(pointers.size===2){ const a=[...pointers.values()]; const d=Math.hypot(a[0].clientX-a[1].clientX, a[0].clientY-a[1].clientY); scale=Math.max(0.2, Math.min(3, gestureStart.sc * (d/gestureStart.dist))); updateCanvas(); } } });
 canvas.addEventListener("pointerup", e=>{ pointers.delete(e.pointerId); drawLast=null; if(pointers.size<2) gestureStart=null; });
+function exportCanvasTrimmed(){ const src=cctx.getImageData(0,0,canvas.width,canvas.height); let minX=canvas.width,minY=canvas.height,maxX=0,maxY=0; for(let y=0;y<canvas.height;y++){for(let x=0;x<canvas.width;x++){const idx=(y*canvas.width+x)*4; if(src.data[idx+3]>0 && src.data[idx]<250){if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y}}} const w=(maxX-minX)+40, h=(maxY-minY)+40; const tmp=document.createElement("canvas"); tmp.width=w; tmp.height=h; tmp.getContext("2d").drawImage(canvas,minX-20,minY-20,w,h,0,0,w,h); return {base64: tmp.toDataURL("image/png").split(",")[1]}; }
+
+window.evalOpen=async()=>{ revealed=true; renderOpen(); try { openResult=await geminiText(`Prüfer: Frage ${currentItem().question}, User: ${$("oAns").value}`); renderOpen(); } catch(e){} };
+window.evalCanvas=async()=>{ revealed=true; renderOpen(); const img=exportCanvasTrimmed(); try { openResult=await geminiImage(`Frage ${currentItem().question}`, "image/png", img.base64); renderOpen(); } catch(e){} };
 
 $("importJsonBtn").onclick=()=>{
   try {
-    let raw = $("jsonText").value.trim().replace(/[\u200B-\u200D\uFEFF]/g, ""); 
+    let raw = $("jsonText").value.trim()
+      .replace(/[\u201C\u201D]/g, '"') 
+      .replace(/[\u200B-\u200D\uFEFF]/g, ""); 
     if(!raw) return; const newData=JSON.parse(raw); let l=currentDataList(); l.push(newData); APP.dataByProfile[profile]=l; 
     localStorage.setItem("v109_dataByProfile", JSON.stringify(APP.dataByProfile)); renderAll(); saveToCloud(); $("jsonText").value=""; alert("Import OK!");
   } catch(e){ alert("JSON Fehler: Text prüfen!"); }
