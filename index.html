@@ -3,226 +3,382 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Master Lern-App Final v157</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-/* =========================================================
-   WICHTIG: TRAGE DEINEN KEY HIER IN ZEILE 14 EIN!
-   Ohne diesen Eintrag bleibt die App auf "Lokal".
-   ========================================================= */
-const CONFIG = { 
-  SUPABASE_KEY: "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9", 
-  SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co", 
-  GEMINI_MODEL: "gemini-2.5-flash" 
-};
-</script>
+<title>Master Lern-App Final v127</title>
 <style>
 :root{
   --bg:#f6f8fc; --card:#fff; --text:#1f2937; --muted:#6b7280; --border:#dbe2ea;
   --dark:#0f172a; --accent:#eef2ff; --good:#ecfdf5; --mid:#fff7ed; --bad:#fef2f2; --red:#c1121f;
 }
 *{box-sizing:border-box}
-html,body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text);overscroll-behavior:none}
+html,body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
 .wrap{max-width:1240px;margin:0 auto;padding:14px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);position:relative}
-.grid{display:grid;gap:12px}.grid2{grid-template-columns:290px 1fr}.grid2a{grid-template-columns:repeat(2,minmax(0,1fr))}
-@media (max-width:950px){.grid2,.grid2a{grid-template-columns:1fr}}
-.badge{display:inline-block;background:var(--accent);border-radius:999px;padding:6px 10px;font-size:13px;border:1px solid var(--border);cursor:pointer}
+.grid{display:grid;gap:12px}.grid2{grid-template-columns:290px 1fr}.grid2a{grid-template-columns:repeat(2,minmax(0,1fr))}.grid4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:950px){.grid2,.grid2a,.grid4{grid-template-columns:1fr}}
+.row{display:flex;gap:10px;flex-wrap:wrap}.muted{color:var(--muted);font-size:14px}
+.badge,.pill{display:inline-block;background:var(--accent);border-radius:999px;padding:6px 10px;font-size:13px}
+.pill{font-size:12px;margin:0 8px 8px 0}
 button,input,select,textarea{font:inherit;border-radius:14px;padding:12px 14px}
-button{border:1px solid var(--border);background:#fff;cursor:pointer} button.primary{background:var(--dark);color:#fff;border-color:var(--dark);width:100%}
-input,select,textarea{width:100%;border:1px solid var(--border);background:#fff}
+button{border:1px solid var(--border);background:#fff;cursor:pointer} button.primary{background:var(--dark);color:#fff;border-color:var(--dark)}
+button:disabled{opacity:0.6;cursor:not-allowed}
+input,select,textarea{width:100%;border:1px solid var(--border);background:#fff} textarea{resize:vertical}
 .tabbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;border:1px solid var(--border);padding:6px;border-radius:16px;background:#fff}
 .tab.active{background:var(--dark);color:#fff}.hidden{display:none!important}
-.focusQuestion{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:0 4px 14px rgba(0,0,0,.05);position:sticky;top:8px;z-index:10}
+.focusQuestion{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+.pinBox{position:sticky;top:8px;z-index:10;}
+@media (max-width:950px){
+  .pinBox{position:sticky;top:0;z-index:10;border-radius:0 0 14px 14px;margin-top:-14px}
+  .focusQuestion h2{font-size:24px;line-height:1.2;margin:0}
+}
 .option{display:block;width:100%;text-align:left;border:1px solid var(--border);margin:0 0 10px;background:#fff;transition:0.2s}
 .option.active{background:#e2e8f0}.option.correct{background:var(--good);border-color:#10b981}.option.wrong{background:var(--bad);border-color:#ef4444}
-.merksatz{color:var(--red);font-weight:700;margin-top:10px;padding:10px;border-left:4px solid var(--red);background:#fff5f5;border-radius:10px}
-.coachbox{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:14px}
-.chat-log{height:280px;overflow-y:scroll;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;margin-bottom:10px}
-.chat-user,.chat-ai{padding:10px 12px;border-radius:14px;margin-bottom:8px;white-space:pre-wrap;font-size:14px}
-.chat-user{background:#ede9fe;margin-left:auto;max-width:88%}.chat-ai{background:#eef2f7;max-width:92%}
-.canvasViewport{position:relative;width:100%;height:450px;overflow:hidden;touch-action:none;background:#fff;border:1px solid var(--border);border-radius:18px}
-#drawCanvas{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0}
-.canvasToolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border);background:#f8fafc;align-items:center;border-radius:14px 14px 0 0}
+.good,.mid,.bad{border-radius:16px;padding:12px;margin-top:12px}.good{background:var(--good)}.mid{background:var(--mid)}.bad{background:var(--bad)}
+.merksatz{color:var(--red);font-weight:700}
+.soft{border:1px solid var(--border);border-radius:18px;background:#fbfdff;padding:14px}.kpi{font-size:28px;font-weight:700}
+.toolRow{display:flex;gap:8px;flex-wrap:wrap}
+.coachbox{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:14px}.chat-log{max-height:240px;overflow:auto;border:1px solid var(--border);border-radius:12px;padding:8px;background:#fff}.chat-user,.chat-ai{padding:10px 12px;border-radius:14px;margin-bottom:8px;white-space:pre-wrap}.chat-user{background:#ede9fe;margin-left:auto;max-width:88%}.chat-ai{background:#eef2f7;max-width:92%}
+.canvasWrap{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:#fff}.canvasToolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-bottom:1px solid var(--border);background:#f8fafc;align-items:center}.canvasViewport{position:relative;width:100%;height:450px;overflow:hidden;touch-action:none;background:#fff}#drawCanvas{position:absolute;left:0;top:0;background:#fff;transform-origin:0 0;touch-action:none}
+.helper{font-size:12px;color:var(--muted)}
+.ratingRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.ratingBtn{border-radius:999px;padding:8px 12px;font-weight:bold;cursor:pointer;background:#fff;border:1px solid var(--border)}
+.ratingBtn.active{background:var(--dark);color:#fff!important;border-color:var(--dark)!important}
+hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 #syncStatusBadge { position: absolute; top: 16px; right: 16px; font-weight: 700; }
-.dashGroup{margin-bottom:20px; border-left:4px solid var(--dark); padding-left:15px}
-.dashItem{background:#fff; border:1px solid var(--border); padding:10px; border-radius:12px; margin-bottom:6px; cursor:pointer}
+.topicItem{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--border);padding:12px;border-radius:14px;margin-bottom:10px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="card"><div id="syncStatusBadge" class="badge">Lokal</div><h1>Master Lern-App v157</h1><div class="row"><div class="badge" id="pointsBadge">0 P</div><div class="badge" id="accBadge">0%</div><div class="badge" id="countsBadge">0 / 0</div></div></div>
+  <div class="card">
+    <div id="syncStatusBadge" class="badge">Lokal</div>
+    <h1>Master Lern-App v127</h1>
+    <div class="muted">KOMPLETT-VERSION: Quiz, Karteikarten, S-Pen Pro, Multi-JSON & Cloud.</div>
+    <div class="row" style="margin-top:10px">
+      <div class="badge" id="pointsBadge">0 Punkte</div>
+      <div class="badge" id="accBadge">Trefferquote: 0%</div>
+      <div class="badge" id="countsBadge">Gewusst 0 · Insgesamt 0</div>
+    </div>
+  </div>
+
   <div class="grid grid2">
     <div class="card">
-      <h3>Profile & Sync</h3><div id="profiles"></div><hr><input type="text" id="syncIdInput" placeholder="Cloud ID..."><button class="primary" id="saveSyncIdBtn" style="margin-top:8px">ID Laden</button><hr><input id="geminiKey" type="password" placeholder="KI Key..."><button id="saveKeysBtn" style="width:100%;margin-top:8px">Speichern</button>
+      <h3>Profile</h3>
+      <div id="profiles"></div>
+      <hr class="sep">
+      <h3>Cloud-Sync (ID)</h3>
+      <input type="text" id="syncIdInput" placeholder="Deine ID...">
+      <button class="primary" id="saveSyncIdBtn" style="width:100%;margin-top:8px">ID Koppeln & Laden</button>
+      <hr class="sep">
+      <h3>KI API Key</h3>
+      <input id="geminiKey" type="password" placeholder="Key hier rein...">
+      <button id="saveKeysBtn" style="width:100%;margin-top:8px">Key speichern</button>
+      <hr class="sep">
+      <label class="muted"><input type="checkbox" id="voiceToggle"> Sprachcoach vorlesen</label>
+      <div class="row" style="margin-top:12px"><button id="resetProgressBtn">Fortschritt zurücksetzen</button></div>
     </div>
+
     <div>
-      <div class="card grid grid2a"><div><div class="muted">Oberthema</div><select id="areaSelect"></select></div><div><div class="muted">Unterthema</div><select id="topicSelect"></select></div></div>
-      <div class="card"><div class="tabbar"><button class="tab active" data-tab="quiz">Quiz</button><button class="tab" data-tab="cards">Karten</button><button class="tab" data-tab="open">Stift</button><button class="tab" data-tab="dashboard">Dash</button><button class="tab" data-tab="topics">Themen</button></div></div>
-      <div id="quizTab"><div class="card" id="quizBody"></div></div>
-      <div id="cardBody" class="hidden"></div>
-      <div id="openTab" class="hidden"><div class="card" id="openBody"></div></div>
-      <div id="dashboardTab" class="hidden"><div class="card"><div id="dashTop"></div><div id="radar" style="margin-top:12px"></div></div></div>
-      <div id="topicsTab" class="hidden"><div class="card"><h3>Themen Import</h3><div id="topicBoxes"></div><hr><textarea id="jsonText" rows="6" placeholder="JSON hier einfügen..."></textarea><button class="primary" id="importJsonBtn" style="margin-top:8px">Importieren</button></div></div>
+      <div class="card grid grid2a">
+        <div><div class="muted">Oberthema</div><select id="areaSelect"></select></div>
+        <div><div class="muted">Unterthema</div><select id="topicSelect"></select></div>
+      </div>
+      <div class="card">
+        <div class="tabbar">
+          <button class="tab active" data-tab="quiz">Quiz</button>
+          <button class="tab" data-tab="cards">Karteikarten</button>
+          <button class="tab" data-tab="open">Freitext / Stift</button>
+          <button class="tab" data-tab="dashboard">Dashboard</button>
+          <button class="tab" data-tab="topics">Themen / Import</button>
+        </div>
+      </div>
+      <div id="quizTab"><div class="card"><div id="quizBody"></div></div></div>
+      <div id="cardsTab" class="hidden"><div class="card"><div id="cardBody"></div></div></div>
+      <div id="openTab" class="hidden"><div class="card"><div id="openBody"></div></div></div>
+      <div id="dashboardTab" class="hidden"><div class="card"><div class="grid grid4" id="dashTop"></div><div id="radar" style="margin-top:12px"></div></div></div>
+      <div id="topicsTab" class="hidden"><div class="card"><h3>Importierte Themen</h3><div id="topicBoxes"></div><hr class="sep"><h3>Thema anhängen</h3><textarea id="jsonText" rows="6" placeholder="JSON hier einfügen..."></textarea><button class="primary" id="importJsonBtn" style="margin-top:12px;width:100%">Thema hinzufügen</button><div id="importStatus" class="helper" style="margin-top:8px">Bereit.</div></div></div>
     </div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const supabaseClient = (CONFIG.SUPABASE_KEY.length > 40) ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY) : null;
+/* =========================
+   🚨 KONFIGURATION
+========================= */
+const CONFIG = {
+  SUPABASE_KEY: "sb_publishable_llN5XLpnGZW2eIkgYoqmoA_1ax0QLG9", 
+  SUPABASE_URL: "https://nujchjlrndwitadigzvs.supabase.co",
+  GEMINI_MODEL: "gemini-2.5-flash" 
+};
+
+/* =========================
+   🔗 SUPABASE
+========================= */
+let supabaseClient = null;
+if (CONFIG.SUPABASE_KEY !== "HIER_DEINEN_ECHTEN_SUPABASE_KEY_EINTRAGEN") {
+    supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+}
 let syncId = localStorage.getItem("app_sync_id") || "";
-function $(id){return document.getElementById(id)}
-function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 
 function updateBadge(status) {
   const b = $("syncStatusBadge");
-  if(status === "ok") { b.textContent = "Cloud OK"; b.style.background = "#dcfce7"; }
-  else if(status === "syncing") { b.textContent = "Speichert..."; b.style.background = "#fef08a"; }
-  else { b.textContent = (supabaseClient) ? "Sync Fehler" : "Lokal"; b.style.background = "#f3f4f6"; }
+  if(status === "ok") { b.textContent = "Cloud OK"; b.style.background = "#dcfce7"; b.style.color = "#166534"; }
+  else if(status === "syncing") { b.textContent = "Speichert..."; b.style.background = "#fef08a"; b.style.color = "#854d0e"; }
+  else { b.textContent = "Fehler/Offline"; b.style.background = "#fee2e2"; b.style.color = "#991b1b"; }
 }
 
-async function saveToCloud() { if(!syncId || !supabaseClient) return; try { await supabaseClient.from("progress").upsert({id: syncId, data: { profile, progress, all_data: APP.dataByProfile }, updated_at: new Date().toISOString()}); updateBadge("ok"); } catch (e) { updateBadge("err"); } }
-async function loadFromCloud() { if(!syncId || !supabaseClient) return; try { const { data } = await supabaseClient.from("progress").select("data").eq("id", syncId).maybeSingle(); if (data?.data) { if(data.data.all_data) APP.dataByProfile = data.data.all_data; if(data.data.progress) progress = data.data.progress; localStorage.setItem("v109_dataByProfile", JSON.stringify(APP.dataByProfile)); updateBadge("ok"); } } catch (e) { updateBadge("err"); } }
+async function saveToCloud() {
+  if(!syncId || !supabaseClient) return;
+  updateBadge("syncing");
+  try { await supabaseClient.from("progress").upsert({id: syncId, data: { profile, progress, all_data: APP.dataByProfile }, updated_at: new Date().toISOString()}); updateBadge("ok"); } catch (e) { updateBadge("err"); }
+}
 
-const APP={profiles:[{id:"stefan",name:"Stefan"},{id:"lolla",name:"Lolla"}],dataByProfile:JSON.parse(localStorage.getItem("v109_dataByProfile")||"{}")};
-let profile="stefan",progress=JSON.parse(localStorage.getItem("master_lernapp_v109_"+profile)||JSON.stringify({points:0,status:{},ratings:{}}));
-let area="Alle Oberthemen",topic="Alle Unterthemen",selected=[],revealed=false,flashRevealed=false,openText="",openResult=null,coachMessages=[];
+async function loadFromCloud() {
+  if(!syncId || !supabaseClient) return;
+  try {
+    const { data } = await supabaseClient.from("progress").select("data").eq("id", syncId).maybeSingle();
+    if (data && data.data) {
+      if(data.data.all_data) APP.dataByProfile = data.data.all_data;
+      if(data.data.progress) progress = data.data.progress;
+      saveDataByProfile(); renderAll(); updateBadge("ok");
+    }
+  } catch (e) { updateBadge("err"); }
+}
+
+/* =========================
+   CORE LOGIC
+========================= */
+const APP={profiles:[{id:"stefan",name:"Stefan",program:"Technischer Betriebswirt",badge:"TBW"},{id:"lolla",name:"Lolla",program:"Wirtschaftsfachwirt",badge:"WFW"}],dataByProfile:JSON.parse(localStorage.getItem("v109_dataByProfile")||"{}")};
+const DEFAULT_PROGRESS={points:0,streak:0,status:{},ratings:{}};
+let profile="stefan",progress=loadProgress(profile),area="Alle Oberthemen",topic="Alle Unterthemen",selected=[],revealed=false,flashRevealed=false,openText="",openResult=null,coachMessages=[],voiceEnabled=false,forcedItemId=null;
 
 const canvas=document.createElement("canvas"); canvas.width=1800; canvas.height=1200; canvas.id="drawCanvas";
-const cctx=canvas.getContext("2d"); cctx.fillStyle="#fff"; cctx.fillRect(0,0,1800,1200); cctx.lineCap="round"; cctx.lineJoin="round";
+const cctx=canvas.getContext("2d"); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); cctx.lineCap="round"; cctx.lineJoin="round";
 let tool="pen",brushSize=4,scale=0.6,offsetX=0,offsetY=0,pointers=new Map(),drawLast=null,gestureStart=null;
 
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function loadProgress(p){return JSON.parse(localStorage.getItem("master_lernapp_v109_"+p)||JSON.stringify(DEFAULT_PROGRESS))}
+function saveDataByProfile(){localStorage.setItem("v109_dataByProfile",JSON.stringify(APP.dataByProfile))}
+function saveProgress(){ localStorage.setItem("master_lernapp_v109_"+profile,JSON.stringify(progress)); saveToCloud(); renderHeader(); }
+
 function currentDataList(){ let l = APP.dataByProfile[profile]; if(!l) return []; return Array.isArray(l) ? l : [l]; }
+
 function allItems(){
   const dataList = currentDataList(); const out = [];
   dataList.forEach((data, dIdx) => {
     (data.unterthemen||[]).forEach((u, ui) => {
       (u.fragen||[]).forEach((q, qi) => {
-        let opt = q.quiz_optionen || [...(q.kernpunkte||[]).slice(0,3).map(x=>({text:x,correct:true})),{text:"Falsch",correct:false}].slice(0,5);
-        out.push({id:`${profile}_${dIdx}_${ui}_${qi}`, area:data.ueberthema||"Unkategorisiert", topic:u.name||"Allgemein", question:q.frage, explanation:q.antwort, merksatz:q.merksatz||"", optionMeta:opt});
+        const correct=(q.kernpunkte||q.signalwoerter||[]).slice(0,3).map(x=>({text:x,correct:true}));
+        const optionMeta=[...correct,{text:"Falsche Antwort-Option A",correct:false},{text:"Falsche Antwort-Option B",correct:false}].slice(0,5);
+        out.push({
+          id:`${profile}_${dIdx}_${ui}_${qi}`, area: data.ueberthema||"Oberthema", topic: u.name||"Unterthema",
+          question: q.frage||"", explanation: q.antwort||"", merksatz: q.merksatz||"",
+          mustHave: q.kernpunkte||q.signalwoerter||[], optionMeta,
+          answer: optionMeta.map((o,i)=>o.correct?i:null).filter(x=>x!==null)
+        });
       });
     });
-  }); return out;
+  });
+  return out;
 }
 
-function areas(){ return ["Alle Oberthemen",...new Set(allItems().map(i=>i.area))]; }
-function topics(){ return ["Alle Unterthemen",...new Set(allItems().filter(i=>area==="Alle Oberthemen"||i.area===area).map(i=>i.topic))]; }
-function filtered(){ return allItems().filter(i=>(area==="Alle Oberthemen"||i.area===area)&&(topic==="Alle Unterthemen"||i.topic===topic)); }
-function currentItem(){ const a=filtered(); return a.find(x=>!progress.ratings?.[x.id]) || a[0]; }
+function areas(){return ["Alle Oberthemen",...new Set(allItems().map(i=>i.area))]}
+function topics(){return ["Alle Unterthemen",...new Set(allItems().filter(i=>area==="Alle Oberthemen"||i.area===area).map(i=>i.topic))]}
+function filtered(){return allItems().filter(i=>(area==="Alle Oberthemen"||i.area===area)&&(topic==="Alle Unterthemen"||i.topic===topic))}
+
+function currentItem(){
+  const a=filtered(); if(!a.length) return null;
+  if(forcedItemId){ const f=a.find(x=>x.id===forcedItemId); if(f) return f; forcedItemId=null; }
+  const r = progress.ratings || {};
+  return a.find(x=>!r[x.id]) || a.find(x=>!progress.status[x.id]) || a[0];
+}
+
 function resetStudyState(){selected=[];revealed=false;flashRevealed=false;openText="";openResult=null;coachMessages=[];clearCanvas()}
 
+/* KI & SPEECH */
 async function geminiText(prompt){
-  const k=localStorage.getItem("ml_final_gemini_key"); if(!k) return "Key fehlt."; 
+  const k=localStorage.getItem("ml_final_gemini_key"); if(!k) throw new Error("Key fehlt."); 
   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${k}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt}]}]})});
   const d=await res.json(); return d.candidates[0].content.parts[0].text;
 }
+
 async function geminiImage(prompt,mimeType,data){
-  const k=localStorage.getItem("ml_final_gemini_key"); if(!k) return "Key fehlt."; 
+  const k=localStorage.getItem("ml_final_gemini_key"); if(!k) throw new Error("Key fehlt."); 
   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${k}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{role:"user",parts:[{text:prompt},{inlineData:{mimeType,data}}]}]})});
   const d=await res.json(); return d.candidates[0].content.parts[0].text;
 }
 
+async function speechToText(fieldId, statusId){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return;
+  const rec=new SR(); rec.lang="de-DE"; rec.onstart=()=>{$(statusId).textContent="Ich höre...";};
+  rec.onresult=e=>{$(fieldId).value += " " + e.results[0][0].transcript; $(statusId).textContent="OK"; openText=$(fieldId).value; debouncedLocalSave();};
+  rec.start();
+}
+
+/* RENDERING TABS */
 function renderQuiz(){
-  const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='Kein Thema.'; return}
+  const item=currentItem(),box=$("quizBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema geladen.</div>'; return}
   const optHtml=item.optionMeta.map((o,i)=>{
     const active=selected.includes(i)?" active":""; 
-    let cls="", dis=revealed?"disabled":""; if(revealed){if(o.correct) cls=" correct"; else if(selected.includes(i)) cls=" wrong"} 
+    let cls="", dis=revealed?"disabled":""; 
+    if(revealed){if(o.correct) cls=" correct"; else if(selected.includes(i)) cls=" wrong"} 
     return `<button class="option${active}${cls}" data-opt="${i}" ${dis}>${esc(o.text)}</button>`
   }).join("");
-  box.innerHTML=`<div class="focusQuestion"><h2>${esc(item.question)}</h2></div><div style="margin-top:14px">${optHtml}<div class="row">${!revealed?'<button class="primary" id="qCheck">Prüfen</button>':''}<button id="qCoachBtn">KI Coach</button></div>${revealed?renderRating(item):""}${revealed?`<div class="good"><strong>Lösung:</strong><br>${esc(item.explanation)} ${item.merksatz?`<div class="merksatz">${esc(item.merksatz)}</div>`:""}</div>`:""}<div id="qCBox" class="coachbox hidden"></div>`;
-  box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{if(revealed)return; const i=parseInt(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz();});
-  if($("qCheck")) $("qCheck").onclick=()=>{revealed=true; progress.status[item.id]="known"; renderQuiz(); saveProgress();};
-  if($("qCoachBtn")) $("qCoachBtn").onclick=()=>{$("qCBox").classList.toggle("hidden"); renderCoachBox("qCBox")};
+  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${esc(item.question)}</h2></div>
+    <div style="margin-top:14px">${optHtml}
+      <div class="toolRow">${!revealed?'<button class="primary" id="qCheck">Prüfen</button>':''}<button id="qCoach">Coach</button></div>
+      ${revealed?renderRatingControls(item,"quiz"):""}
+      ${revealed?`<div class="good"><strong>Lösung:</strong><br>${esc(item.explanation)}<br><br><strong>Merksatz:</strong> ${esc(item.merksatz)}</div>`:""}
+      <div id="qCBox" class="coachbox hidden"></div>`;
+  box.querySelectorAll("[data-opt]").forEach(btn=>btn.onclick=()=>{if(revealed)return; const i=parseInt(btn.dataset.opt); selected=selected.includes(i)?selected.filter(x=>x!==i):[...selected,i]; renderQuiz(); debouncedLocalSave();});
+  if($("qCheck")) $("qCheck").onclick=()=>{revealed=true; progress.status[item.id]=selected.length?"known":"unsure"; renderQuiz(); saveProgress();};
+  $("qCoach").onclick=()=>{$("qCBox").classList.toggle("hidden"); renderCoachBox("qCBox",item)};
+  if(revealed) attachRatingHandlers(box,item);
 }
 
 function renderCards(){
-  const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='Kein Thema.'; return}
-  box.innerHTML=`<div class="card"><div class="focusQuestion" style="cursor:pointer" onclick="flashRevealed=!flashRevealed; renderCards()"><h2>${flashRevealed?esc(item.explanation):esc(item.question)}</h2></div>${flashRevealed && item.merksatz?`<div class="merksatz">${esc(item.merksatz)}</div>`:""}<div class="row" style="margin-top:14px"><button class="primary" onclick="flashRevealed=!flashRevealed; renderCards()">Karte drehen</button><button id="cCoachBtn">KI Coach</button></div>${flashRevealed?renderRating(item):""}<div id="cCBox" class="coachbox hidden"></div></div>`;
-  if($("cCoachBtn")) $("cCoachBtn").onclick=()=>{$("cCBox").classList.toggle("hidden"); renderCoachBox("cCBox")};
+  const item=currentItem(),box=$("cardBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema geladen.</div>'; return}
+  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${flashRevealed?esc(item.explanation):esc(item.question)}</h2></div>
+    <div class="toolRow" style="margin-top:14px"><button class="primary" onclick="flashRevealed=!flashRevealed; renderCards()">${flashRevealed?'Vorderseite':'Karte drehen'}</button></div>
+    ${flashRevealed?renderRatingControls(item,"cards"):""}`;
+  if(flashRevealed) attachRatingHandlers(box,item);
 }
 
 function renderOpen(){
-  const item=currentItem(),box=$("openBody"); if(!item){box.innerHTML='Kein Thema.'; return}
-  box.innerHTML=`<div class="focusQuestion"><h2>${esc(item.question)}</h2></div><textarea id="oAns" placeholder="Antwort..." style="height:120px">${esc(openText)}</textarea>
-    <div class="row"><button class="primary" onclick="evalOpen()">Text bewerten</button></div>
-    ${revealed?renderRating(item):""}${revealed?`<div class="soft"><strong>Feedback:</strong><br>${openResult || esc(item.explanation)} ${item.merksatz?`<div class="merksatz">${esc(item.merksatz)}</div>`:""}</div>`:""}
+  const item=currentItem(),box=$("openBody"); if(!item){box.innerHTML='<div class="muted">Kein Thema.</div>'; return}
+  box.innerHTML=`<div class="focusQuestion pinBox"><h2>${esc(item.question)}</h2></div>
+    <textarea id="oAns" class="bigEditor" placeholder="Schreiben oder sprechen...">${esc(openText)}</textarea>
+    <div class="toolRow"><button class="primary" id="oEval">Text bewerten</button><button id="oMic">🎤 Sprache</button><span id="oStatus" class="helper"></span></div>
+    ${revealed?renderRatingControls(item,"open"):""}
+    ${revealed?`<div class="soft"><strong>Bewertung:</strong><br>${openResult || esc(item.explanation)}</div>`:""}
     <div class="card" style="margin-top:14px">
-      <button class="primary" style="margin-bottom:10px" id="sPenToggleBtn">Stifteingabe (S-Pen Pro) +/-</button>
-      <div id="inkB" class="hidden">
-        <div class="canvasToolbar">
-          <button onclick="tool='pen'">Stift</button><button onclick="tool='eraser'">Radierer</button><button onclick="clearCanvas()">Leeren</button><button class="primary" onclick="evalCanvas()">Stift bewerten</button>
-        </div>
-        <div class="canvasViewport" id="cVp"></div>
-      </div>
+      <div class="collapseHead" onclick="$('#inkB').classList.toggle('hidden'); setTimeout(mountCanvas, 50)"><strong>Stifteingabe (S-Pen Pro)</strong><button>+/-</button></div>
+      <div id="inkB" class="hidden"><div class="canvasWrap"><div class="canvasToolbar"><button onclick="tool='pen'">Stift</button><button onclick="tool='eraser'">Radierer</button><button onclick="clearCanvas()">Leeren</button><button class="primary" id="canvEval">Stift bewerten</button></div><div class="canvasViewport" id="cVp"></div></div></div>
     </div>`;
-  if($("sPenToggleBtn")) $("sPenToggleBtn").onclick=()=> { $("inkB").classList.toggle("hidden"); setTimeout(mountCanvas, 50); };
-  mountCanvas();
+  mountCanvas(); $("oMic").onclick=()=>speechToText("oAns", "oStatus");
+  $("oEval").onclick=async()=>{
+    openText=$("oAns").value; revealed=true; renderOpen(); $("oStatus").textContent="KI prüft...";
+    try { openResult = await geminiText(`Bewerte als IHK-Prüfer: Frage ${item.question}, Lösung ${item.explanation}, Userantwort: ${openText}.`); renderOpen(); } catch(e){ $("oStatus").textContent="Fehler!"; }
+  };
+  if($("canvEval")) $("canvEval").onclick=async()=>{
+    revealed=true; renderOpen(); const img=exportCanvasTrimmed(); $("oStatus").textContent="KI prüft Bild...";
+    try { openResult = await geminiImage(`Lies die Handschrift und bewerte zur Frage ${item.question}. Lösung ist ${item.explanation}`, "image/png", img.base64); renderOpen(); } catch(e){ $("oStatus").textContent="KI-Fehler!"; }
+  };
+  if(revealed) attachRatingHandlers(box,item);
 }
 
-function renderRating(item){ return `<div class="ratingRow" style="margin-top:10px"><button class="ratingBtn" style="color:green" onclick="sRate('${item.id}','easy')">Einfach</button><button class="ratingBtn" style="color:orange" onclick="sRate('${item.id}','med')">Mittel</button><button class="ratingBtn" style="color:red" onclick="sRate('${item.id}','hard')">Schwer</button></div>`; }
-window.sRate=(id,l)=>{ if(!progress.ratings) progress.ratings={}; progress.ratings[id]=l; saveProgress(); resetStudyState(); renderAll(); };
-
-function renderCoachBox(id){
-  const box=$(id); 
-  box.innerHTML=`<div class="chat-log" id="${id}_log"></div>
-    <div class="row" style="margin-bottom:8px; gap:5px; flex-wrap:wrap">
-      <button class="badge" onclick="quickCoach('${id}','Analogie')">Analogie</button>
-      <button class="badge" onclick="quickCoach('${id}','Einfacher')">Einfacher</button>
-      <button class="badge" onclick="quickCoach('${id}','Beispiel')">Beispiel</button>
-      <button class="badge" onclick="quickCoach('${id}','Merksatz')">Merksatz</button>
-    </div>
-    <div class="row"><input id="${id}_in" style="flex:1" placeholder="Frage..."><button onclick="sendCoach('${id}')">Senden</button></div>`;
-  const log=$(id+"_log"); log.innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join("");
-  log.scrollTop = log.scrollHeight;
+function renderRatingControls(item,mode){
+  return `<div class="ratingRow" style="background:#eff6ff; border:2px solid #3b82f6; border-radius:12px; padding:12px">
+    <div style="width:100%; font-weight:800; margin-bottom:8px; color:#1e40af">Bewertung & Weiter:</div>
+    <button data-rate="easy" data-mode="${mode}" class="ratingBtn" style="color:green">Einfach</button>
+    <button data-rate="medium" data-mode="${mode}" class="ratingBtn" style="color:orange">Mittel</button>
+    <button data-rate="hard" data-mode="${mode}" class="ratingBtn" style="color:red">Schwierig</button>
+  </div>`;
 }
-window.quickCoach=async(id,type)=>{ 
-  const q={Analogie:"Analogie.", Einfacher:"Einfacher.", Beispiel:"Beispiel.", Merksatz:"Merksatz."}[type]; 
-  coachMessages.push({role:"user",text:q}); renderCoachBox(id); 
-  const r=await geminiText(`Kontext: ${currentItem().question}. User: ${q}`); coachMessages.push({role:"ai",text:r}); renderCoachBox(id); 
-};
-window.sendCoach=async(id)=>{ 
-  const t=$(id+"_in").value; if(!t)return; coachMessages.push({role:"user",text:t}); $(id+"_in").value=""; renderCoachBox(id); 
-  const r=await geminiText(`Kontext: ${currentItem().question}. User: ${t}`); coachMessages.push({role:"ai",text:r}); renderCoachBox(id); 
-};
-
-function renderDashboard(){
-  const items=allItems(); const grouped = {}; items.forEach(i => { if(!grouped[i.area]) grouped[i.area] = {}; if(!grouped[i.area][i.topic]) grouped[i.area][i.topic] = []; grouped[i.area][i.topic].push(i); });
-  let html = ""; for(let a in grouped){ html += `<div class="dashGroup"><h3>${esc(a)}</h3>`; for(let t in grouped[a]){ html += `<div class="dashTopic"><h4>${esc(t)}</h4>`; grouped[a][t].forEach(i => { html += `<div class="dashItem" onclick="area='${a}'; topic='${t}'; document.querySelector('[data-tab=quiz]').click(); renderAll()">${esc(i.question)}</div>`; }); html += `</div>`; } html += `</div>`; }
-  $("radar").innerHTML = html;
+function attachRatingHandlers(scope,item){
+  scope.querySelectorAll("[data-rate]").forEach(b=>b.onclick=()=>{ 
+    if(!progress.ratings) progress.ratings={}; progress.ratings[item.id]={level:b.dataset.rate, mode:b.dataset.mode};
+    saveProgress(); resetStudyState(); renderAll(); 
+  });
 }
 
-function mountCanvas(){ const vp=$("cVp"); if(vp && !vp.contains(canvas)) vp.appendChild(canvas); updateCanvas(); }
-function updateCanvas(){ canvas.style.transform=`translate(${offsetX}px, ${offsetY}px) scale(${scale})`; }
-function clearCanvas(){ cctx.setTransform(1,0,0,1,0,0); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); }
-function clientToCanvas(e){ const v=$("cVp").getBoundingClientRect(); return {x:(e.clientX-v.left-offsetX)/scale,y:(e.clientY-v.top-offsetY)/scale}; }
-canvas.addEventListener("pointerdown", e=>{ canvas.setPointerCapture(e.pointerId); pointers.set(e.pointerId,e); if(e.pointerType==='pen'||e.pointerType==='mouse'){ if(pointers.size===1) drawLast=clientToCanvas(e); } else if(pointers.size===1) gestureStart={px:e.clientX, py:e.clientY, ox:offsetX, oy:offsetY}; else if(pointers.size===2){ const a=[...pointers.values()]; gestureStart={dist:Math.hypot(a[0].clientX-a[1].clientX, a[0].clientY-a[1].clientY), sc:scale, ox:offsetX, oy:offsetY}; } });
-canvas.addEventListener("pointermove", e=>{ if(!pointers.has(e.pointerId)) return; pointers.set(e.pointerId,e); if((e.pointerType==='pen'||e.pointerType==='mouse') && drawLast){ const p=clientToCanvas(e); cctx.save(); if(tool==='eraser'){ cctx.globalCompositeOperation="destination-out"; cctx.lineWidth=40; } else { cctx.strokeStyle="#111"; cctx.lineWidth=brushSize; } cctx.beginPath(); cctx.moveTo(drawLast.x,drawLast.y); cctx.lineTo(p.x,p.y); cctx.stroke(); cctx.restore(); drawLast=p; } else if(e.pointerType==='touch' && gestureStart){ if(pointers.size===1){ offsetX=gestureStart.ox+(e.clientX-gestureStart.px); offsetY=gestureStart.oy+(e.clientY-gestureStart.py); updateCanvas(); } else if(pointers.size===2){ const a=[...pointers.values()]; const d=Math.hypot(a[0].clientX-a[1].clientX, a[0].clientY-a[1].clientY); scale=Math.max(0.2, Math.min(3, gestureStart.sc * (d/gestureStart.dist))); updateCanvas(); } } });
-canvas.addEventListener("pointerup", e=>{ pointers.delete(e.pointerId); drawLast=null; if(pointers.size<2) gestureStart=null; });
-function exportCanvasTrimmed(){ const src=cctx.getImageData(0,0,canvas.width,canvas.height); let minX=canvas.width,minY=canvas.height,maxX=0,maxY=0; for(let y=0;y<canvas.height;y++){for(let x=0;x<canvas.width;x++){const idx=(y*canvas.width+x)*4; if(src.data[idx+3]>0 && src.data[idx]<250){if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y}}} const w=(maxX-minX)+40, h=(maxY-minY)+40; const tmp=document.createElement("canvas"); tmp.width=w; tmp.height=h; tmp.getContext("2d").drawImage(canvas,minX-20,minY-20,w,h,0,0,w,h); return {base64: tmp.toDataURL("image/png").split(",")[1]}; }
+function renderCoachBox(id,item){
+  const box=$(id); box.innerHTML=`<div class="chat-log" id="${id}_log"></div><div class="row"><input id="${id}_in" style="flex:1"><button class="primary" id="${id}_btn">Senden</button></div>`;
+  $(id+"_btn").onclick=async()=>{
+    const t=$(id+"_in").value; coachMessages.push({role:"user",text:t}); $(id+"_in").value=""; renderCoachBox(id,item);
+    const r=await geminiText(`Coach: Thema ${item.topic}. Frage ${item.question}. User fragt: ${t}`);
+    coachMessages.push({role:"ai",text:r}); renderCoachBox(id,item);
+  };
+  $(id+"_log").innerHTML=coachMessages.map(m=>`<div class="${m.role==='user'?'chat-user':'chat-ai'}">${esc(m.text)}</div>`).join("");
+}
 
-window.evalOpen=async()=>{ revealed=true; renderOpen(); try { openResult=await geminiText(`Prüfer: Frage ${currentItem().question}, User: ${$("oAns").value}`); renderOpen(); } catch(e){} };
-window.evalCanvas=async()=>{ revealed=true; renderOpen(); const img=exportCanvasTrimmed(); try { openResult=await geminiImage(`Frage ${currentItem().question}`, "image/png", img.base64); renderOpen(); } catch(e){} };
+/* THEMEN IMPORT */
+function renderTopics(){
+  const list = currentDataList(); const box = $("topicBoxes"); box.innerHTML = "";
+  list.forEach((data, idx) => {
+    const div = document.createElement("div"); div.className = "topicItem";
+    div.innerHTML = `<div><strong>${esc(data.ueberthema)}</strong><br><small>${data.unterthemen.length} Unterthemen</small></div>
+                     <button style="color:red; border:1px solid red; border-radius:10px; padding:5px 10px" onclick="deleteTheme(${idx})">Löschen</button>`;
+    box.appendChild(div);
+  });
+}
+window.deleteTheme = idx => { if(confirm("Thema löschen?")) { let l=currentDataList(); l.splice(idx,1); APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud(); }};
 
 $("importJsonBtn").onclick=()=>{
   try {
-    let raw = $("jsonText").value.trim()
-      .replace(/[\u201C\u201D]/g, '"') 
-      .replace(/[\u200B-\u200D\uFEFF]/g, ""); 
-    if(!raw) return; const newData=JSON.parse(raw); let l=currentDataList(); l.push(newData); APP.dataByProfile[profile]=l; 
-    localStorage.setItem("v109_dataByProfile", JSON.stringify(APP.dataByProfile)); renderAll(); saveToCloud(); $("jsonText").value=""; alert("Import OK!");
-  } catch(e){ alert("JSON Fehler: Text prüfen!"); }
+    const newData = JSON.parse($("jsonText").value.trim()); let l=currentDataList(); l.push(newData);
+    APP.dataByProfile[profile]=l; saveDataByProfile(); renderAll(); saveToCloud(); $("jsonText").value="";
+    $("importStatus").textContent="Hinzugefügt!";
+  } catch(e) { alert("JSON Fehler!"); }
 };
 
-function saveProgress(){localStorage.setItem("master_lernapp_v109_"+profile,JSON.stringify(progress)); saveToCloud(); renderHeader();}
-function renderHeader(){ const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length; $("pointsBadge").textContent=progress.points+" P"; $("accBadge").textContent=(vals.length?Math.round((known/vals.length)*100):0)+"%"; $("countsBadge").textContent=`${known} / ${allItems().length}`; }
-function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className=profile===p.id?"primary":""; btn.textContent=p.name; btn.onclick=()=>{profile=p.id; progress=JSON.parse(localStorage.getItem("master_lernapp_v109_"+profile)||JSON.stringify({points:0,status:{},ratings:{}})); resetStudyState(); renderAll()}; box.appendChild(btn)})}
-function renderSelectors(){const aSel=$("areaSelect"); aSel.innerHTML=areas().map(a=>`<option value="${a}">${a}</option>`).join(""); aSel.value=area; aSel.onchange=()=>{area=aSel.value;topic="Alle Unterthemen";resetStudyState();renderAll()}; const tSel=$("topicSelect"); tSel.innerHTML=topics().map(t=>`<option value="${t}">${t}</option>`).join(""); tSel.value=topic; tSel.onchange=()=>{topic=tSel.value;resetStudyState();renderAll()}}
-function renderAll(){ renderHeader(); renderProfiles(); renderSelectors(); renderQuiz(); renderCards(); renderOpen(); renderTopics(); renderDashboard(); }
+/* S-PEN ENGINE */
+function mountCanvas(){ const vp=$("cVp"); if(vp && !vp.contains(canvas)) vp.appendChild(canvas); updateCanvasTransform(); }
+function updateCanvasTransform(){ canvas.style.transform=`translate(${offsetX}px, ${offsetY}px) scale(${scale})`; }
+function clearCanvas(){ cctx.setTransform(1,0,0,1,0,0); cctx.fillStyle="#fff"; cctx.fillRect(0,0,canvas.width,canvas.height); }
+function clientToCanvas(e){ const v=$("cVp").getBoundingClientRect(); return {x:(e.clientX-v.left-offsetX)/scale,y:(e.clientY-v.top-offsetY)/scale}; }
 
-document.querySelectorAll(".tab").forEach(btn => { btn.onclick = () => { document.querySelectorAll(".tab").forEach(b => b.classList.remove("active")); btn.classList.add("active"); ["quizTab", "cardBody", "openTab", "dashboardTab", "topicsTab"].forEach(id => { if ($(id)) $(id).classList.add("hidden"); }); const m = { quiz: "quizTab", cards: "cardBody", open: "openTab", dashboard: "dashboardTab", topics: "topicsTab" }; if ($(m[btn.dataset.tab])) $(m[btn.dataset.tab]).classList.remove("hidden"); if (btn.dataset.tab === 'open') mountCanvas(); }; });
-document.addEventListener("DOMContentLoaded", () => { $("geminiKey").value = localStorage.getItem("ml_final_gemini_key") || ""; if(supabaseClient) { loadFromCloud().then(() => renderAll()); } else { renderAll(); } });
-$("saveKeysBtn").onclick=()=>{ localStorage.setItem("ml_final_gemini_key", $("geminiKey").value.trim()); alert("OK"); };
-$("saveSyncIdBtn").onclick=()=>{ syncId=$("syncIdInput").value.trim(); localStorage.setItem("app_sync_id", syncId); if(supabaseClient) loadFromCloud().then(()=>renderAll()); };
+canvas.addEventListener("pointerdown", e=>{
+  canvas.setPointerCapture(e.pointerId); pointers.set(e.pointerId,e);
+  if(e.pointerType==='pen'||e.pointerType==='mouse'){ if(pointers.size===1) drawLast=clientToCanvas(e); }
+  else if(pointers.size===1) gestureStart={px:e.clientX, py:e.clientY, ox:offsetX, oy:offsetY};
+  else if(pointers.size===2){ const a=[...pointers.values()]; gestureStart={dist:Math.hypot(a[0].clientX-a[1].clientX, a[0].clientY-a[1].clientY), sc:scale, ox:offsetX, oy:offsetY}; }
+});
+canvas.addEventListener("pointermove", e=>{
+  if(!pointers.has(e.pointerId)) return; pointers.set(e.pointerId,e);
+  if((e.pointerType==='pen'||e.pointerType==='mouse') && drawLast){
+    const p=clientToCanvas(e); cctx.save();
+    if(tool==='eraser'){ cctx.globalCompositeOperation="destination-out"; cctx.lineWidth=brushSize*5; }
+    else { cctx.strokeStyle="#111"; cctx.lineWidth=brushSize; }
+    cctx.beginPath(); cctx.moveTo(drawLast.x,drawLast.y); cctx.lineTo(p.x,p.y); cctx.stroke(); cctx.restore(); drawLast=p;
+  } else if(e.pointerType==='touch' && gestureStart){
+    if(pointers.size===1){ offsetX=gestureStart.ox+(e.clientX-gestureStart.px); offsetY=gestureStart.oy+(e.clientY-gestureStart.py); }
+    else if(pointers.size===2){ const a=[...pointers.values()]; const d=Math.hypot(a[0].clientX-a[1].clientX, a[0].clientY-a[1].clientY); scale=Math.max(0.2, Math.min(3, gestureStart.sc * (d/gestureStart.dist))); }
+    updateCanvasTransform();
+  }
+});
+canvas.addEventListener("pointerup", e=>{ pointers.delete(e.pointerId); drawLast=null; if(pointers.size<2) gestureStart=null; });
+
+function exportCanvasTrimmed(){
+  const src=cctx.getImageData(0,0,canvas.width,canvas.height); let minX=canvas.width,minY=canvas.height,maxX=0,maxY=0,found=false;
+  for(let y=0;y<canvas.height;y++){for(let x=0;x<canvas.width;x++){const idx=(y*canvas.width+x)*4; if(src.data[idx+3]>0 && src.data[idx]<250){found=true; if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y}}}
+  const pad=20; const w=(maxX-minX)+pad*2, h=(maxY-minY)+pad*2;
+  const tmp=document.createElement("canvas"); tmp.width=w; tmp.height=h; const tctx=tmp.getContext("2d");
+  tctx.fillStyle="#fff"; tctx.fillRect(0,0,w,h); tctx.drawImage(canvas,minX-pad,minY-pad,w,h,0,0,w,h);
+  return {base64: tmp.toDataURL("image/png").split(",")[1]};
+}
+
+/* PERSISTENCE & RENDERALL */
+function debouncedLocalSave(){ const i=currentItem(); if(i) localStorage.setItem("draft_"+i.id, JSON.stringify({openText, selected, scale, offsetX, offsetY})); }
+function restoreDraft(){
+  const i=currentItem(); if(!i) return; const d=JSON.parse(localStorage.getItem("draft_"+i.id)||"{}");
+  if(!progress.status[i.id]){ openText=d.openText||""; selected=d.selected||[]; }
+  if(d.scale){ scale=d.scale; offsetX=d.offsetX; offsetY=d.offsetY; }
+}
+function renderHeader(){const vals=Object.values(progress.status),known=vals.filter(v=>v==="known").length,acc=vals.length?Math.round((known/vals.length)*100):0; $("pointsBadge").textContent=progress.points+" Punkte"; $("accBadge").textContent="Quote: "+acc+"%"; $("countsBadge").textContent=`Gewusst ${known} · Gesamt ${allItems().length}`}
+function renderDashboard(){
+  const items=filtered(); $("dashTop").innerHTML=`<div class="soft">Fragen: ${items.length}</div><div class="soft">Gewusst: ${Object.values(progress.status).filter(v=>v==="known").length}</div>`;
+  $("radar").innerHTML = items.map(i=>`<div class="soft"><strong>${esc(i.question)}</strong></div>`).join("");
+}
+function renderProfiles(){const box=$("profiles"); box.innerHTML=""; APP.profiles.forEach(p=>{const btn=document.createElement("button"); btn.className="profileBtn"+(profile===p.id?" active":""); btn.innerHTML=`<div style="font-weight:700">${esc(p.name)}</div>`; btn.onclick=()=>{profile=p.id;progress=loadProgress(profile);resetStudyState();renderAll()}; box.appendChild(btn)})}
+function renderSelectors(){const aSel=$("areaSelect"); aSel.innerHTML=areas().map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join(""); aSel.value=area; aSel.onchange=()=>{area=aSel.value;topic="Alle Unterthemen";resetStudyState();renderAll()}; const tSel=$("topicSelect"); tSel.innerHTML=topics().map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join(""); tSel.value=topic; tSel.onchange=()=>{topic=tSel.value;resetStudyState();renderAll()}}
+
+function renderAll(){ restoreDraft(); renderHeader(); renderProfiles(); renderSelectors(); renderQuiz(); renderCards(); renderOpen(); renderTopics(); renderDashboard(); }
+
+document.querySelectorAll(".tab").forEach(btn=>{ btn.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active")); btn.classList.add("active");
+  ["quizTab","cardBody","openTab","dashboardTab","topicsTab"].forEach(id=>{if($(id)) $(id).classList.add("hidden")});
+  const m={quiz:"quizTab",cards:"cardBody",open:"openTab",dashboard:"dashboardTab",topics:"topicsTab"};
+  if($(m[btn.dataset.tab])) $(m[btn.dataset.tab]).classList.remove("hidden");
+}});
+
+document.addEventListener("DOMContentLoaded", () => { 
+  $("geminiKey").value = localStorage.getItem("ml_final_gemini_key") || "";
+  loadFromCloud(); renderAll(); 
+});
+$("saveKeysBtn").onclick=()=>{ localStorage.setItem("ml_final_gemini_key", $("geminiKey").value.trim()); alert("Key gespeichert"); };
+$("saveSyncIdBtn").onclick=()=>{ syncId=$("syncIdInput").value.trim(); localStorage.setItem("app_sync_id", syncId); loadFromCloud(); };
 </script>
 </body>
 </html>
