@@ -235,7 +235,8 @@ let dashboardSelectedLevel = "easy";
 ========================= */
 let supabaseClient = null;
 let syncId = localStorage.getItem("app_sync_id") || "";
-
+let lastCloudUpdatedAt = null;
+  
 try{
   supabaseClient = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
 }catch(e){
@@ -250,23 +251,53 @@ function updateBadge(status){
   else { b.textContent = "Fehler/Offline"; b.style.background="#fee2e2"; b.style.color="#991b1b"; }
 }
 async function saveToCloud(){
-if(!syncId){
-  console.log("Keine Sync ID");
-  return;
-}
+  if(!syncId || !supabaseClient){
+    updateBadge("local");
+    return;
+  }
+
   updateBadge("syncing");
+
   try{
-    await supabaseClient.from("progress").upsert([{
-      id: syncId,
-      data: {
-        all_data: APP.dataByProfile,
-        all_progress: APP.progressByProfile
-      },
-      updated_at: new Date().toISOString()
-    }]);
+    const { data: existingRows, error: loadError } = await supabaseClient
+      .from("progress")
+      .select("data, updated_at")
+      .eq("id", syncId)
+      .order("updated_at", { ascending: false })
+      .limit(1);
+
+    if(loadError) throw loadError;
+
+    const existing = existingRows && existingRows.length > 0 ? existingRows[0] : null;
+    const cloudData = existing?.data || {};
+    const profiles = cloudData.profiles || {};
+
+    profiles[profile] = {
+      data: APP.dataByProfile[profile] || [],
+      progress: APP.progressByProfile[profile] || JSON.parse(JSON.stringify(DEFAULT_PROGRESS))
+    };
+
+    const payload = {
+      profiles
+    };
+
+    const nowIso = new Date().toISOString();
+
+    const { error: saveError } = await supabaseClient
+      .from("progress")
+      .upsert([{
+        id: syncId,
+        data: payload,
+        updated_at: nowIso
+      }]);
+
+    if(saveError) throw saveError;
+
+    lastCloudUpdatedAt = nowIso;
     updateBadge("ok");
   }catch(e){
     updateBadge("err");
+    console.error("saveToCloud error:", e);
   }
 }
 
