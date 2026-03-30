@@ -308,20 +308,31 @@ async function loadFromCloud(){
   }
 
   try{
-   const { data } = await supabaseClient
-  .from("progress")
-  .select("data, updated_at")
-  .eq("id", syncId)
-  .order("updated_at", { ascending: false })
-  .limit(1);
+    const { data: rows, error } = await supabaseClient
+      .from("progress")
+      .select("data, updated_at")
+      .eq("id", syncId)
+      .order("updated_at", { ascending: false })
+      .limit(1);
 
-    
-    if(data && data.length > 0 && data[0].data){
-      if(data[0].data.all_data) APP.dataByProfile = data[0].data.all_data;
-      if(data[0].data.all_progress) APP.progressByProfile = data[0].data.all_progress;
+    if(error) throw error;
+
+    if(rows && rows.length > 0 && rows[0].data){
+      const cloudRow = rows[0];
+      const cloudProfiles = cloudRow.data?.profiles || {};
+
+      APP.profiles.forEach(p=>{
+        const cp = cloudProfiles[p.id];
+        if(cp){
+          APP.dataByProfile[p.id] = cp.data || [];
+          APP.progressByProfile[p.id] = cp.progress || JSON.parse(JSON.stringify(DEFAULT_PROGRESS));
+        }
+      });
+
       saveDataByProfile();
       saveAllProgress();
-      saveDataByProfile();
+
+      lastCloudUpdatedAt = cloudRow.updated_at || null;
       progress = loadProgress(profile);
       renderAll();
       updateBadge("ok");
@@ -330,6 +341,7 @@ async function loadFromCloud(){
     }
   }catch(e){
     updateBadge("err");
+    console.error("loadFromCloud error:", e);
   }
 }
 let cloudWatcherStarted = false;
