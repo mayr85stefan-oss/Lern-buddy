@@ -397,12 +397,12 @@ function startCloudWatcher(){
 
   document.addEventListener("visibilitychange", async ()=>{
     if(document.visibilityState === "visible"){
-      await safeCloudCheck();
+      await loadFromCloud();
     }
   });
 
   window.addEventListener("online", async ()=>{
-    await safeCloudCheck();
+    await loadFromCloud();
   });
 
   window.addEventListener("offline", ()=>{
