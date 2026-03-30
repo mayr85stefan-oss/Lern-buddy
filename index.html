@@ -1645,16 +1645,8 @@ $("loadCloudBtn").onclick = async ()=>{
 document.addEventListener("DOMContentLoaded", async ()=>{
   $("geminiKey").value = localStorage.getItem("ml_v129_gemini_key") || "";
   $("syncIdInput").value = syncId || "";
-
-  if(syncId){
-    await loadFromCloud();
-  } else {
-    updateBadge("local");
-  }
-
+  updateBadge(syncId ? "ok" : "local");
   renderAll();
-
-  startCloudWatcher();
 });
 </script>
 </body>
