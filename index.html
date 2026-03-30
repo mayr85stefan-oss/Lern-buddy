@@ -133,6 +133,7 @@ hr.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
       <div class="row" style="margin-top:8px">
   <button class="primary" id="saveCloudBtn" style="flex:1">Cloud speichern</button>
   <button id="loadCloudBtn" style="flex:1">Cloud laden</button>
+      <div id="cloudErrorText" class="helper" style="margin-top:8px;color:#b91c1c"></div>    
       </div>
 
       <hr class="sep">
@@ -256,6 +257,8 @@ async function saveToCloud(){
     return;
   }
 
+$("cloudErrorText").textContent = "";
+  
   updateBadge("syncing");
 
   try{
@@ -296,8 +299,9 @@ async function saveToCloud(){
     lastCloudUpdatedAt = nowIso;
     updateBadge("ok");
   }catch(e){
-    updateBadge("err");
-    console.error("saveToCloud error:", e);
+  updateBadge("err");
+  console.error("saveToCloud error:", e);
+  $("cloudErrorText").textContent = "Cloud-Fehler: " + (e && e.message ? e.message : String(e));
   }
 }
 
