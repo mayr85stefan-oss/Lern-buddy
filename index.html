@@ -352,26 +352,41 @@ function startCloudWatcher(){
   cloudWatcherStarted = true;
 
   async function safeCloudCheck(){
-    if(!syncId || !supabaseClient){
-      updateBadge("local");
+  if(!syncId || !supabaseClient){
+    updateBadge("local");
+    return;
+  }
+
+  try{
+    const { data: rows, error } = await supabaseClient
+      .from("progress")
+      .select("updated_at")
+      .eq("id", syncId)
+      .order("updated_at", { ascending: false })
+      .limit(1);
+
+    if(error){
+      updateBadge("err");
       return;
     }
 
-    try{
-      const { error } = await supabaseClient
-        .from("progress")
-        .select("id")
-        .eq("id", syncId)
-        .limit(1);
+    if(rows && rows.length > 0){
+      const cloudUpdatedAt = rows[0].updated_at || null;
 
-      if(error){
-        updateBadge("err");
-      } else {
-        updateBadge("ok");
+      if(cloudUpdatedAt && cloudUpdatedAt !== lastCloudUpdatedAt){
+        lastCloudUpdatedAt = cloudUpdatedAt;   // WICHTIG!
+        await loadFromCloud();
+        return;
       }
-    }catch(e){
-      updateBadge("err");
+
+      updateBadge("ok");
+    } else {
+      updateBadge("local");
     }
+  }catch(e){
+    updateBadge("err");
+    console.error("safeCloudCheck error:", e);
+  }
   }
 
   safeCloudCheck();
