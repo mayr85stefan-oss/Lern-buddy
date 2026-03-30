@@ -342,7 +342,7 @@ async function loadFromCloud(){
   }catch(e){
   updateBadge("err");
   console.error("saveToCloud error:", e);
-  alert("Cloud-Fehler: " + (e?.message || JSON.stringify(e)));
+  alert("Cloud-Fehler: " + (e && e.message ? e.message : String(e)));
   }
 }
 let cloudWatcherStarted = false;
