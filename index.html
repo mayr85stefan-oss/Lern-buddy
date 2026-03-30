@@ -340,8 +340,9 @@ async function loadFromCloud(){
       updateBadge("local");
     }
   }catch(e){
-    updateBadge("err");
-    console.error("loadFromCloud error:", e);
+  updateBadge("err");
+  console.error("saveToCloud error:", e);
+  alert("Cloud-Fehler: " + (e?.message || JSON.stringify(e)));
   }
 }
 let cloudWatcherStarted = false;
