@@ -391,15 +391,45 @@ function currentDataList(){
   return Array.isArray(raw) ? raw : [raw];
 }
 
+function shuffleArray(arr){
+  const a = [...arr];
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+  
 function normalizeImportedData(data){
   if(!data || !Array.isArray(data.unterthemen)) throw new Error("Ungültiges JSON-Schema.");
+
   data.unterthemen.forEach(u=>{
     u.fragen = Array.isArray(u.fragen) ? u.fragen : [];
+
     u.fragen.forEach(q=>{
       q.signalwoerter = Array.isArray(q.signalwoerter) ? q.signalwoerter : [];
       q.kernpunkte = Array.isArray(q.kernpunkte) && q.kernpunkte.length ? q.kernpunkte : q.signalwoerter.slice(0,3);
+
       if(Array.isArray(q.quiz_optionen) && q.quiz_optionen.length){
-        q.quiz_optionen = q.quiz_optionen.map(x => ({ text: String(x.text || ""), correct: !!x.correct }));
+        // Neuer Stil: quiz_optionen als Strings + antwort als String oder Array
+        if(typeof q.quiz_optionen[0] === "string"){
+          const richtigeAntworten = Array.isArray(q.antwort) ? q.antwort : [q.antwort];
+
+          q.quiz_optionen = q.quiz_optionen.map(opt => ({
+            text: String(opt),
+            correct: richtigeAntworten.includes(opt)
+          }));
+
+          q.quiz_optionen = shuffleArray(q.quiz_optionen);
+        } else {
+          // Alter Stil: quiz_optionen als Objekte
+          q.quiz_optionen = q.quiz_optionen.map(x => ({
+            text: String(x.text || ""),
+            correct: !!x.correct
+          }));
+
+          q.quiz_optionen = shuffleArray(q.quiz_optionen);
+        }
       } else {
         const kp = (q.kernpunkte || []).slice(0,3);
         q.quiz_optionen = [
@@ -407,9 +437,12 @@ function normalizeImportedData(data){
           {text:"Die Aussage gilt unabhängig von Marktform und Rahmenbedingungen immer absolut.", correct:false},
           {text:"Für die Bewertung reichen Überschrift und ein Beispiel ohne Kernbegriff aus.", correct:false}
         ].slice(0,5);
+
+        q.quiz_optionen = shuffleArray(q.quiz_optionen);
       }
     });
   });
+
   return data;
 }
 
@@ -438,7 +471,7 @@ function allItems(){
           topic: u.name || "Ohne Unterthema",
           operator: q.typ || "",
           question: q.frage || "",
-          explanation: q.antwort || "",
+          explanation: Array.isArray(q.antwort) ? q.antwort.join(" | ") : (q.antwort || ""),
           merksatz: q.merksatz || "",
           mustHave: q.kernpunkte || q.signalwoerter || [],
           hint: q.falle || "",
