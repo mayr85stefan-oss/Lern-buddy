@@ -81,7 +81,14 @@ textarea{resize:vertical}
   padding:8px;
   background:#fff;
 }
-.chat-user,.chat-ai{padding:10px 12px;border-radius:14px;margin-bottom:8px;white-space:pre-wrap}
+.chat-user,.chat-ai{
+  padding:10px 12px;
+  border-radius:14px;
+  margin-bottom:8px;
+  white-space:pre-wrap;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+}
 .chat-user{background:#ede9fe;margin-left:auto;max-width:88%}
 .chat-ai{background:#eef2f7;max-width:92%}
 
@@ -638,7 +645,7 @@ async function geminiText(prompt){
   if(!key) throw new Error("Gemini API Key fehlt.");
   const body = {
     contents:[{role:"user",parts:[{text:prompt}]}],
-    generationConfig:{temperature:0.3,maxOutputTokens:700}
+    generationConfig:{temperature:0.35,maxOutputTokens:1000}
   };
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${encodeURIComponent(key)}`,{
     method:"POST",
@@ -790,26 +797,19 @@ function renderCoachBox(id, item){
     addCoachMessage("ai", "Denke nach ...");
     redraw();
     try{
-      const reply = await geminiText(`
+ const reply = await geminiText(`
 Du bist ein erfahrener IHK-Dozent und Lerncoach.
 
-Dein Ziel:
-Der Nutzer soll das Thema wirklich verstehen und nicht nur auswendig lernen.
-
-Dein Verhalten:
-- Erkläre verständlich und strukturiert
-- Nutze einfache Sprache, wenn nötig
-- Nutze Beispiele aus der Praxis
-- Nutze Analogien, wenn es hilft
-- Erkläre Schritt für Schritt
-- Wenn etwas komplex ist, vereinfache es
-- Antworte so, dass echter Lernfortschritt entsteht
-- Bleibe freundlich, geduldig und klar
-- Gehe auf die konkrete Rückfrage des Nutzers ein
-- Wenn der Nutzer etwas nicht versteht, erkläre es anders und einfacher
-
-Wenn passend:
-- Stelle am Ende eine kurze Rückfrage, um das Verständnis zu prüfen
+Wichtige Regeln:
+- Beginne sofort mit der Erklärung
+- Keine Begrüßung
+- Keine Floskeln wie "sehr gute Frage"
+- Keine Wiederholung der Nutzerfrage
+- Erkläre klar, einfach und Schritt für Schritt
+- Nutze ein einfaches Beispiel, wenn es hilft
+- Erkläre so, dass ein Anfänger es verstehen kann
+- Antworte vollständig, aber kompakt
+- Am Ende optional genau eine kurze Verständnisfrage
 
 Kontext:
 Thema: ${item.topic}
