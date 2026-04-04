@@ -448,14 +448,36 @@ function normalizeImportedData(data){
 
 function buildQuizOptions(q){
   if(Array.isArray(q.quiz_optionen) && q.quiz_optionen.length){
-    return q.quiz_optionen.map(x=>({text:x.text, correct:!!x.correct}));
+    // Falls quiz_optionen noch Strings sind
+    if(typeof q.quiz_optionen[0] === "string"){
+      const richtigeAntworten = Array.isArray(q.antwort) ? q.antwort : [q.antwort];
+      return shuffleArray(
+        q.quiz_optionen.map(opt => ({
+          text: String(opt),
+          correct: richtigeAntworten.includes(opt)
+        }))
+      );
+    }
+
+    // Falls quiz_optionen schon Objekte sind
+    return shuffleArray(
+      q.quiz_optionen.map(x => ({
+        text: String(x.text || ""),
+        correct: !!x.correct
+      }))
+    );
   }
-  const correct = (q.kernpunkte && q.kernpunkte.length ? q.kernpunkte : q.signalwoerter || []).slice(0,3).map(x=>({text:x, correct:true}));
-  return [
+
+  const correct = (q.kernpunkte && q.kernpunkte.length ? q.kernpunkte : q.signalwoerter || [])
+    .slice(0,3)
+    .map(x => ({ text: x, correct: true }));
+
+  return shuffleArray([
     ...correct,
     {text:"Die Aussage gilt unabhängig von Marktform und Rahmenbedingungen immer absolut.", correct:false},
     {text:"Für die Bewertung reichen Überschrift und Beispiel ohne Kernbegriff aus.", correct:false}
-  ].slice(0,5);
+  ].slice(0,5));
+}
 }
 
 function allItems(){
@@ -518,6 +540,15 @@ function arraysEqual(a,b){
   return sa.every((v,i)=>v===sb[i]);
 }
 
+ function normalizeStoredProfiles(){
+  Object.keys(APP.dataByProfile || {}).forEach(profileId => {
+    const raw = APP.dataByProfile[profileId];
+    const list = Array.isArray(raw) ? raw : (raw ? [raw] : []);
+    APP.dataByProfile[profileId] = list.map(item => normalizeImportedData(item));
+  });
+  saveDataByProfile();
+ } 
+  
 /* =========================
    HEADER / PROFILE / FILTER
 ========================= */
@@ -1622,6 +1653,7 @@ $("loadCloudBtn").onclick = async ()=>{
 document.addEventListener("DOMContentLoaded", async ()=>{
   $("geminiKey").value = localStorage.getItem("ml_v129_gemini_key") || "";
   $("syncIdInput").value = syncId || "";
+  normalizeStoredProfiles();
   updateBadge(syncId ? "ok" : "local");
   renderAll();
 });
