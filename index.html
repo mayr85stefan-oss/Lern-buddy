@@ -552,6 +552,15 @@ function arraysEqual(a,b){
   return sa.every((v,i)=>v===sb[i]);
 }
 
+function miniOperatorRule(op){
+  const o = String(op || "").toLowerCase();
+
+  if(o === "beschreibe" || o === "beschreiben") return "Mini-Regel: beschreiben = sachlich darstellen, Merkmale nennen.";
+  if(o === "erklaere" || o === "erklaeren") return "Mini-Regel: erklären = Zusammenhang + warum/wie.";
+  if(o === "erlaeutere" || o === "erlaeutern") return "Mini-Regel: erläutern = erklären + Beispiel.";
+  return "";
+}
+  
  function normalizeStoredProfiles(){
   Object.keys(APP.dataByProfile || {}).forEach(profileId => {
     const raw = APP.dataByProfile[profileId];
@@ -985,6 +994,7 @@ function renderCards(){
     <div class="focusQuestion pinBox">
       <div class="row"><span class="badge">${esc(item.area)}</span><span class="badge">${esc(item.topic)}</span></div>
       <h2 style="margin-top:10px">${esc(flashRevealed ? item.explanation : item.question)}</h2>
+      ${!flashRevealed && miniOperatorRule(item.operator) ? `<div class="soft" style="margin-top:10px;background:#fff7ed"><strong>${esc(miniOperatorRule(item.operator))}</strong></div>` : ""}
       ${flashRevealed ? `<div class="merksatz" style="margin-top:12px">Merksatz: ${esc(item.merksatz)}</div>` : ''}
     </div>
 
@@ -1065,7 +1075,8 @@ function renderOpen(){
         ${item.operator ? `<span class="badge">${esc(item.operator)}</span>` : ""}
       </div>
       <h2>${esc(item.question)}</h2>
-      <div class="muted">Kurz antworten. Danach direkt bewerten und zur nächsten Frage weitergehen.</div>
+       <div class="muted">Kurz antworten. Danach direkt bewerten und zur nächsten Frage weitergehen.</div>
+${miniOperatorRule(item.operator) ? `<div class="soft" style="margin-top:10px;background:#fff7ed"><strong>${esc(miniOperatorRule(item.operator))}</strong></div>` : ""}
     </div>
 
     <div class="soft" style="margin-top:12px">
